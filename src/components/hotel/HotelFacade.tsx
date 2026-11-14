@@ -21,8 +21,8 @@ export const HotelDecor = memo(function HotelDecor({ m }: { m: Model }) {
           <stop offset="1" stopColor="#192620" />
         </linearGradient>
         <linearGradient id="hg-warm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff0b8" />
-          <stop offset="0.55" stopColor="#f6d77c" />
+          <stop offset="0" stopColor="#fbe7b5" />
+          <stop offset="0.55" stopColor="#efc77a" />
           <stop offset="1" stopColor="#d9a64a" />
         </linearGradient>
         <radialGradient id="hg-room" cx="0.5" cy="0.7" r="0.8">
@@ -31,9 +31,9 @@ export const HotelDecor = memo(function HotelDecor({ m }: { m: Model }) {
           <stop offset="1" stopColor="#c98f3e" />
         </radialGradient>
         <radialGradient id="hg-halo" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#fee274" stopOpacity="0.5" />
-          <stop offset="0.6" stopColor="#fee274" stopOpacity="0.1" />
-          <stop offset="1" stopColor="#fee274" stopOpacity="0" />
+          <stop offset="0" stopColor="#e3c27a" stopOpacity="0.5" />
+          <stop offset="0.6" stopColor="#e3c27a" stopOpacity="0.1" />
+          <stop offset="1" stopColor="#e3c27a" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="hg-stone" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#efe7d8" />
@@ -50,12 +50,12 @@ export const HotelDecor = memo(function HotelDecor({ m }: { m: Model }) {
         </linearGradient>
         <radialGradient id="hg-lamp" cx="0.5" cy="0.5" r="0.5">
           <stop offset="0" stopColor="#fff1c4" stopOpacity="0.95" />
-          <stop offset="0.3" stopColor="#f6d77c" stopOpacity="0.32" />
-          <stop offset="1" stopColor="#f6d77c" stopOpacity="0" />
+          <stop offset="0.3" stopColor="#efc77a" stopOpacity="0.32" />
+          <stop offset="1" stopColor="#efc77a" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="hg-reflect" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f6d77c" stopOpacity="0.32" />
-          <stop offset="1" stopColor="#f6d77c" stopOpacity="0" />
+          <stop offset="0" stopColor="#efc77a" stopOpacity="0.32" />
+          <stop offset="1" stopColor="#efc77a" stopOpacity="0" />
         </linearGradient>
         <pattern id="hg-flutes" width="7" height="10" patternUnits="userSpaceOnUse">
           <rect width="7" height="10" fill="#ebe3d3" />

@@ -126,7 +126,7 @@
 }
 .sw__focus {
   fill: none;
-  stroke: #fee274;
+  stroke: #e3c27a;
   stroke-width: 2.5;
   opacity: 0;
 }
@@ -157,7 +157,7 @@
 }
 .sw--available .sw__num,
 .sw--in_progress .sw__num {
-  fill: #fee274;
+  fill: #e3c27a;
 }
 .sw--in_progress .sw__room {
   opacity: 0.86;
@@ -184,7 +184,7 @@
   opacity: 0.32;
 }
 .sw--completed .sw__plaque {
-  fill: #fee274;
+  fill: #e3c27a;
 }
 .sw--completed .sw__num {
   fill: #1e4d3b;
@@ -282,7 +282,7 @@
   width: min(300px, 24vw);
   padding: 20px 22px 22px;
   background: rgba(10, 24, 18, 0.82);
-  border: 1px solid rgba(254, 226, 116, 0.16);
+  border: 1px solid rgba(227, 194, 122, 0.16);
   border-radius: 4px;
   animation: introIn 0.9s var(--ease) both 0.3s;
 }
@@ -321,7 +321,7 @@
 }
 .hx-ticks li {
   height: 9px;
-  border: 1px solid rgba(254, 226, 116, 0.35);
+  border: 1px solid rgba(227, 194, 122, 0.35);
 }
 .hx-ticks li.is-available {
   border-color: var(--highlight);
@@ -348,7 +348,7 @@
 }
 .hx-cta:hover,
 .hx-card__enter:hover {
-  background: #ffeb98;
+  background: #ecd193;
 }
 .hx-cta:active,
 .hx-card__enter:active {
@@ -363,7 +363,7 @@
   z-index: 5;
   min-height: 40px;
   padding: 0 16px;
-  border: 1px solid rgba(254, 226, 116, 0.5);
+  border: 1px solid rgba(227, 194, 122, 0.5);
   border-radius: 999px;
   background: rgba(10, 24, 18, 0.9);
   color: #fff;
@@ -392,7 +392,7 @@
     height: var(--card-h);
     padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
     background: #0d1f18;
-    border-top: 1px solid rgba(254, 226, 116, 0.22);
+    border-top: 1px solid rgba(227, 194, 122, 0.22);
   }
   .hx-card__inner {
     display: grid;
@@ -459,7 +459,7 @@
   gap: 8px;
   min-height: 40px;
   padding: 0 12px 0 5px;
-  border: 1px solid rgba(254, 226, 116, 0.35);
+  border: 1px solid rgba(227, 194, 122, 0.35);
   border-radius: 999px;
   background: transparent;
   color: inherit;
@@ -523,7 +523,7 @@
 }
 .dial2__track {
   fill: none;
-  stroke: rgba(254, 226, 116, 0.14);
+  stroke: rgba(227, 194, 122, 0.14);
   stroke-width: 5;
 }
 .dial2__fill {
@@ -563,7 +563,7 @@
   z-index: 50;
   width: min(340px, calc(100vw - 24px));
   padding: 16px 18px 18px;
-  border: 1px solid rgba(254, 226, 116, 0.25);
+  border: 1px solid rgba(227, 194, 122, 0.25);
   border-radius: 12px;
   background: #0d1f18;
   color: #fff;
@@ -640,7 +640,7 @@
 .chrono__bar {
   height: 3px;
   margin-top: 6px;
-  background: rgba(254, 226, 116, 0.15);
+  background: rgba(227, 194, 122, 0.15);
   overflow: hidden;
 }
 .chrono__bar span {
@@ -709,7 +709,7 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 1px solid rgba(254, 226, 116, 0.35);
+  border: 1px solid rgba(227, 194, 122, 0.35);
   border-radius: 999px;
   background: transparent;
   color: inherit;
@@ -728,7 +728,7 @@
 
 /* veil tones */
 .veil--warm {
-  background: radial-gradient(circle at 50% 55%, #fff4c9 0%, #f6d77c 45%, #c98f3e 100%);
+  background: radial-gradient(circle at 50% 55%, #fff4c9 0%, #efc77a 45%, #c98f3e 100%);
 }
 .veil--warm.is-start,
 .veil--night.is-start,
@@ -806,4 +806,197 @@
   .lang-switch__opt {
     min-width: 30px;
   }
+}
+
+/* =====================================================================
+   Focus music
+   ===================================================================== */
+.music {
+  position: relative;
+}
+.music__btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(227, 194, 122, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+}
+.site-header--paper .music__btn {
+  border-color: var(--rule-strong);
+}
+.music__btn.is-playing {
+  border-color: var(--highlight);
+}
+.music__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+.music__bars i {
+  display: block;
+  width: 2.5px;
+  height: 40%;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.8;
+}
+.music__bars i:nth-child(2) {
+  height: 75%;
+}
+.music__bars i:nth-child(3) {
+  height: 55%;
+}
+.music__bars i:nth-child(4) {
+  height: 30%;
+}
+.music__btn.is-playing .music__bars i {
+  background: var(--highlight);
+  animation: eq 2.8s ease-in-out infinite;
+}
+.music__btn.is-playing .music__bars i:nth-child(2) {
+  animation-delay: -0.7s;
+}
+.music__btn.is-playing .music__bars i:nth-child(3) {
+  animation-delay: -1.4s;
+}
+.music__btn.is-playing .music__bars i:nth-child(4) {
+  animation-delay: -2.1s;
+}
+.music__pop {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 50;
+  width: min(320px, calc(100vw - 24px));
+  padding: 16px 18px 18px;
+  border: 1px solid rgba(227, 194, 122, 0.25);
+  border-radius: 12px;
+  background: #0d1f18;
+  color: #fff;
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+  animation: fadeUp 0.22s var(--ease) both;
+}
+@media (max-width: 560px) {
+  .music__pop {
+    position: fixed;
+    top: calc(var(--header-h) + 6px);
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+}
+.music__play {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 18px 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--highlight);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.music__play-icon {
+  width: 0;
+  height: 0;
+  border-left: 10px solid currentColor;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+.music__play-icon.is-pause {
+  width: 10px;
+  height: 12px;
+  border: 0;
+  border-left: 3.5px solid currentColor;
+  border-right: 3.5px solid currentColor;
+}
+.music__moods {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+}
+.music__mood {
+  display: grid;
+  gap: 1px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+}
+.music__mood.is-on {
+  border-color: var(--highlight);
+  background: rgba(227, 194, 122, 0.08);
+}
+.music__mood-name {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+}
+.music__mood-desc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+.music__vol {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+.music__vol input {
+  flex: 1;
+  accent-color: var(--highlight);
+}
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1.1);
+  }
+}
+.music__bars i {
+  transform-origin: bottom;
+}
+@media (max-width: 380px) {
+  .sound-toggle,
+  .music__btn {
+    width: 34px;
+    height: 34px;
+  }
+  .site-header .chrono__chip {
+    min-height: 34px;
+    padding: 0 2px;
+  }
+  .site-nav__progress {
+    min-height: 34px;
+    padding: 0 8px;
+  }
+  .site-header__inner {
+    padding: 0 10px;
+  }
+}
+
+/* lobby doors: the annex lounge */
+.hx-door__glow {
+  fill: #fff3c4;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  pointer-events: none;
+}
+.hx-door:hover .hx-door__glow,
+.hx-door:focus-visible .hx-door__glow {
+  opacity: 0.35;
+}
+.hx-door:focus-visible .sw__focus {
+  opacity: 1;
 }

@@ -4,6 +4,7 @@ import Header from '../../../components/Header';
 import ChapterReader from '../../../components/ChapterReader';
 import ChapterRoom from '../../../components/room/ChapterRoom';
 import { GAMES } from '../../../game/chapters';
+import HALL from '../../../game/chapters/hall';
 import ProgressView from '../../../components/ProgressView';
 import { getChapter, getChapterMetas } from '../../../lib/content';
 import { LANGS, dict, hrefFor, parseSlug, routes, type Lang } from '../../../lib/i18n';
@@ -15,6 +16,7 @@ export function generateStaticParams() {
   for (const lang of LANGS) {
     const pathOf = (href: string) => href.split('/').filter(Boolean)[1];
     out.push({ lang, slug: pathOf(routes.progress(lang)) });
+    out.push({ lang, slug: pathOf(routes.hall(lang)) });
     for (const m of getChapterMetas(lang)) out.push({ lang, slug: pathOf(routes.chapter(lang, m.id)) });
   }
   return out;
@@ -27,6 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   if (!r || r.kind === 'hotel') return {};
   const languages = Object.fromEntries(LANGS.map((l) => [l, hrefFor(l, r)]));
   if (r.kind === 'progress') return { title: dict[lang].progressTitle, alternates: { languages } };
+  if (r.kind === 'hall') return { title: HALL.room.name[lang], alternates: { languages } };
   const m = getChapterMetas(lang).find((c) => c.id === r.id);
   return {
     title: m ? `${dict[lang].chapter} ${m.id} · ${m.title}` : undefined,
@@ -60,6 +63,18 @@ export default async function SlugPage({ params }: { params: Promise<{ lang: str
               reward: GAMES[m.id]?.challenge.reward.name ?? null,
             }))}
           />
+        </main>
+      </div>
+    );
+  }
+
+  if (r.kind === 'hall') {
+    if (slug !== routes.hall(lang).split('/')[2]) notFound();
+    return (
+      <div className="page page--room">
+        <Header lang={lang} ids={ids} tone="night" />
+        <main id="main">
+          <ChapterRoom lang={lang} game={HALL} title={HALL.room.name[lang]} block="" ids={['00']} annex />
         </main>
       </div>
     );

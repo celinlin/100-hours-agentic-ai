@@ -11,16 +11,19 @@ export const routes = {
   hotel: (lang: Lang) => `/${lang}/`,
   chapter: (lang: Lang, id: string) => `/${lang}/${lang === 'fr' ? 'etape' : 'step'}-${id}/`,
   progress: (lang: Lang) => `/${lang}/${lang === 'fr' ? 'progression' : 'progress'}/`,
+  hall: (lang: Lang) => `/${lang}/${lang === 'fr' ? 'hall' : 'lobby'}/`,
 };
 
 export type Route =
   | { kind: 'hotel' }
   | { kind: 'progress' }
+  | { kind: 'hall' }
   | { kind: 'chapter'; id: string };
 
 /** Parse a `[slug]` segment, in either language. */
 export function parseSlug(slug: string): Route | null {
   if (slug === 'progression' || slug === 'progress') return { kind: 'progress' };
+  if (slug === 'hall' || slug === 'lobby') return { kind: 'hall' };
   const m = /^(?:etape|step)-(\d{2})$/.exec(slug);
   if (m) return { kind: 'chapter', id: m[1] };
   return null;
@@ -29,6 +32,7 @@ export function parseSlug(slug: string): Route | null {
 export function hrefFor(lang: Lang, r: Route): string {
   if (r.kind === 'hotel') return routes.hotel(lang);
   if (r.kind === 'progress') return routes.progress(lang);
+  if (r.kind === 'hall') return routes.hall(lang);
   return routes.chapter(lang, r.id);
 }
 

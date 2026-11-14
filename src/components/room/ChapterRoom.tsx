@@ -98,12 +98,14 @@ export default function ChapterRoom({
   title,
   block,
   ids,
+  annex = false,
 }: {
   lang: Lang;
   game: ChapterGame;
   title: string;
   block: string;
   ids: string[];
+  annex?: boolean;
 }) {
   const t = L[lang];
   const g = useGame();
@@ -193,14 +195,14 @@ export default function ChapterRoom({
   });
 
   const toHotel = () => {
-    travel.setFrom(game.id);
+    if (!annex) travel.setFrom(game.id);
     coverAndGo(routes.hotel(lang), 'night');
   };
 
   const win = () => {
     passChallenge(game.id);
     sfx('unlock');
-    if (nextId) travel.setUnlocked(nextId);
+    if (nextId && !annex) travel.setUnlocked(nextId);
     setCeremony(true);
   };
 
@@ -241,7 +243,7 @@ export default function ChapterRoom({
         </button>
         <div className="room-bar__title">
           <p className="room-bar__kicker">
-            {t.step} {game.id} · {game.room.name[lang]}
+            {annex ? (lang === 'fr' ? 'Rez-de-chaussée · accès libre' : 'Ground floor · open access') : `${t.step} ${game.id} · ${game.room.name[lang]}`}
           </p>
           <h1 className="room-bar__h1">{title}</h1>
         </div>
@@ -258,9 +260,11 @@ export default function ChapterRoom({
           <button type="button" className="room-btn" onClick={() => (sfx('open'), setPanel({ type: 'library' }), focus(null))}>
             {t.library}
           </button>
-          <Link className="room-btn room-btn--ghost" href={`${routes.chapter(lang, game.id)}programme/`}>
-            {t.deeper}
-          </Link>
+          {!annex && (
+            <Link className="room-btn room-btn--ghost" href={`${routes.chapter(lang, game.id)}programme/`}>
+              {t.deeper}
+            </Link>
+          )}
         </div>
       </div>
 
@@ -374,7 +378,7 @@ export default function ChapterRoom({
             </svg>
             <p className="ceremony__kicker">{t.earned}</p>
             <h2 className="ceremony__title">{game.challenge.reward.name[lang]}</h2>
-            <p className="ceremony__body">{nextId ? t.unlockedNext(nextId) : t.lastFloor}</p>
+            <p className="ceremony__body">{annex ? (lang === 'fr' ? 'Il rejoint ta collection. Les fenêtres de l’hôtel t’attendent.' : 'It joins your collection. The hotel windows await you.') : nextId ? t.unlockedNext(nextId) : t.lastFloor}</p>
             <div className="ceremony__actions">
               <button type="button" className="hx-cta" onClick={toHotel} autoFocus>
                 {t.toHotel}

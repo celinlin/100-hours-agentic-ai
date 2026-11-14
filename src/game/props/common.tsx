@@ -13,7 +13,7 @@ export const INK = {
   greenDeep: '#0f2a20',
   cream: '#efe7d8',
   paper: '#f7f2e6',
-  light: '#fee274',
+  light: '#e3c27a',
   glow: '#fff3c4',
   shadow: 'rgba(0,0,0,0.22)',
   wood: '#6b4a2f',

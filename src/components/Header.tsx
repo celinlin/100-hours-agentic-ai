@@ -7,6 +7,7 @@ import { useProgress, useHydrated, completedCount, saveScroll, nav } from '../li
 import { leaveToHotel, isPlainClick } from '../lib/transition';
 import Chronometer from './Chronometer';
 import SoundToggle from './SoundToggle';
+import MusicPlayer from './MusicPlayer';
 import { useGame, isUnlocked, travel } from '../game/state';
 
 export function Monogram({ className }: { className?: string }) {
@@ -99,6 +100,7 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
             </span>
           </Link>
           <Chronometer lang={lang} tone={tone} />
+          <MusicPlayer lang={lang} />
           <SoundToggle lang={lang} />
           <div className="lang-switch" role="group" aria-label={t.language}>
             {LANGS.map((l) => (

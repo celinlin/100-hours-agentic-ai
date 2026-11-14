@@ -357,7 +357,24 @@ const ch04: ChapterGame = {
     ],
     reward: { name: { fr: 'Le jeton du standard', en: 'The switchboard token' }, prop: 'c04_token' },
   },
-  videos: [],
+  videos: [
+    {
+      id: 'lsMQRaeKNDk',
+      title: 'What is a REST API?',
+      channel: 'IBM Technology',
+      lang: 'en',
+      note: { fr: 'Requêtes, méthodes et réponses d’une API web, en quelques minutes.', en: 'Requests, methods and responses of a web API, in a few minutes.' },
+      programme: false,
+    },
+    {
+      id: '41NOoEz3Tzc',
+      title: 'Webhooks for Beginners - Full Course',
+      channel: 'freeCodeCamp.org',
+      lang: 'en',
+      note: { fr: 'Un cours complet pour aller plus loin sur les webhooks : réception, vérification, tests.', en: 'A full course to go further on webhooks: receiving, verifying, testing.' },
+      programme: false,
+    },
+  ],
   resources: [
     { title: 'Overview of HTTP', url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview', kind: 'doc', source: 'MDN', lang: 'en', note: { fr: 'Lis jusqu’à « HTTP Messages » : ce que contiennent une requête et une réponse.', en: 'Read up to “HTTP Messages”: what a request and a response contain.' }, programme: true },
     { title: 'Python quickstart', url: 'https://developers.google.com/workspace/calendar/api/quickstart/python', kind: 'doc', source: 'Google Calendar API', lang: 'en', note: { fr: 'Suis-le jusqu’au bout avec un agenda de test : il crée `credentials.json` puis `token.json`.', en: 'Follow it to the end with a test calendar: it creates `credentials.json` then `token.json`.' }, programme: true },

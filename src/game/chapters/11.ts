@@ -276,7 +276,16 @@ def tracer(cas: str, tour: int, evenement: str, nom: str):
     ],
     reward: { name: { fr: 'Le chronomètre de bord', en: 'The ship’s chronometer' }, prop: 'c11_chrono' },
   },
-  videos: [],
+  videos: [
+    {
+      id: 'CAQ_a2-9UOI',
+      title: 'Observability vs. APM vs. Monitoring',
+      channel: 'IBM Technology',
+      lang: 'en',
+      note: { fr: 'Ce que l’observabilité ajoute à la simple surveillance : comprendre pourquoi, pas seulement quoi.', en: 'What observability adds to plain monitoring: understanding why, not only what.' },
+      programme: false,
+    },
+  ],
   resources: [
     { title: 'Observability primer', url: 'https://opentelemetry.io/docs/concepts/observability-primer/', kind: 'doc', source: 'OpenTelemetry', lang: 'en', note: { fr: 'Les signaux, puis les traces : ce que sont un log, une trace et une métrique.', en: 'The signals, then traces: what a log, a trace and a metric are.' }, programme: true },
     { title: 'Pricing', url: 'https://platform.claude.com/docs/en/about-claude/pricing', kind: 'doc', source: 'Claude Docs', lang: 'en', note: { fr: 'Le prix par million de tokens, entrée et sortie, pour passer des tokens aux euros.', en: 'The price per million tokens, input and output, to go from tokens to money.' }, programme: true },

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { buildModel, roman, type Suite } from '../../game/hotel/geometry';
+import { buildModel, roman, CX, type Suite } from '../../game/hotel/geometry';
 import { useGame, windowState, nextUp, travel, type WindowState } from '../../game/state';
 import { sfx } from '../../game/sound';
 import { coverAndGo, revealPage, prefersReducedMotion } from '../../lib/transition';
@@ -33,6 +33,8 @@ const L = {
     tap: 'Touche une fenêtre pour t’en approcher.',
     hover: 'Choisis une fenêtre éclairée.',
     facade: 'Façade de l’hôtel : quatorze fenêtres, une par étape',
+    hall: 'Le salon du hall',
+    hallHint: 'Accès libre · les outils du quotidien',
   },
   en: {
     step: 'Step',
@@ -48,6 +50,8 @@ const L = {
     tap: 'Tap a window to get closer.',
     hover: 'Choose a lit window.',
     facade: 'Hotel façade: fourteen windows, one per step',
+    hall: 'The lobby lounge',
+    hallHint: 'Open access · everyday tools',
   },
 };
 
@@ -65,6 +69,7 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
   const [opening, setOpening] = useState<string | null>(null);
   const [unlocking, setUnlocking] = useState<string | null>(null);
   const [shake, setShake] = useState<string | null>(null);
+  const [hallHover, setHallHover] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const camRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -175,6 +180,24 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
     setTimeout(() => coverAndGo(href, 'warm'), 980);
   };
 
+  const enterHall = () => {
+    if (opening) return;
+    const href = routes.hall(lang);
+    if (prefersReducedMotion()) {
+      router.push(href);
+      return;
+    }
+    setOpening('hall');
+    sfx('open');
+    router.prefetch(href);
+    const lob = model.lobby;
+    const door = { x: CX - 90, y: lob.y + 50, w: 180, h: lob.h - 50 };
+    const stage = stageRef.current!;
+    const k = Math.max(stage.clientWidth / (door.w * scaleNow()), stage.clientHeight / (door.h * scaleNow())) * 1.1;
+    camera(door, k, true);
+    setTimeout(() => coverAndGo(href, 'warm'), 700);
+  };
+
   const pick = (s: Suite) => {
     if (isTouch()) {
       // contextual magnifier: first tap brings the tier close and previews the window
@@ -273,8 +296,39 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
                   );
                 })}
             </g>
+            <a
+              className="hx-suite hx-door"
+              href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}${routes.hall(lang)}`}
+              aria-label={`${t.hall}. ${t.hallHint}.`}
+              onMouseEnter={() => setHallHover(true)}
+              onMouseLeave={() => setHallHover(false)}
+              onFocus={() => setHallHover(true)}
+              onBlur={() => setHallHover(false)}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                e.preventDefault();
+                enterHall();
+              }}
+            >
+              <rect x={CX - 92} y={model.lobby.y + 56} width={184} height={model.lobby.h - 56} fill="transparent" />
+              <rect className="hx-door__glow" x={CX - 86} y={model.lobby.y + 63} width={172} height={model.lobby.h - 63} />
+              <rect className="sw__focus" x={CX - 96} y={model.lobby.y + 52} width={192} height={model.lobby.h - 50} rx={4} />
+            </a>
           </svg>
           </div>
+          {hallHover && (
+            <div
+              className="hx-label hx-label--hall"
+              aria-hidden="true"
+              style={{
+                left: `${(frameRef.current?.offsetLeft ?? 0) + (CX + 130) * scaleNow()}px`,
+                top: `${(frameRef.current?.offsetTop ?? 0) + (model.lobby.y + 60) * scaleNow()}px`,
+              }}
+            >
+              <span className="hx-label__num">{t.hallHint}</span>
+              <span className="hx-label__title">{t.hall}</span>
+            </div>
+          )}
           {/* label pinned in façade coordinates (desktop hover) */}
           {hover && shownSuite && shownCh && (
             <div

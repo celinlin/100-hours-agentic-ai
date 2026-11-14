@@ -10,7 +10,7 @@ export const hotelCodeTheme: ThemeRegistration = {
   },
   tokenColors: [
     { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#8695A5', fontStyle: 'italic' } },
-    { scope: ['keyword', 'storage', 'keyword.control', 'storage.type', 'keyword.operator.logical'], settings: { foreground: '#FEE274' } },
+    { scope: ['keyword', 'storage', 'keyword.control', 'storage.type', 'keyword.operator.logical'], settings: { foreground: '#E3C27A' } },
     { scope: ['string', 'string.quoted', 'punctuation.definition.string'], settings: { foreground: '#B9DCC4' } },
     { scope: ['constant.numeric', 'constant.language', 'support.constant'], settings: { foreground: '#DBA58C' } },
     { scope: ['entity.name.function', 'support.function', 'meta.function-call.generic'], settings: { foreground: '#F4EFE5' } },

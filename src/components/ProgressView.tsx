@@ -8,6 +8,7 @@ import { useGame, windowState, nextUp, resetGame, type WindowState } from '../ga
 import { useChrono, chrono, fmtTotal, GOAL_MS } from '../game/chrono';
 import { revealPage } from '../lib/transition';
 import Chronometer from './Chronometer';
+import { NOTION_INDEX } from '../game/notions';
 
 interface Item {
   id: string;
@@ -42,6 +43,9 @@ const L = {
     confirmTime: 'Remettre le temps total à zéro ? Cette action est définitive.',
     back: 'Retour à l’hôtel',
     time: 'Temps total',
+    notions: 'Index des notions',
+    notionsLede: 'Chaque module de formation-ia-gratuite.com, et la pièce de l’hôtel où il se pratique.',
+    hall: 'Hall',
   },
   en: {
     kicker: 'My progress',
@@ -66,6 +70,9 @@ const L = {
     confirmTime: 'Reset total time to zero? This cannot be undone.',
     back: 'Back to the hotel',
     time: 'Total time',
+    notions: 'Notions index',
+    notionsLede: 'Every module of formation-ia-gratuite.com, and the hotel room where you practise it.',
+    hall: 'Lobby',
   },
 };
 
@@ -173,6 +180,40 @@ export default function ProgressView({ lang, chapters }: { lang: Lang; chapters:
         ) : (
           <p className="register2__small">{t.none}</p>
         )}
+      </section>
+
+      <section className="register2__notions">
+        <h2 className="register2__block-title">{t.notions}</h2>
+        <p className="register2__small">{t.notionsLede}</p>
+        {NOTION_INDEX.map((grp) => (
+          <div key={grp.group.en} className="notions__group">
+            <h3>{grp.group[lang]}</h3>
+            <ul>
+              {grp.modules.map((mod) => (
+                <li key={mod.title.en}>
+                  <span className="notions__title">{mod.title[lang]}</span>
+                  <span className="notions__rooms">
+                    {mod.rooms.map((r) =>
+                      r === '00' ? (
+                        <Link key={r} href={routes.hall(lang)} className="notions__chip notions__chip--hall">
+                          {t.hall}
+                        </Link>
+                      ) : st(r) === 'locked' ? (
+                        <span key={r} className="notions__chip is-locked">
+                          {r}
+                        </span>
+                      ) : (
+                        <Link key={r} href={routes.chapter(lang, r)} className="notions__chip">
+                          {r}
+                        </Link>
+                      ),
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </section>
 
       <footer className="register2__foot">
