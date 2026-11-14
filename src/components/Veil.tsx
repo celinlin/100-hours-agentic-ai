@@ -39,7 +39,13 @@ export default function Veil() {
         router.push(cmd.href);
         return;
       }
-      if (cmd.type === 'enter') {
+      if (cmd.type === 'cover') {
+        el.className = `veil veil--${cmd.tone} is-on is-start`;
+        el.style.transform = '';
+        void el.offsetWidth;
+        el.classList.remove('is-start');
+        navTimer = setTimeout(() => router.push(cmd.href), 260);
+      } else if (cmd.type === 'enter') {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         const r = cmd.rect ?? new DOMRect(vw / 2 - 40, vh / 2 - 40, 80, 80);

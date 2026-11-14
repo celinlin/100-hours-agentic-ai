@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Header from '../../../components/Header';
 import ChapterReader from '../../../components/ChapterReader';
+import ChapterRoom from '../../../components/room/ChapterRoom';
+import { GAMES } from '../../../game/chapters';
 import ProgressView from '../../../components/ProgressView';
 import { getChapter, getChapterMetas } from '../../../lib/content';
 import { LANGS, dict, hrefFor, parseSlug, routes, type Lang } from '../../../lib/i18n';
@@ -44,10 +46,20 @@ export default async function SlugPage({ params }: { params: Promise<{ lang: str
   if (r.kind === 'progress') {
     if (slug !== routes.progress(lang).split('/')[2]) notFound();
     return (
-      <div className="page page--paper">
-        <Header lang={lang} ids={ids} tone="paper" />
+      <div className="page page--register">
+        <Header lang={lang} ids={ids} tone="night" />
         <main>
-          <ProgressView lang={lang} chapters={metas.map((m) => ({ id: m.id, title: m.title, blockNumber: m.blockNumber, blockName: m.blockName }))} />
+          <ProgressView
+            lang={lang}
+            chapters={metas.map((m) => ({
+              id: m.id,
+              title: m.title,
+              blockNumber: m.blockNumber,
+              blockName: m.blockName,
+              stations: GAMES[m.id]?.stations.length ?? 0,
+              reward: GAMES[m.id]?.challenge.reward.name ?? null,
+            }))}
+          />
         </main>
       </div>
     );
@@ -55,6 +67,18 @@ export default async function SlugPage({ params }: { params: Promise<{ lang: str
 
   const idx = ids.indexOf(r.id);
   if (idx < 0 || slug !== routes.chapter(lang, r.id).split('/')[2]) notFound();
+  const game = GAMES[r.id];
+  if (game) {
+    const meta = metas[idx];
+    return (
+      <div className="page page--room">
+        <Header lang={lang} ids={ids} tone="night" />
+        <main id="main">
+          <ChapterRoom lang={lang} game={game} title={meta.title} block={meta.block} ids={ids} />
+        </main>
+      </div>
+    );
+  }
   const c = await getChapter(lang, r.id);
   const prev = idx > 0 ? metas[idx - 1] : null;
   const next = idx < metas.length - 1 ? metas[idx + 1] : null;

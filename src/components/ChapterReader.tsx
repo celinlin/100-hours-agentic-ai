@@ -281,7 +281,7 @@ export default function ChapterReader({
     if (!isPlainClick(e)) return;
     e.preventDefault();
     nav.setFocusWindow(chapter.id);
-    leaveToHotel(routes.hotel(lang));
+    leaveToHotel(routes.chapter(lang, chapter.id));
   };
 
   const goChapter = (e: React.MouseEvent, id: string) => {
@@ -344,9 +344,9 @@ export default function ChapterReader({
       </div>
 
       <div className="reader__bar">
-        <Link href={routes.hotel(lang)} className="back-link" onClick={backToHotel}>
+        <Link href={routes.chapter(lang, chapter.id)} className="back-link" onClick={backToHotel}>
           <span className="back-link__arrow" aria-hidden="true" />
-          {t.backToHotel}
+          {lang === 'fr' ? 'Retour à la pièce' : 'Back to the room'}
         </Link>
         <div className="reader__tools">
           <button type="button" className={`reader__focus-btn${focusPart ? ' is-on' : ''}`} aria-pressed={!!focusPart} onClick={toggleFocus}>
@@ -476,8 +476,8 @@ export default function ChapterReader({
             )}
           </nav>
           <div className="finale__links">
-            <Link href={routes.hotel(lang)} className="btn btn--ghost-dark" onClick={backToHotel}>
-              {t.backToHotel}
+            <Link href={routes.chapter(lang, chapter.id)} className="btn btn--ghost-dark" onClick={backToHotel}>
+              {lang === 'fr' ? 'Retour à la pièce' : 'Back to the room'}
             </Link>
             <Link href={routes.progress(lang)} className="link-quiet">
               {t.myProgress}

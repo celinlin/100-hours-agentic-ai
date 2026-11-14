@@ -2,142 +2,204 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { roman } from '../lib/building';
-import { dict, routes, type Lang } from '../lib/i18n';
-import { useProgress, useHydrated, statusOf, completedCount, resetProgress, setStatus, nav, isStorageAvailable, type Status } from '../lib/progress';
-import { revealPage, enterChapter, isPlainClick } from '../lib/transition';
+import { roman } from '../game/hotel/geometry';
+import { routes, type Lang } from '../lib/i18n';
+import { useGame, windowState, nextUp, resetGame, type WindowState } from '../game/state';
+import { useChrono, chrono, fmtTotal, GOAL_MS } from '../game/chrono';
+import { revealPage } from '../lib/transition';
+import Chronometer from './Chronometer';
 
 interface Item {
   id: string;
   title: string;
   blockNumber: number;
   blockName: string;
+  stations: number;
+  reward: { fr: string; en: string } | null;
 }
 
+const L = {
+  fr: {
+    kicker: 'Ma progression',
+    title: 'Le registre de l’hôtel',
+    lede: 'Tout est enregistré sur cet appareil, sans compte. Une fenêtre s’ouvre quand le défi de la précédente est réussi.',
+    hours: 'Vers les 100 heures',
+    windows: 'Fenêtres',
+    open: 'ouvertes',
+    done: 'terminées',
+    current: 'En cours',
+    resume: (id: string) => `Reprendre l’étape ${id}`,
+    begin: 'Ouvrir la fenêtre 01',
+    state: { locked: 'Verrouillée', available: 'À ouvrir', in_progress: 'En cours', completed: 'Terminée' } as Record<WindowState, string>,
+    objects: (d: number, t: number) => `${d} / ${t} objets compris`,
+    collection: 'Les objets obtenus',
+    none: 'Aucun pour l’instant : réussis un défi pour obtenir le premier.',
+    reset: 'Réinitialiser',
+    resetGame: 'Effacer la progression des étapes',
+    resetTime: 'Remettre le temps total à zéro',
+    confirm1: 'Effacer la progression des étapes sur cet appareil ?',
+    confirm2: 'Confirme une seconde fois : cette action est définitive.',
+    confirmTime: 'Remettre le temps total à zéro ? Cette action est définitive.',
+    back: 'Retour à l’hôtel',
+    time: 'Temps total',
+  },
+  en: {
+    kicker: 'My progress',
+    title: 'The hotel register',
+    lede: 'Everything is saved on this device, no account needed. A window opens when the previous one’s challenge is passed.',
+    hours: 'Towards 100 hours',
+    windows: 'Windows',
+    open: 'open',
+    done: 'completed',
+    current: 'Current',
+    resume: (id: string) => `Resume step ${id}`,
+    begin: 'Open window 01',
+    state: { locked: 'Locked', available: 'Ready to open', in_progress: 'In progress', completed: 'Completed' } as Record<WindowState, string>,
+    objects: (d: number, t: number) => `${d} / ${t} objects understood`,
+    collection: 'Objects earned',
+    none: 'None yet: pass a challenge to earn the first.',
+    reset: 'Reset',
+    resetGame: 'Erase step progress',
+    resetTime: 'Reset total time to zero',
+    confirm1: 'Erase step progress on this device?',
+    confirm2: 'Confirm once more: this cannot be undone.',
+    confirmTime: 'Reset total time to zero? This cannot be undone.',
+    back: 'Back to the hotel',
+    time: 'Total time',
+  },
+};
+
 export default function ProgressView({ lang, chapters }: { lang: Lang; chapters: Item[] }) {
-  const t = dict[lang];
-  const progress = useProgress();
-  const hydrated = useHydrated();
-  const ids = chapters.map((c) => c.id);
-  const done = hydrated ? completedCount(progress, ids) : 0;
-  const started = hydrated ? ids.filter((id) => statusOf(progress, id) === 'in_progress').length : 0;
-  const last = hydrated && progress.lastVisited ? chapters.find((c) => c.id === progress.lastVisited) : undefined;
-  const [storageOk, setStorageOk] = useState(true);
-
+  const t = L[lang];
+  const g = useGame();
+  const c = useChrono();
+  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
+    setHydrated(true);
     revealPage();
-    setStorageOk(isStorageAvailable());
   }, []);
-
-  const open = (e: React.MouseEvent, id: string, resume = false) => {
-    if (!isPlainClick(e)) return;
-    e.preventDefault();
-    if (resume) nav.setResume(id);
-    enterChapter(null, routes.chapter(lang, id));
-  };
+  const ids = chapters.map((x) => x.id);
+  const st = (id: string): WindowState => (hydrated ? windowState(g, ids, id) : id === ids[0] ? 'available' : 'locked');
+  const openN = ids.filter((id) => st(id) !== 'locked').length;
+  const doneN = ids.filter((id) => st(id) === 'completed').length;
+  const next = hydrated ? nextUp(g, ids) : ids[0];
+  const earned = chapters.filter((x) => st(x.id) === 'completed' && x.reward);
+  const total = hydrated ? c.totalMs : 0;
 
   const groups = new Map<number, { name: string; items: Item[] }>();
-  chapters.forEach((c) => {
-    if (!groups.has(c.blockNumber)) groups.set(c.blockNumber, { name: c.blockName, items: [] });
-    groups.get(c.blockNumber)!.items.push(c);
+  chapters.forEach((x) => {
+    if (!groups.has(x.blockNumber)) groups.set(x.blockNumber, { name: x.blockName, items: [] });
+    groups.get(x.blockNumber)!.items.push(x);
   });
 
-  const pctDone = ids.length ? done / ids.length : 0;
-
   return (
-    <div className="register" id="main" tabIndex={-1}>
-      <header className="register__head">
-        <p className="eyebrow eyebrow--dark">{t.myProgress}</p>
-        <h1 className="register__title">{t.progressTitle}</h1>
-        <p className="register__lede">{t.progressLede}</p>
-        {!storageOk && <p className="notice notice--paper">{t.storageUnavailable}</p>}
-        <div className="register__summary">
-          <div className="dial" aria-hidden="true">
-            <svg viewBox="0 0 120 70">
-              <path d="M10 64 A50 50 0 0 1 110 64" className="dial__track" />
-              <path d="M10 64 A50 50 0 0 1 110 64" className="dial__fill" pathLength={1} style={{ strokeDasharray: `${pctDone} 1` }} />
-              <line
-                x1="60"
-                y1="64"
-                x2={60 + Math.cos(Math.PI + pctDone * Math.PI) * 40}
-                y2={64 + Math.sin(Math.PI + pctDone * Math.PI) * 40}
-                className="dial__needle"
-              />
-              <circle cx="60" cy="64" r="4" className="dial__hub" />
-            </svg>
-          </div>
-          <div>
-            <p className="register__count">{t.completedCount(done, ids.length)}</p>
-            <p className="register__sub">
-              {started} {t.status.in_progress.toLowerCase()} · {ids.length - done - started} {t.status.not_started.toLowerCase()}
-            </p>
-            {last ? (
-              <Link href={routes.chapter(lang, last.id)} className="btn btn--brass" onClick={(e) => open(e, last.id, true)}>
-                {t.continueLearning}
-                <span className="btn__meta">
-                  {t.chapter} {last.id} · {last.title}
-                </span>
-              </Link>
-            ) : (
-              <Link href={routes.chapter(lang, ids[0])} className="btn btn--brass" onClick={(e) => open(e, ids[0])}>
-                {t.startJourney}
-              </Link>
-            )}
-          </div>
-        </div>
+    <div className="register2" id="main" tabIndex={-1}>
+      <header className="register2__head">
+        <p className="register2__kicker">{t.kicker}</p>
+        <h1 className="register2__title">{t.title}</h1>
+        <p className="register2__lede">{t.lede}</p>
       </header>
 
-      <div className="register__floors">
-        {[...groups.entries()].map(([n, g]) => (
-          <section key={n} className="register__block">
-            <h2 className="register__block-title">
-              <span>{roman(n)}</span> {g.name}
+      <div className="register2__grid">
+        <section className="register2__card register2__card--chrono" aria-label={t.hours}>
+          <p className="register2__label">{t.hours}</p>
+          <Chronometer lang={lang} expanded />
+          <p className="register2__big">
+            {fmtTotal(total, lang)} <span>/ 100 h</span>
+          </p>
+          <p className="register2__small">{Math.round((total / GOAL_MS) * 1000) / 10} %</p>
+        </section>
+
+        <section className="register2__card">
+          <p className="register2__label">{t.windows}</p>
+          <p className="register2__big">
+            {openN} <span>{t.open}</span>
+          </p>
+          <p className="register2__big">
+            {doneN} <span>/ {ids.length} {t.done}</span>
+          </p>
+          <ol className="hx-ticks register2__ticks" aria-hidden="true">
+            {ids.map((id) => (
+              <li key={id} className={`is-${st(id)}`} />
+            ))}
+          </ol>
+          <p className="register2__label">{t.current}</p>
+          <Link className="hx-cta register2__cta" href={routes.chapter(lang, next)}>
+            {next === ids[0] && !(hydrated && g.chapters[next]?.visited) ? t.begin : t.resume(next)}
+          </Link>
+        </section>
+      </div>
+
+      <section className="register2__floors">
+        {[...groups.entries()].reverse().map(([n, grp]) => (
+          <div key={n} className="register2__block">
+            <h2 className="register2__block-title">
+              <span>{roman(n)}</span> {grp.name}
             </h2>
-            <ol className="register__list">
-              {g.items.map((c) => {
-                const st: Status = hydrated ? statusOf(progress, c.id) : 'not_started';
+            <ol>
+              {[...grp.items].reverse().map((x) => {
+                const s = st(x.id);
+                const solved = hydrated ? g.chapters[x.id]?.stations.length ?? 0 : 0;
                 return (
-                  <li key={c.id} className={`register__row is-${st}`}>
-                    <span className="register__num">{c.id}</span>
-                    <Link href={routes.chapter(lang, c.id)} className="register__name" onClick={(e) => open(e, c.id, st === 'in_progress')}>
-                      {c.title}
-                    </Link>
-                    <span className={`register__state is-${st}`}>
-                      <span className={`status-mark is-${st}`} aria-hidden="true" />
-                      {t.status[st]}
-                    </span>
-                    <span className="register__toggle">
-                      {st === 'completed' ? (
-                        <button type="button" className="link-btn" onClick={() => setStatus(c.id, 'in_progress')}>
-                          {t.undoCompleted}
-                        </button>
-                      ) : (
-                        <button type="button" className="link-btn" onClick={() => setStatus(c.id, 'completed')}>
-                          {t.markCompleted}
-                        </button>
-                      )}
-                    </span>
+                  <li key={x.id} className={`register2__row is-${s}`}>
+                    <span className="register2__num">{x.id}</span>
+                    {s === 'locked' ? (
+                      <span className="register2__name">{x.title}</span>
+                    ) : (
+                      <Link className="register2__name" href={routes.chapter(lang, x.id)}>
+                        {x.title}
+                      </Link>
+                    )}
+                    <span className="register2__meta">{x.stations ? t.objects(Math.min(solved, x.stations), x.stations) : ''}</span>
+                    <span className={`register2__state is-${s}`}>{t.state[s]}</span>
                   </li>
                 );
               })}
             </ol>
-          </section>
+          </div>
         ))}
-      </div>
+      </section>
 
-      <footer className="register__foot">
-        <Link href={routes.hotel(lang)} className="btn btn--ghost-dark">
-          {t.backToHotel}
+      <section className="register2__collection">
+        <h2 className="register2__block-title">{t.collection}</h2>
+        {earned.length ? (
+          <ul>
+            {earned.map((x) => (
+              <li key={x.id}>
+                <span className="register2__num">{x.id}</span> {x.reward![lang]}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="register2__small">{t.none}</p>
+        )}
+      </section>
+
+      <footer className="register2__foot">
+        <Link className="room-btn" href={routes.hotel(lang)}>
+          {t.back}
         </Link>
-        <button
-          type="button"
-          className="link-btn link-btn--danger"
-          onClick={() => {
-            if (window.confirm(t.resetConfirm)) resetProgress();
-          }}
-        >
-          {t.resetProgress}
-        </button>
+        <details className="register2__reset">
+          <summary>{t.reset}</summary>
+          <button
+            type="button"
+            className="link-btn link-btn--danger"
+            onClick={() => {
+              if (window.confirm(t.confirm1) && window.confirm(t.confirm2)) resetGame();
+            }}
+          >
+            {t.resetGame}
+          </button>
+          <button
+            type="button"
+            className="link-btn link-btn--danger"
+            onClick={() => {
+              if (window.confirm(t.confirmTime) && window.confirm(t.confirm2)) chrono.resetAll();
+            }}
+          >
+            {t.resetTime}
+          </button>
+        </details>
       </footer>
     </div>
   );

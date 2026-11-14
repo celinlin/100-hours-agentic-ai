@@ -10,6 +10,7 @@ type Listener = (cmd: VeilCommand) => void;
 export type VeilCommand =
   | { type: 'enter'; rect: DOMRect | null; href: string }
   | { type: 'leave'; href: string }
+  | { type: 'cover'; href: string; tone: 'warm' | 'night' | 'paper' }
   | { type: 'reveal' };
 
 const listeners = new Set<Listener>();
@@ -43,4 +44,9 @@ export function revealPage() {
 /** Plain left-click without modifiers — the only case we intercept. */
 export function isPlainClick(e: { button: number; metaKey: boolean; ctrlKey: boolean; shiftKey: boolean; altKey: boolean }) {
   return e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+}
+
+/** Fade a coloured veil over the screen, then navigate (camera transitions end with this). */
+export function coverAndGo(href: string, tone: 'warm' | 'night' | 'paper') {
+  listeners.forEach((l) => l({ type: 'cover', href, tone }));
 }

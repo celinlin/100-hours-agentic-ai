@@ -5,6 +5,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { dict, routes, switchLangPath, parseSlug, LANGS, type Lang } from '../lib/i18n';
 import { useProgress, useHydrated, completedCount, saveScroll, nav } from '../lib/progress';
 import { leaveToHotel, isPlainClick } from '../lib/transition';
+import Chronometer from './Chronometer';
+import SoundToggle from './SoundToggle';
+import { useGame, isUnlocked, travel } from '../game/state';
 
 export function Monogram({ className }: { className?: string }) {
   return (
@@ -22,7 +25,11 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
   const router = useRouter();
   const progress = useProgress();
   const hydrated = useHydrated();
-  const done = completedCount(progress, ids);
+  const game = useGame();
+  const done = ids.filter((id) => game.chapters[id]?.challenge).length;
+  void completedCount;
+  void progress;
+  void isUnlocked;
   const route = parseSlug(pathname.split('/').filter(Boolean)[1] ?? '');
   const onHotel = !route;
 
@@ -53,6 +60,7 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
           onClick={(e) => {
             if (!onHotel && isPlainClick(e)) {
               e.preventDefault();
+              if (route?.kind === 'chapter') travel.setFrom(route.id);
               leaveToHotel(routes.hotel(lang));
             }
           }}
@@ -72,6 +80,7 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
               onClick={(e) => {
                 if (isPlainClick(e)) {
                   e.preventDefault();
+                  if (route?.kind === 'chapter') travel.setFrom(route.id);
                   leaveToHotel(routes.hotel(lang));
                 }
               }}
@@ -89,6 +98,8 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
               {hydrated ? `${done}/${ids.length}` : `–/${ids.length}`}
             </span>
           </Link>
+          <Chronometer lang={lang} tone={tone} />
+          <SoundToggle lang={lang} />
           <div className="lang-switch" role="group" aria-label={t.language}>
             {LANGS.map((l) => (
               <Link

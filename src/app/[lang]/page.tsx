@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Header from '../../components/Header';
-import HotelView from '../../components/HotelView';
+import HotelScene from '../../components/hotel/HotelScene';
 import { getChapterMetas } from '../../lib/content';
 import { isLang, routes, type Lang } from '../../lib/i18n';
 
@@ -20,10 +20,10 @@ export default async function HotelPage({ params }: { params: Promise<{ lang: st
   const metas = getChapterMetas(lang);
   const chapters = metas.map((m) => ({ id: m.id, title: m.title, blockNumber: m.blockNumber, blockName: m.blockName, question: m.question }));
   return (
-    <div className="page page--hotel">
+    <div className="page page--hotel2">
       <Header lang={lang} ids={metas.map((m) => m.id)} tone="night" />
-      <main>
-        <HotelView lang={lang} chapters={chapters} />
+      <main id="main">
+        <HotelScene lang={lang} chapters={chapters} />
       </main>
     </div>
   );

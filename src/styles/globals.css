@@ -178,6 +178,7 @@ a {
   color: var(--brass-dark);
 }
 .brand__name {
+  white-space: nowrap;
   display: flex;
   flex-direction: column;
   line-height: 1;

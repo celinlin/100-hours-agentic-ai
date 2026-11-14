@@ -5,6 +5,9 @@ import '@fontsource-variable/newsreader/opsz-italic.css';
 import '@fontsource-variable/geist/wght.css';
 import '@fontsource-variable/geist-mono/wght.css';
 import '../../styles/globals.css';
+import '../../styles/hotel.css';
+import '../../styles/mechanics.css';
+import '../../styles/room.css';
 import Veil from '../../components/Veil';
 import { LANGS, isLang, dict } from '../../lib/i18n';
 
