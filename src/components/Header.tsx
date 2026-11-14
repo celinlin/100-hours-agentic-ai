@@ -1,0 +1,121 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { dict, routes, switchLangPath, parseSlug, LANGS, type Lang } from '../lib/i18n';
+import { useProgress, useHydrated, completedCount, saveScroll, nav } from '../lib/progress';
+import { leaveToHotel, isPlainClick } from '../lib/transition';
+
+export function Monogram({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 28 36" aria-hidden="true">
+      <path d="M14 1 L15 7 H13 Z" fill="currentColor" />
+      <path d="M10 7 H18 V12 H21 V18 H24 V35 H4 V18 H7 V12 H10 Z" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M14 7 V35 M10 18 V35 M18 18 V35" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+    </svg>
+  );
+}
+
+export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[]; tone: 'night' | 'paper' }) {
+  const t = dict[lang];
+  const pathname = usePathname() ?? `/${lang}/`;
+  const router = useRouter();
+  const progress = useProgress();
+  const hydrated = useHydrated();
+  const done = completedCount(progress, ids);
+  const route = parseSlug(pathname.split('/').filter(Boolean)[1] ?? '');
+  const onHotel = !route;
+
+  const switchTo = (to: Lang) => {
+    try {
+      window.localStorage.setItem('hotel100.lang', to);
+    } catch {
+      /* preference simply not remembered */
+    }
+    if (route?.kind === 'chapter') {
+      const h = document.documentElement;
+      saveScroll(route.id, h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight));
+      nav.setResume(route.id);
+    } else if (onHotel) {
+      nav.saveHotelScroll(window.scrollY / Math.max(1, document.documentElement.scrollHeight));
+    }
+  };
+
+  return (
+    <header className={`site-header site-header--${tone}`}>
+      <a className="skip-link" href="#main">
+        {t.skip}
+      </a>
+      <div className="site-header__inner">
+        <Link
+          href={routes.hotel(lang)}
+          className="brand"
+          onClick={(e) => {
+            if (!onHotel && isPlainClick(e)) {
+              e.preventDefault();
+              leaveToHotel(routes.hotel(lang));
+            }
+          }}
+        >
+          <Monogram className="brand__mark" />
+          <span className="brand__name">
+            <span className="brand__line">100 Hours</span>
+            <span className="brand__line brand__line--sub">of Agentic AI</span>
+          </span>
+        </Link>
+
+        <nav className="site-nav" aria-label={lang === 'fr' ? 'Navigation principale' : 'Main navigation'}>
+          {!onHotel && (
+            <Link
+              href={routes.hotel(lang)}
+              className="site-nav__link site-nav__link--hotel"
+              onClick={(e) => {
+                if (isPlainClick(e)) {
+                  e.preventDefault();
+                  leaveToHotel(routes.hotel(lang));
+                }
+              }}
+            >
+              {t.theHotel}
+            </Link>
+          )}
+          <Link
+            href={routes.progress(lang)}
+            className="site-nav__progress"
+            aria-current={route?.kind === 'progress' ? 'page' : undefined}
+          >
+            <span className="site-nav__progress-label">{t.myProgress}</span>
+            <span className="site-nav__count" aria-hidden={!hydrated}>
+              {hydrated ? `${done}/${ids.length}` : `–/${ids.length}`}
+            </span>
+          </Link>
+          <div className="lang-switch" role="group" aria-label={t.language}>
+            {LANGS.map((l) => (
+              <Link
+                key={l}
+                href={switchLangPath(pathname, l)}
+                hrefLang={l}
+                lang={l}
+                aria-current={l === lang ? 'true' : undefined}
+                className={`lang-switch__opt${l === lang ? ' is-current' : ''}`}
+                onClick={(e) => {
+                  if (l === lang) {
+                    e.preventDefault();
+                    return;
+                  }
+                  switchTo(l);
+                  if (isPlainClick(e)) {
+                    e.preventDefault();
+                    router.push(switchLangPath(pathname, l) + (typeof window !== 'undefined' ? window.location.hash : ''), { scroll: false });
+                  }
+                }}
+              >
+                {l.toUpperCase()}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      </div>
+    </header>
+  );
+}

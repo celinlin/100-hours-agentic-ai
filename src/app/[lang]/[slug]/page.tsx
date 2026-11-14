@@ -1,0 +1,92 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import Header from '../../../components/Header';
+import ChapterReader from '../../../components/ChapterReader';
+import ProgressView from '../../../components/ProgressView';
+import { getChapter, getChapterMetas } from '../../../lib/content';
+import { LANGS, dict, hrefFor, parseSlug, routes, type Lang } from '../../../lib/i18n';
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  const out: { lang: string; slug: string }[] = [];
+  for (const lang of LANGS) {
+    const pathOf = (href: string) => href.split('/').filter(Boolean)[1];
+    out.push({ lang, slug: pathOf(routes.progress(lang)) });
+    for (const m of getChapterMetas(lang)) out.push({ lang, slug: pathOf(routes.chapter(lang, m.id)) });
+  }
+  return out;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string; slug: string }> }): Promise<Metadata> {
+  const { lang: raw, slug } = await params;
+  const lang = raw as Lang;
+  const r = parseSlug(slug);
+  if (!r || r.kind === 'hotel') return {};
+  const languages = Object.fromEntries(LANGS.map((l) => [l, hrefFor(l, r)]));
+  if (r.kind === 'progress') return { title: dict[lang].progressTitle, alternates: { languages } };
+  const m = getChapterMetas(lang).find((c) => c.id === r.id);
+  return {
+    title: m ? `${dict[lang].chapter} ${m.id} · ${m.title}` : undefined,
+    description: m?.question,
+    alternates: { languages },
+  };
+}
+
+export default async function SlugPage({ params }: { params: Promise<{ lang: string; slug: string }> }) {
+  const { lang: raw, slug } = await params;
+  const lang = raw as Lang;
+  const r = parseSlug(slug);
+  if (!r || r.kind === 'hotel') notFound();
+  const metas = getChapterMetas(lang);
+  const ids = metas.map((m) => m.id);
+
+  if (r.kind === 'progress') {
+    if (slug !== routes.progress(lang).split('/')[2]) notFound();
+    return (
+      <div className="page page--paper">
+        <Header lang={lang} ids={ids} tone="paper" />
+        <main>
+          <ProgressView lang={lang} chapters={metas.map((m) => ({ id: m.id, title: m.title, blockNumber: m.blockNumber, blockName: m.blockName }))} />
+        </main>
+      </div>
+    );
+  }
+
+  const idx = ids.indexOf(r.id);
+  if (idx < 0 || slug !== routes.chapter(lang, r.id).split('/')[2]) notFound();
+  const c = await getChapter(lang, r.id);
+  const prev = idx > 0 ? metas[idx - 1] : null;
+  const next = idx < metas.length - 1 ? metas[idx + 1] : null;
+  return (
+    <div className="page page--paper">
+      <Header lang={lang} ids={ids} tone="paper" />
+      <main>
+        <ChapterReader
+          key={`${lang}-${c.id}`}
+          lang={lang}
+          total={metas.length}
+          prev={prev && { id: prev.id, title: prev.title }}
+          next={next && { id: next.id, title: next.title }}
+          chapter={{
+            id: c.id,
+            title: c.title,
+            block: c.block,
+            lede: c.lede,
+            questionHtml: c.questionHtml,
+            outcomesTitle: c.outcomesTitle,
+            outcomes: c.outcomes,
+            needsTitle: c.needsTitle,
+            needs: c.needs,
+            minimum: c.minimum,
+            footnote: c.footnote,
+            stats: c.stats,
+            html: c.html,
+            toc: c.toc,
+            minutes: Math.round(c.words / 200),
+          }}
+        />
+      </main>
+    </div>
+  );
+}
