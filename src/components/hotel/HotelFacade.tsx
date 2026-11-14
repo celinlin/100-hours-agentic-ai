@@ -257,7 +257,7 @@ export const HotelDecor = memo(function HotelDecor({ m }: { m: Model }) {
 /* A suite window, four states                                          */
 /* ------------------------------------------------------------------ */
 
-export function SuiteWindow({
+export const SuiteWindow = memo(function SuiteWindow({
   s,
   state,
   active,
@@ -337,4 +337,4 @@ export function SuiteWindow({
       <rect x={s.cell.x} y={s.cell.y} width={s.cell.w} height={s.cell.h} rx={4} className="sw__focus" />
     </g>
   );
-}
+});

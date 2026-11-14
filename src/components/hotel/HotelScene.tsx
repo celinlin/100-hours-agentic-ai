@@ -18,6 +18,9 @@ export interface SceneChapter {
   question: string;
 }
 
+/** Above this, Chrome's raster cost for the zoom layer becomes visible on mid-range devices. */
+const MAX_ZOOM = 2.6;
+
 const L = {
   fr: {
     step: 'Étape',
@@ -105,6 +108,21 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
 
   const scaleNow = () => (frameRef.current ? frameRef.current.clientWidth / model.W : 1);
 
+  // prefetch the rooms the learner can open, while the browser is idle
+  useEffect(() => {
+    if (!hydrated) return;
+    const go = () => {
+      router.prefetch(routes.hall(lang));
+      ids.forEach((id) => {
+        if (windowState(game, ids, id) !== 'locked') router.prefetch(routes.chapter(lang, id));
+      });
+    };
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(go);
+    else setTimeout(go, 800);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, lang]);
+
   // arrival: zoom back out from the window we came from, then play an unlock if any
   useLayoutEffect(() => {
     setHydrated(true);
@@ -113,7 +131,7 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
     const s = from ? model.suites.find((x) => x.id === from) : null;
     if (s && !prefersReducedMotion()) {
       const stage = stageRef.current!;
-      const k = Math.min(stage.clientWidth / (s.w * scaleNow()), stage.clientHeight / (s.h * scaleNow())) * 0.9;
+      const k = Math.min(MAX_ZOOM, Math.min(stage.clientWidth / (s.w * scaleNow()), stage.clientHeight / (s.h * scaleNow())) * 0.9);
       camera(s, k, false);
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
@@ -170,14 +188,14 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
     }
     setOpening(s.id);
     sfx('open');
-    router.prefetch(href);
     const stage = stageRef.current!;
-    // after the shutters swing and the light rises, the camera travels into the window
+    // the curtains part first, then the camera travels into the window
     setTimeout(() => {
-      const k = Math.max(stage.clientWidth / (s.w * scaleNow()), stage.clientHeight / (s.h * scaleNow())) * 1.15;
+      // capped: the browser rasterises the layer at the final scale of the animation
+      const k = Math.min(MAX_ZOOM, Math.max(stage.clientWidth / (s.w * scaleNow()), stage.clientHeight / (s.h * scaleNow())));
       camera({ x: s.x, y: s.y + 20, w: s.w, h: s.h - 20 }, k, true);
-    }, 380);
-    setTimeout(() => coverAndGo(href, 'warm'), 980);
+    }, 420);
+    setTimeout(() => coverAndGo(href, 'warm'), 860);
   };
 
   const enterHall = () => {
@@ -193,7 +211,7 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
     const lob = model.lobby;
     const door = { x: CX - 90, y: lob.y + 50, w: 180, h: lob.h - 50 };
     const stage = stageRef.current!;
-    const k = Math.max(stage.clientWidth / (door.w * scaleNow()), stage.clientHeight / (door.h * scaleNow())) * 1.1;
+    const k = Math.min(MAX_ZOOM, Math.max(stage.clientWidth / (door.w * scaleNow()), stage.clientHeight / (door.h * scaleNow())));
     camera(door, k, true);
     setTimeout(() => coverAndGo(href, 'warm'), 700);
   };
@@ -229,14 +247,17 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
       <div className="hx-stage" ref={stageRef}>
         <div className="hx-camera" ref={camRef}>
           <div className="hx-frame" ref={frameRef} style={{ aspectRatio: `${model.W} / ${model.H}` }}>
+          {/* static decor on its own layer: painted once, never repainted by window animations */}
+          <svg className="hx-svg hx-svg--decor" viewBox={`0 0 ${model.W} ${model.H}`} aria-hidden="true" focusable="false">
+            <HotelDecor m={model} />
+          </svg>
           <svg
             ref={svgRef}
-            className="hx-svg"
+            className="hx-svg hx-svg--suites"
             viewBox={`0 0 ${model.W} ${model.H}`}
             role="group"
             aria-label={t.facade}
           >
-            <HotelDecor m={model} />
             <g className="hx-suites">
               {model.suites
                 .slice()

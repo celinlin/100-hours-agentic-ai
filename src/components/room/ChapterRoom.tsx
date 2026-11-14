@@ -167,7 +167,8 @@ export default function ChapterRoom({
     sfx('open');
     setPanel({ type: 'station', id: s.id });
     setResume(game.id, s.id);
-    focus(s.at);
+    // let the panel mount first, then move the camera on the next frame
+    requestAnimationFrame(() => requestAnimationFrame(() => focus(s.at)));
   };
   const openDoor = () => {
     if (!doorReady && !passed) {
