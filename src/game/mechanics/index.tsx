@@ -9,6 +9,8 @@ import Spot from './Spot';
 import Fill from './Fill';
 import Sampler from './Sampler';
 import Loop from './Loop';
+import Desk from './Desk';
+import Stepper from './Stepper';
 
 export type { Lang } from './strings';
 
@@ -36,6 +38,10 @@ export default function MechanicView(props: { m: Mechanic; lang: 'fr' | 'en'; on
       return <Sampler key={key} m={m} {...rest} />;
     case 'loop':
       return <Loop key={key} m={m} {...rest} />;
+    case 'desk':
+      return <Desk key={key} m={m} {...rest} />;
+    case 'stepper':
+      return <Stepper key={key} m={m} {...rest} />;
     default: {
       const never: never = m;
       return never;

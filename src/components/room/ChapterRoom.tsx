@@ -12,6 +12,10 @@ import { sfx } from '../../game/sound';
 import { coverAndGo, revealPage, prefersReducedMotion } from '../../lib/transition';
 import { routes, type Lang } from '../../lib/i18n';
 import LiteVideo from './LiteVideo';
+import IntroSceneView from './levels/IntroScene';
+import MissionBoard from './levels/MissionBoard';
+import TeachRoom from './levels/TeachRoom';
+import ToolkitView from './levels/ToolkitView';
 
 const L = {
   fr: {
@@ -90,7 +94,8 @@ const L = {
   },
 };
 
-type Panel = { type: 'station'; id: string } | { type: 'challenge' } | { type: 'library' } | null;
+type Panel = { type: 'station'; id: string } | { type: 'challenge' } | { type: 'library' } | { type: 'kit' } | { type: 'mission' } | { type: 'teach' } | { type: 'intro' } | null;
+const WIDE = ['mission', 'teach', 'intro'];
 
 export default function ChapterRoom({
   lang,
@@ -122,14 +127,22 @@ export default function ChapterRoom({
   const solved = useMemo(() => new Set(hydrated ? cs?.stations ?? [] : []), [cs, hydrated]);
   const passed = hydrated && !!cs?.challenge;
   const solvedCount = game.stations.filter((s) => solved.has(s.id)).length;
-  const doorReady = solvedCount === game.stations.length;
+  const stationsDone = solvedCount === game.stations.length;
+  const missionDone = !game.mission || solved.has('mission');
+  const teachDone = !game.teach || solved.has('teach');
+  const introDone = !game.intro || solved.has('intro');
+  const doorReady = stationsDone && missionDone && teachDone;
 
   useLayoutEffect(() => {
     setHydrated(true);
   }, []);
   useEffect(() => {
     if (!hydrated) return;
-    if (isUnlocked(g, ids, game.id)) markVisited(game.id);
+    if (isUnlocked(g, ids, game.id)) {
+      markVisited(game.id);
+      // first visit: the concierge desk opens straight away — a first success in seconds
+      if (game.intro && !(g.chapters[game.id]?.stations ?? []).includes('intro')) setPanel({ type: 'intro' });
+    }
     revealPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
@@ -258,6 +271,11 @@ export default function ChapterRoom({
           <span>{t.stations(solvedCount, game.stations.length)}</span>
         </div>
         <div className="room-bar__actions">
+          {game.toolkit && (
+            <button type="button" className="room-btn room-btn--ghost" onClick={() => (sfx('open'), setPanel({ type: 'kit' }), focus(null))}>
+              {lang === 'fr' ? 'Kit de transmission' : 'Teaching kit'}
+            </button>
+          )}
           <button type="button" className="room-btn" onClick={() => (sfx('open'), setPanel({ type: 'library' }), focus(null))}>
             {t.library}
           </button>
@@ -268,6 +286,51 @@ export default function ChapterRoom({
           )}
         </div>
       </div>
+
+      {(game.intro || game.mission || game.teach) && (
+        <nav className="journey" aria-label={lang === 'fr' ? 'Parcours de la chambre' : 'Room journey'}>
+          <ol>
+            {game.intro && (
+              <li>
+                <button type="button" className={`journey__step${introDone ? ' is-done' : ''}`} onClick={() => (sfx('open'), setPanel({ type: 'intro' }), focus(null))}>
+                  <span className="journey__k">{lang === 'fr' ? 'Accueil' : 'Welcome'}</span>
+                  <span className="journey__t">{lang === 'fr' ? 'Le comptoir' : 'The desk'}</span>
+                </button>
+              </li>
+            )}
+            <li>
+              <button type="button" className={`journey__step${stationsDone ? ' is-done' : ''}`} onClick={() => { const s0 = game.stations.find((x) => !solved.has(x.id)) ?? game.stations[0]; openStation(s0); }}>
+                <span className="journey__k">{lang === 'fr' ? 'Niveau 1' : 'Level 1'}</span>
+                <span className="journey__t">
+                  {lang === 'fr' ? 'Comprendre' : 'Understand'} <em>{solvedCount}/{game.stations.length}</em>
+                </span>
+              </button>
+            </li>
+            {game.mission && (
+              <li>
+                <button type="button" className={`journey__step${missionDone ? ' is-done' : ''}`} onClick={() => (sfx('open'), setPanel({ type: 'mission' }), focus(null))}>
+                  <span className="journey__k">{lang === 'fr' ? 'Niveau 2' : 'Level 2'}</span>
+                  <span className="journey__t">{lang === 'fr' ? 'Appliquer' : 'Apply'}</span>
+                </button>
+              </li>
+            )}
+            {game.teach && (
+              <li>
+                <button type="button" className={`journey__step${teachDone ? ' is-done' : ''}`} onClick={() => (sfx('open'), setPanel({ type: 'teach' }), focus(null))}>
+                  <span className="journey__k">{lang === 'fr' ? 'Niveau 3' : 'Level 3'}</span>
+                  <span className="journey__t">{lang === 'fr' ? 'Transmettre' : 'Teach'}</span>
+                </button>
+              </li>
+            )}
+            <li>
+              <button type="button" className={`journey__step journey__step--door${passed ? ' is-done' : ''}${doorReady ? ' is-ready' : ''}`} onClick={openDoor}>
+                <span className="journey__k">{lang === 'fr' ? 'Validation' : 'Validation'}</span>
+                <span className="journey__t">{lang === 'fr' ? 'Défi final' : 'Final challenge'}</span>
+              </button>
+            </li>
+          </ol>
+        </nav>
+      )}
 
       <div className="room-stage" ref={stageRef}>
         <div className="room-camera" ref={camRef}>
@@ -339,7 +402,45 @@ export default function ChapterRoom({
       </nav>
 
       {/* side panel / sheet */}
-      {panel && (
+      {panel && WIDE.includes(panel.type) && (
+        <section className={`level-sheet level-sheet--${panel.type}`} role="dialog" aria-modal="false" aria-label={panel.type}>
+          <div className="level-sheet__bar">
+            <button type="button" className="room-panel__close" onClick={closePanel}>
+              {t.close}
+            </button>
+          </div>
+          <div className="level-sheet__body">
+            {panel.type === 'intro' && game.intro && (
+              <IntroSceneView
+                lang={lang}
+                intro={game.intro}
+                onDone={() => {
+                  solveStation(game.id, 'intro');
+                  closePanel();
+                }}
+              />
+            )}
+            {panel.type === 'mission' && game.mission && (
+              <MissionBoard lang={lang} mission={game.mission} done={missionDone && hydrated && solved.has('mission')} onDone={() => solveStation(game.id, 'mission')} />
+            )}
+            {panel.type === 'teach' && game.teach && (
+              <TeachRoom lang={lang} teach={game.teach} done={hydrated && solved.has('teach')} onDone={() => solveStation(game.id, 'teach')} />
+            )}
+            {panel.type === 'mission' && missionDone && (
+              <button type="button" className="hx-cta level-sheet__next" onClick={() => (game.teach && !teachDone ? setPanel({ type: 'teach' }) : openDoor())}>
+                {game.teach && !teachDone ? (lang === 'fr' ? 'Niveau 3 · Transmettre' : 'Level 3 · Teach') : t.door}
+              </button>
+            )}
+            {panel.type === 'teach' && teachDone && (
+              <button type="button" className="hx-cta level-sheet__next" onClick={openDoor}>
+                {t.door}
+              </button>
+            )}
+          </div>
+        </section>
+      )}
+
+      {panel && !WIDE.includes(panel.type) && (
         <aside className={`room-panel room-panel--${panel.type}`} role="dialog" aria-modal="false" aria-label={station ? station.title[lang] : panel.type === 'library' ? t.library : game.challenge.title[lang]}>
           <div className="room-panel__head">
             <button type="button" className="room-panel__close" onClick={closePanel}>
@@ -358,14 +459,31 @@ export default function ChapterRoom({
                   solveStation(game.id, station.id);
                   sfx('correct');
                 }}
-                onNext={nextStation && nextStation.id !== station.id ? () => openStation(nextStation) : doorReady || solvedCount >= game.stations.length - 1 ? openDoor : null}
-                nextLabel={nextStation && nextStation.id !== station.id ? `${t.next} · ${nextStation.object[lang]}` : t.door}
+                onNext={
+                  nextStation && nextStation.id !== station.id
+                    ? () => openStation(nextStation)
+                    : game.mission && !missionDone
+                      ? () => (sfx('open'), setPanel({ type: 'mission' }), focus(null))
+                      : game.teach && !teachDone
+                        ? () => (sfx('open'), setPanel({ type: 'teach' }), focus(null))
+                        : openDoor
+                }
+                nextLabel={
+                  nextStation && nextStation.id !== station.id
+                    ? `${t.next} · ${nextStation.object[lang]}`
+                    : game.mission && !missionDone
+                      ? lang === 'fr' ? 'Niveau 2 · Appliquer' : 'Level 2 · Apply'
+                      : game.teach && !teachDone
+                        ? lang === 'fr' ? 'Niveau 3 · Transmettre' : 'Level 3 · Teach'
+                        : t.door
+                }
               />
             )}
             {panel.type === 'challenge' && (
               <ChallengeView lang={lang} game={game} ready={doorReady || passed} passed={passed} solvedCount={solvedCount} onWin={win} />
             )}
             {panel.type === 'library' && <LibraryView lang={lang} game={game} />}
+            {panel.type === 'kit' && game.toolkit && <ToolkitView lang={lang} kit={game.toolkit} chapter={`${t.step} ${game.id} · ${title}`} />}
           </div>
         </aside>
       )}
@@ -379,6 +497,12 @@ export default function ChapterRoom({
             </svg>
             <p className="ceremony__kicker">{t.earned}</p>
             <h2 className="ceremony__title">{game.challenge.reward.name[lang]}</h2>
+            {game.capability && (
+              <p className="ceremony__cap">
+                {lang === 'fr' ? 'Le concierge sait maintenant : ' : 'The concierge can now: '}
+                <b>{game.capability[lang]}</b>
+              </p>
+            )}
             <p className="ceremony__body">{annex ? (lang === 'fr' ? 'Il rejoint ta collection. Les fenêtres de l’hôtel t’attendent.' : 'It joins your collection. The hotel windows await you.') : nextId ? t.unlockedNext(nextId) : t.lastFloor}</p>
             <div className="ceremony__actions">
               <button type="button" className="hx-cta" onClick={toHotel} autoFocus>
@@ -419,6 +543,7 @@ function StationView({
 }) {
   const t = L[lang];
   const [won, setWon] = useState(solved);
+  const [firstDone, setFirstDone] = useState(solved);
   const video = s.video ? game.videos.find((v) => v.id === s.video) : null;
   return (
     <div className="station">
@@ -426,16 +551,44 @@ function StationView({
         <span className="station__n">{index + 1}</span> {s.object[lang]}
       </p>
       <h2 className="station__title">{s.title[lang]}</h2>
+      {s.everyday && (
+        <div className="everyday">
+          <p className="everyday__k">{lang === 'fr' ? 'Dans la vie de tous les jours' : 'In everyday life'}</p>
+          <p className="everyday__a">{s.everyday.analogy[lang]}</p>
+          <p className="everyday__l">
+            <b>{lang === 'fr' ? 'Là où l’image s’arrête : ' : 'Where the picture stops: '}</b>
+            {s.everyday.limit[lang]}
+          </p>
+        </div>
+      )}
       <p className="station__show">{s.show[lang]}</p>
       <MechanicView
         key={s.id}
         m={s.mechanic}
         lang={lang}
         onSolved={() => {
+          if (s.then) {
+            setFirstDone(true);
+            return;
+          }
           setWon(true);
           if (!solved) onSolved();
         }}
       />
+      {s.then && (firstDone || solved) && (
+        <div className="station__then">
+          <p className="station__then-k">{lang === 'fr' ? 'À toi de jouer' : 'Your turn'}</p>
+          <MechanicView
+            key={`${s.id}-then`}
+            m={s.then}
+            lang={lang}
+            onSolved={() => {
+              setWon(true);
+              if (!solved) onSolved();
+            }}
+          />
+        </div>
+      )}
       {(won || solved) && (
         <div className="station__after">
           <div className="takeaway-card">
@@ -481,7 +634,13 @@ function ChallengeView({ lang, game, ready, passed, solvedCount, onWin }: { lang
       <div className="station">
         <p className="station__kicker">{t.door}</p>
         <h2 className="station__title">{game.challenge.title[lang]}</h2>
-        <p className="station__show">{t.doorLocked(game.stations.length)}</p>
+        <p className="station__show">
+          {game.mission || game.teach
+            ? lang === 'fr'
+              ? 'La porte s’ouvre quand les trois niveaux sont faits : comprendre, appliquer, transmettre.'
+              : 'The door opens once the three levels are done: understand, apply, teach.'
+            : t.doorLocked(game.stations.length)}
+        </p>
         <div className="door-meter" aria-hidden="true">
           {game.stations.map((s, i) => (
             <span key={s.id} className={i < solvedCount ? 'is-done' : ''} />

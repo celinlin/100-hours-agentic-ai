@@ -1009,3 +1009,17 @@
 .hx-door:focus-visible .sw__focus {
   opacity: 1;
 }
+
+@media (max-width: 460px) {
+  .brand__name {
+    display: none;
+  }
+  .site-nav {
+    gap: 6px;
+  }
+  .sound-toggle,
+  .music__btn {
+    width: 36px;
+    height: 36px;
+  }
+}

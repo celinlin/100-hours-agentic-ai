@@ -13,6 +13,28 @@ const ch01: ChapterGame = {
     name: { fr: 'La salle des machines du langage', en: 'The language engine room' },
     style: { wall: '#2f4a3f', wallDeep: '#253c33', floor: '#7a5536', accent: '#7c2f2a', motif: 'chevron' },
   },
+  capability: {
+    fr: 'Comprendre une demande, et demander l’outil qui contient la réponse plutôt que deviner.',
+    en: 'Understand a request, and ask for the tool that holds the answer instead of guessing.',
+  },
+  intro: {
+    guest: 'M. Delmas',
+    request: { fr: 'Pouvez-vous vérifier que ma réservation de jeudi est bien confirmée ?', en: 'Could you check that my Thursday booking is confirmed?' },
+    guess: { fr: 'Oui, bien sûr ! Votre chambre 214 est confirmée pour trois nuits.', en: 'Yes, of course! Your room 214 is confirmed for three nights.' },
+    tools: [
+      { id: 'registre', label: { fr: 'registre("Delmas")', en: 'registre("Delmas")' }, result: { fr: 'Delmas · 2 nuits dès jeudi · chambre 512 · confirmée, acompte versé.', en: 'Delmas · 2 nights from Thursday · room 512 · confirmed, deposit paid.' } },
+      { id: 'meteo', label: { fr: 'meteo("jeudi")', en: 'meteo("jeudi")' }, result: { fr: 'Jeudi : 14 °C, averses le matin.', en: 'Thursday: 14 °C, showers in the morning.' } },
+      { id: 'plan', label: { fr: 'plan("quartier")', en: 'plan("quartier")' }, result: { fr: 'Musées, gare et restaurants à moins de dix minutes.', en: 'Museums, station and restaurants within ten minutes.' } },
+    ],
+    correct: 'registre',
+    answer: { fr: 'Oui, M. Delmas : deux nuits à partir de jeudi, chambre 512, confirmée. L’acompte est bien versé.', en: 'Yes, Mr Delmas: two nights from Thursday, room 512, confirmed. The deposit has been paid.' },
+    wrongTool: { fr: 'Ce résultat ne dit rien de la réservation. Il faut demander l’outil qui contient la réponse.', en: 'This result says nothing about the booking. Ask for the tool that holds the answer.' },
+    lesson: {
+      model: { fr: 'comprend la demande et choisit quoi demander. Il ne connaît pas les réservations de l’hôtel.', en: 'understands the request and chooses what to ask for. It does not know the hotel’s bookings.' },
+      call: { fr: 'est une demande écrite, registre("Delmas"). C’est le code de l’hôtel qui l’exécute.', en: 'is a written request, registre("Delmas"). The hotel’s code executes it.' },
+      result: { fr: 'revient au modèle, qui répond à partir de ce fait, et non de son imagination.', en: 'comes back to the model, which answers from that fact, not from its imagination.' },
+    },
+  },
   skills: [
     { fr: 'Expliquer ce qu’est un token et pourquoi un mot rare en prend plusieurs', en: 'Explain what a token is and why a rare word takes several' },
     { fr: 'Décrire comment le modèle choisit le token suivant', en: 'Describe how the model picks the next token' },
@@ -29,6 +51,10 @@ const ch01: ChapterGame = {
       id: 'tokens',
       prop: 'typewriter',
       at: { x: 250, y: 560 },
+      everyday: {
+        analogy: { fr: 'Comme épeler un nom inconnu au téléphone : les mots courants passent d’un bloc, les noms rares se découpent en morceaux.', en: 'Like spelling an unfamiliar name on the phone: common words go through in one piece, rare names get cut into bits.' },
+        limit: { fr: 'Les tokens ne sont pas des syllabes : le découpage vient de statistiques sur des textes, et il change d’un modèle à l’autre.', en: 'Tokens are not syllables: the split comes from statistics over texts, and it changes from one model to another.' },
+      },
       object: { fr: 'La machine à découper', en: 'The cutting machine' },
       title: { fr: 'Le modèle lit des morceaux, pas des mots', en: 'The model reads pieces, not words' },
       show: {
@@ -67,6 +93,10 @@ const ch01: ChapterGame = {
       id: 'sampling',
       prop: 'gauge',
       at: { x: 520, y: 470 },
+      everyday: {
+        analogy: { fr: 'Comme compléter à voix haute « Le rendez-vous est… » : plusieurs suites sont possibles, certaines plus probables que d’autres.', en: 'Like finishing “The meeting is…” out loud: several continuations are possible, some more likely than others.' },
+        limit: { fr: 'Le modèle ne réfléchit pas à la suite comme toi : il calcule une probabilité pour chaque token, puis un tirage en retient un.', en: 'The model does not think about the continuation as you do: it computes a probability for each token, then a draw keeps one.' },
+      },
       object: { fr: 'Le sélecteur de tokens', en: 'The token selector' },
       title: { fr: 'Prédire, puis tirer le token suivant', en: 'Predict, then draw the next token' },
       show: {
@@ -98,45 +128,6 @@ const ch01: ChapterGame = {
       video: 'wjZofJX0v4M',
     },
     {
-      id: 'context',
-      prop: 'cardfile',
-      at: { x: 1075, y: 560 },
-      object: { fr: 'Le classeur du contexte', en: 'The context cabinet' },
-      title: { fr: 'D’où vient la mémoire ?', en: 'Where does memory come from?' },
-      show: {
-        fr: 'Dans une conversation, tu écris : « je m’appelle Maël et je prépare un rendez-vous jeudi ». Puis tu ouvres une deuxième conversation et tu demandes : « comment je m’appelle ? »',
-        en: 'In a conversation, you write: “my name is Maël and I’m preparing a meeting on Thursday”. Then you open a second conversation and ask: “what is my name?”',
-      },
-      mechanic: {
-        kind: 'choice',
-        prompt: { fr: 'Que se passe-t-il, fonction mémoire coupée ?', en: 'What happens, with the memory feature switched off?' },
-        options: [
-          {
-            id: 'a',
-            label: { fr: 'Le modèle répond « Maël » : il se souvient de toi.', en: 'The model answers “Maël”: it remembers you.' },
-            correct: false,
-            why: { fr: 'Le modèle ne garde rien entre deux appels. Rien de la première conversation n’est dans ce nouveau contexte.', en: 'The model keeps nothing between two calls. Nothing from the first conversation is in this new context.' },
-          },
-          {
-            id: 'b',
-            label: { fr: 'Il ne peut pas savoir : l’information est absente de son contexte.', en: 'It cannot know: the information is missing from its context.' },
-            correct: true,
-            why: { fr: 'Exact. Le contexte, c’est tout ce que le modèle reçoit au moment de répondre. Dans la première conversation, c’est le système qui lui remet l’historique à chaque appel.', en: 'Right. The context is everything the model receives when answering. In the first conversation, the system hands it the history at every call.' },
-          },
-          {
-            id: 'c',
-            label: { fr: 'Il retrouve ton prénom dans ses données d’entraînement.', en: 'It finds your name in its training data.' },
-            correct: false,
-            why: { fr: 'Tes conversations ne deviennent pas des connaissances du modèle. Et s’il répondait un prénom quand même, ce serait une invention plausible.', en: 'Your conversations do not become the model’s knowledge. And if it answered a name anyway, it would be a plausible invention.' },
-          },
-        ],
-      },
-      takeaway: {
-        fr: 'Une information absente du contexte est inconnue du modèle. La « mémoire » d’une conversation, c’est le système qui renvoie l’historique.',
-        en: 'Information missing from the context is unknown to the model. A conversation’s “memory” is the system sending the history back.',
-      },
-    },
-    {
       id: 'loop',
       prop: 'loopmachine',
       at: { x: 800, y: 690 },
@@ -146,7 +137,33 @@ const ch01: ChapterGame = {
         fr: 'Joue le modèle. À chaque tour, tu demandes un outil, ou tu écris FINAL. Le système exécute l’outil et renvoie le résultat dans ton contexte.',
         en: 'Play the model. Each turn, you ask for a tool, or you write FINAL. The system runs the tool and returns the result into your context.',
       },
+      everyday: {
+        analogy: { fr: 'Comme le concierge qui consulte le registre au lieu de deviner : il demande, quelqu’un cherche, il répond avec le résultat.', en: 'Like the concierge who checks the register instead of guessing: he asks, someone looks it up, he answers with the result.' },
+        limit: { fr: 'Le modèle ne va rien chercher lui-même : il écrit une demande, et c’est le code autour qui l’exécute, ou la refuse.', en: 'The model fetches nothing itself: it writes a request, and the code around it runs it, or refuses it.' },
+      },
       mechanic: {
+        kind: 'stepper',
+        prompt: { fr: 'Regarde un tour de boucle, étape par étape.', en: 'Watch one turn of the loop, step by step.' },
+        steps: [
+          { actor: 'guest', label: { fr: 'La demande arrive', en: 'The request arrives' }, detail: { fr: '« Prépare mon rendez-vous de jeudi avec Inès Caron. »', en: '“Prepare my Thursday meeting with Inès Caron.”' } },
+          { actor: 'model', label: { fr: 'Le modèle décide', en: 'The model decides' }, detail: { fr: 'Il n’a pas l’agenda. Il écrit une demande d’outil : calendrier(jeudi).', en: 'It does not have the calendar. It writes a tool request: calendrier(jeudi).' } },
+          { actor: 'system', label: { fr: 'Le système exécute', en: 'The system executes' }, detail: { fr: 'Le code de l’application lance l’outil. Le modèle, lui, n’exécute rien.', en: 'The application code runs the tool. The model executes nothing.' } },
+          { actor: 'tool', label: { fr: 'L’outil répond', en: 'The tool answers' }, detail: { fr: '« 10 h, Inès Caron, Brume & Quai, visio, 45 min. »', en: '“10 am, Inès Caron, Brume & Quai, video call, 45 min.”' } },
+          { actor: 'system', label: { fr: 'Le résultat revient dans le contexte', en: 'The result returns to the context' }, detail: { fr: 'Le système ajoute le résultat à la conversation et rappelle le modèle.', en: 'The system adds the result to the conversation and calls the model again.' } },
+          { actor: 'model', label: { fr: 'Le modèle décide à nouveau', en: 'The model decides again' }, detail: { fr: 'Un autre outil, ou FINAL : il écrit le brief à partir des résultats reçus.', en: 'Another tool, or FINAL: it writes the brief from the results received.' } },
+          { actor: 'human', label: { fr: 'Un humain valide', en: 'A human validates' }, detail: { fr: 'Tu relis le brief avant de t’en servir.', en: 'You reread the brief before using it.' } },
+        ],
+        check: {
+          kind: 'choice',
+          prompt: { fr: 'Qui exécute l’appel calendrier(jeudi) ?', en: 'Who executes the call calendrier(jeudi)?' },
+          options: [
+            { id: 'm', label: { fr: 'Le modèle', en: 'The model' }, correct: false, why: { fr: 'Le modèle écrit la demande. Il n’a ni accès à l’agenda ni moyen de lancer quoi que ce soit.', en: 'The model writes the request. It has no access to the calendar and no way to run anything.' } },
+            { id: 's', label: { fr: 'Le système, c’est-à-dire le code autour du modèle', en: 'The system, that is the code around the model' }, correct: true, why: { fr: 'Oui : le code lit la demande, lance l’outil (ou le refuse) et renvoie le résultat.', en: 'Yes: the code reads the request, runs the tool (or refuses it) and returns the result.' } },
+            { id: 'u', label: { fr: 'Le client', en: 'The guest' }, correct: false, why: { fr: 'Le client pose la question ; il ne voit même pas l’appel d’outil.', en: 'The guest asks the question; they do not even see the tool call.' } },
+          ],
+        },
+      },
+      then: {
         kind: 'loop',
         prompt: {
           fr: 'Utilise uniquement les informations renvoyées par les outils. Réunis ce qu’il faut pour un brief, puis termine.',
@@ -176,9 +193,71 @@ const ch01: ChapterGame = {
       video: 'F8NKVhkZZWI',
     },
     {
+      id: 'context',
+      prop: 'cardfile',
+      at: { x: 1075, y: 560 },
+      object: { fr: 'Le classeur du contexte', en: 'The context cabinet' },
+      title: { fr: 'Le modèle ne lit que ce qui est sur le bureau', en: 'The model only reads what is on the desk' },
+      everyday: {
+        analogy: { fr: 'Le contexte, c’est un bureau : le modèle ne lit que ce qui y est posé, et la place est limitée.', en: 'The context is a desk: the model only reads what is laid on it, and space is limited.' },
+        limit: { fr: 'La vraie limite se compte en tokens, pas en documents. Et le modèle relit tout le bureau à chaque appel : il ne garde rien une fois le bureau rangé.', en: 'The real limit is counted in tokens, not documents. And the model rereads the whole desk at every call: it keeps nothing once the desk is cleared.' },
+      },
+      show: {
+        fr: 'Le client va poser trois questions. Pose sur le bureau ce dont le concierge aura besoin.',
+        en: 'The guest will ask three questions. Put on the desk what the concierge will need.',
+      },
+      mechanic: {
+        kind: 'desk',
+        prompt: { fr: 'Quatre documents tiennent sur le bureau. Choisis-les, puis fais entrer le client.', en: 'Four documents fit on the desk. Choose them, then let the guest in.' },
+        slots: 4,
+        docs: [
+          { id: 'consigne', label: { fr: 'Consigne du concierge', en: 'Concierge instructions' }, detail: { fr: 'rôle, ton, règles', en: 'role, tone, rules' } },
+          { id: 'resa', label: { fr: 'Réservation Delmas', en: 'Delmas booking' } },
+          { id: 'histo', label: { fr: 'Fiche du séjour précédent', en: 'Previous stay record' } },
+          { id: 'regl', label: { fr: 'Règlement intérieur', en: 'House rules' } },
+          { id: 'spa', label: { fr: 'Tarifs du spa', en: 'Spa prices' } },
+          { id: 'menu', label: { fr: 'Carte du restaurant', en: 'Restaurant menu' } },
+          { id: 'meteo', label: { fr: 'Météo de la semaine', en: 'Weekly weather' } },
+          { id: 'plan', label: { fr: 'Plan du quartier', en: 'Neighbourhood map' } },
+        ],
+        questions: [
+          {
+            q: { fr: 'Ma chambre sera-t-elle prête jeudi ?', en: 'Will my room be ready on Thursday?' },
+            needs: ['consigne', 'resa'],
+            answer: { fr: 'Oui, chambre 512, prête à partir de 15 h.', en: 'Yes, room 512, ready from 3 pm.' },
+            missing: { fr: 'Sans ce document, le concierge ne peut que deviner, ou répondre hors de son rôle.', en: 'Without this document, the concierge can only guess, or answer out of role.' },
+          },
+          {
+            q: { fr: 'Vous avez gardé mon oreiller ferme, comme la dernière fois ?', en: 'Did you keep my firm pillow, like last time?' },
+            needs: ['consigne', 'histo'],
+            answer: { fr: 'Oui, c’est noté depuis votre dernier séjour.', en: 'Yes, it has been noted since your last stay.' },
+            missing: { fr: '« La dernière fois » n’existe pas pour le modèle si la fiche n’est pas sur le bureau.', en: '“Last time” does not exist for the model if the record is not on the desk.' },
+          },
+          {
+            q: { fr: 'Mon chien peut-il venir ?', en: 'Can my dog come?' },
+            needs: ['consigne', 'regl'],
+            answer: { fr: 'Oui, les chiens de moins de 10 kg sont acceptés, avec un supplément.', en: 'Yes, dogs under 10 kg are welcome, for a fee.' },
+            missing: { fr: 'Le modèle pourrait produire une règle plausible… et fausse.', en: 'The model could produce a plausible rule… that is false.' },
+          },
+        ],
+      },
+      takeaway: {
+        fr: 'Le modèle ne connaît que ce qui est dans son contexte au moment de répondre. La place est limitée : choisir ce qu’on y met, consignes comprises, fait partie du travail.',
+        en: 'The model only knows what is in its context when it answers. Space is limited: choosing what goes in, instructions included, is part of the job.',
+      },
+      more: {
+        fr: 'Expérience 2 du programme : écris « je m’appelle Maël » dans une conversation, puis demande « comment je m’appelle ? » dans une autre. Fonction mémoire coupée, le modèle ne peut pas savoir : l’information n’est pas dans ce nouveau contexte. Dans la première conversation, c’est le système qui lui remet l’historique à chaque appel.',
+        en: 'Programme experiment 2: write “my name is Maël” in one conversation, then ask “what is my name?” in another. With memory off, the model cannot know: the information is not in this new context. In the first conversation, the system hands it the history at every call.',
+      },
+    },
+    {
       id: 'families',
       prop: 'cabinet',
       at: { x: 1290, y: 470 },
+      everyday: {
+        analogy: { fr: 'Comme des poupées gigognes : chaque famille tient dans la précédente.', en: 'Like nesting dolls: each family fits inside the previous one.' },
+        limit: { fr: 'Les frontières ne sont pas toujours nettes, et un agent n’est pas une famille de plus : c’est un LLM placé dans un système, avec des outils.', en: 'The borders are not always sharp, and an agent is not one more family: it is an LLM placed inside a system, with tools.' },
+      },
       object: { fr: 'La vitrine des familles', en: 'The family cabinet' },
       title: { fr: 'Les poupées gigognes de l’IA', en: 'AI’s nesting dolls' },
       show: {
@@ -262,6 +341,184 @@ const ch01: ChapterGame = {
       },
     ],
     reward: { name: { fr: 'La clé de la salle des machines', en: 'The engine-room key' }, prop: 'key01' },
+  },
+  mission: {
+    sector: { fr: 'Hôtellerie et tourisme', en: 'Hospitality and tourism' },
+    client: { fr: 'Hôtel Le Belvédère, 80 chambres (fictif)', en: 'Hôtel Le Belvédère, 80 rooms (fictional)' },
+    brief: {
+      fr: 'Notre réception reçoit les mêmes questions tous les jours : horaires, parking, animaux, état des réservations. Nous voulons réduire ce temps sans perdre notre service personnalisé.',
+      en: 'Our front desk gets the same questions every day: opening hours, parking, pets, booking status. We want to cut that time without losing our personal service.',
+    },
+    constraints: [
+      { label: { fr: 'Informations disponibles', en: 'Available information' }, detail: { fr: 'Une FAQ à jour et le logiciel de réservations.', en: 'An up-to-date FAQ and the booking software.' } },
+      { label: { fr: 'Outils existants', en: 'Existing tools' }, detail: { fr: 'Réservations (lecture et modification), messagerie clients, paiement.', en: 'Bookings (read and change), guest messaging, payments.' } },
+      { label: { fr: 'Données confidentielles', en: 'Confidential data' }, detail: { fr: 'Numéros de carte et pièces d’identité ne doivent jamais apparaître dans une réponse.', en: 'Card numbers and ID documents must never appear in a reply.' } },
+      { label: { fr: 'Situations exceptionnelles', en: 'Exceptional situations' }, detail: { fr: 'Réclamations, demandes de remboursement, clients mécontents.', en: 'Complaints, refund requests, unhappy guests.' } },
+      { label: { fr: 'Validation humaine', en: 'Human approval' }, detail: { fr: 'Tout geste commercial ou modification de réservation est validé par la réception.', en: 'Any goodwill gesture or booking change is approved by the front desk.' } },
+      { label: { fr: 'Qualité de service', en: 'Service quality' }, detail: { fr: 'Répondre dans la langue du client, avec le ton de l’hôtel, y compris la nuit.', en: 'Reply in the guest’s language, in the hotel’s tone, including at night.' } },
+    ],
+    problem: {
+      kind: 'choice',
+      prompt: { fr: 'Quel est le vrai problème à résoudre ?', en: 'What is the real problem to solve?' },
+      options: [
+        { id: 'a', label: { fr: 'Remplacer la réception par un chatbot', en: 'Replace the front desk with a chatbot' }, correct: false, why: { fr: 'Le client veut garder un service personnalisé. Il veut libérer du temps, pas supprimer l’accueil.', en: 'The client wants to keep a personal service. They want to free up time, not remove the front desk.' } },
+        { id: 'b', label: { fr: 'Traiter seul le répétitif et préparer le reste pour l’équipe', en: 'Handle the repetitive part alone and prepare the rest for the team' }, correct: true, why: { fr: 'Oui : automatiser ce qui est factuel et répétitif, et laisser à l’équipe ce qui demande un jugement.', en: 'Yes: automate what is factual and repetitive, and leave what needs judgement to the team.' } },
+        { id: 'c', label: { fr: 'Un agent autonome qui gère tout, remboursements compris', en: 'An autonomous agent that handles everything, refunds included' }, correct: false, why: { fr: 'Les actions sensibles exigent une validation humaine (contrainte du brief). Un agent n’est pas la réponse à tout.', en: 'Sensitive actions require human approval (a brief constraint). An agent is not the answer to everything.' } },
+      ],
+    },
+    tasks: {
+      kind: 'sort',
+      prompt: { fr: 'Pour chaque tâche, la solution la plus simple qui suffit.', en: 'For each task, the simplest solution that is enough.' },
+      bins: [
+        { id: 'rule', label: { fr: 'Automatisation classique', en: 'Classic automation' } },
+        { id: 'llm', label: { fr: 'Fonction LLM', en: 'LLM feature' } },
+        { id: 'agent', label: { fr: 'Agent avec outils', en: 'Agent with tools' } },
+        { id: 'human', label: { fr: 'Humain', en: 'Human' } },
+      ],
+      items: [
+        { id: 't1', label: { fr: 'Envoyer la confirmation après chaque réservation', en: 'Send the confirmation after each booking' }, bin: 'rule', why: { fr: 'Un déclencheur fixe suffit : aucun texte à comprendre ni à rédiger.', en: 'A fixed trigger is enough: no text to understand or write.' } },
+        { id: 't2', label: { fr: 'Répondre aux questions de la FAQ, dans la langue du client', en: 'Answer FAQ questions, in the guest’s language' }, bin: 'llm', why: { fr: 'Formuler une réponse à partir d’un texte fourni : pas besoin d’outil ni d’action.', en: 'Phrase an answer from a given text: no tool or action needed.' } },
+        { id: 't3', label: { fr: 'Vérifier une réservation, puis répondre', en: 'Check a booking, then reply' }, bin: 'agent', why: { fr: 'Il faut choisir et appeler l’outil de réservations selon la demande.', en: 'It must choose and call the booking tool depending on the request.' } },
+        { id: 't4', label: { fr: 'Traiter une réclamation avec demande de remboursement', en: 'Handle a complaint with a refund request' }, bin: 'human', why: { fr: 'Jugement, geste commercial, argent : c’est à l’équipe.', en: 'Judgement, goodwill, money: that belongs to the team.' } },
+        { id: 't5', label: { fr: 'Relancer les clients trois jours avant l’arrivée', en: 'Remind guests three days before arrival' }, bin: 'rule', why: { fr: 'Une date et un modèle de message : une règle suffit.', en: 'A date and a message template: a rule is enough.' } },
+        { id: 't6', label: { fr: 'Traduire la carte du restaurant chaque saison', en: 'Translate the restaurant menu every season' }, bin: 'llm', why: { fr: 'Une tâche de texte ponctuelle, relue par l’équipe : pas d’agent.', en: 'A one-off text task, reviewed by the team: no agent.' } },
+      ],
+    },
+    tools: [
+      { id: 'faq', label: { fr: 'FAQ de l’hôtel', en: 'Hotel FAQ' }, desc: { fr: 'Horaires, parking, animaux, services.', en: 'Hours, parking, pets, services.' }, role: 'needed', why: { fr: 'La plupart des questions y ont leur réponse : sans elle, la solution invente.', en: 'Most questions are answered there: without it, the solution invents.' } },
+      { id: 'resa_read', label: { fr: 'Réservations : consulter', en: 'Bookings: look up' }, desc: { fr: 'Lire le statut d’une réservation.', en: 'Read a booking’s status.' }, role: 'needed', why: { fr: 'Indispensable pour répondre sur une réservation sans deviner.', en: 'Essential to answer about a booking without guessing.' } },
+      { id: 'mail', label: { fr: 'Messagerie clients', en: 'Guest messaging' }, desc: { fr: 'Envoyer la réponse au client.', en: 'Send the reply to the guest.' }, role: 'needed', why: { fr: 'Sans elle, aucune réponse ne part.', en: 'Without it, no reply goes out.' } },
+      { id: 'resa_write', label: { fr: 'Réservations : modifier', en: 'Bookings: change' }, desc: { fr: 'Changer des dates ou une chambre.', en: 'Change dates or a room.' }, role: 'optional', why: { fr: 'Utile seulement si chaque modification attend la validation de la réception.', en: 'Useful only if every change waits for the front desk’s approval.' } },
+      { id: 'pay', label: { fr: 'Paiement : rembourser', en: 'Payments: refund' }, desc: { fr: 'Déclencher un remboursement.', en: 'Trigger a refund.' }, role: 'forbidden', why: { fr: 'Un remboursement engage l’hôtel : la solution ne doit même pas y avoir accès.', en: 'A refund commits the hotel: the solution should not even have access to it.' } },
+      { id: 'export', label: { fr: 'Export de toute la base clients', en: 'Export of the whole guest database' }, desc: { fr: 'Télécharger toutes les fiches clients.', en: 'Download every guest record.' }, role: 'forbidden', why: { fr: 'Inutile pour répondre, et expose des données personnelles.', en: 'Useless for replying, and exposes personal data.' } },
+    ],
+    permissions: [
+      { tool: 'resa_read', options: ['read', 'deny'], allowed: ['read'], why: { fr: 'Consulter suffit pour répondre.', en: 'Looking up is enough to reply.' } },
+      { tool: 'mail', options: ['auto', 'draft', 'approve'], allowed: ['auto'], why: { fr: 'Les réponses factuelles doivent pouvoir partir seules, y compris la nuit ; les cas sensibles sont transmis, pas envoyés.', en: 'Factual replies must be able to go out on their own, including at night; sensitive cases are passed on, not sent.' } },
+      { tool: 'resa_write', options: ['approve', 'auto', 'deny'], allowed: ['approve', 'deny'], why: { fr: 'Une modification change le prix ou la chambre : elle attend la réception.', en: 'A change alters the price or the room: it waits for the front desk.' } },
+    ],
+    tests: [
+      { id: 'q1', request: { fr: 'À quelle heure est servi le petit-déjeuner ?', en: 'What time is breakfast served?' }, needsTools: ['faq', 'mail'], permission: { tool: 'mail', allowed: ['auto'] }, ok: { fr: 'Réponse envoyée en quelques secondes, tirée de la FAQ.', en: 'Reply sent in seconds, taken from the FAQ.' }, ko: { fr: 'Sans FAQ ou sans envoi autorisé, la réponse est inventée ou ne part pas.', en: 'Without the FAQ or permission to send, the reply is invented or never goes out.' } },
+      { id: 'q2', request: { fr: 'Ma réservation de jeudi est-elle confirmée ? (Delmas)', en: 'Is my Thursday booking confirmed? (Delmas)' }, needsTools: ['resa_read', 'mail'], ok: { fr: 'La solution consulte le registre et répond avec le fait.', en: 'The solution checks the register and replies with the fact.' }, ko: { fr: 'Sans accès en lecture aux réservations, elle ne peut que deviner.', en: 'Without read access to bookings, it can only guess.' } },
+      { id: 'q3', request: { fr: 'Il est 2 h du matin : avez-vous un parking ?', en: 'It is 2 am: do you have parking?' }, needsTools: ['faq', 'mail'], permission: { tool: 'mail', allowed: ['auto'] }, ok: { fr: 'Le client a sa réponse en pleine nuit.', en: 'The guest gets an answer in the middle of the night.' }, ko: { fr: 'La réponse attend qu’un humain l’envoie : à 2 h, personne. Le client n’a rien.', en: 'The reply waits for a human to send it: at 2 am, nobody. The guest gets nothing.' } },
+      { id: 'q4', request: { fr: 'Pouvez-vous décaler mon séjour d’un jour ?', en: 'Could you move my stay by one day?' }, needsTools: ['mail'], permission: { tool: 'resa_write', allowed: ['approve', 'deny'] }, critical: true, ok: { fr: 'La demande part à la réception avec la réservation résumée : un humain décide.', en: 'The request goes to the front desk with the booking summarised: a human decides.' }, ko: { fr: 'La solution a modifié la réservation seule : nouveau tarif appliqué sans validation.', en: 'The solution changed the booking on its own: a new rate applied without approval.' } },
+      { id: 'q5', request: { fr: 'Je suis furieux, je veux être remboursé !', en: 'I am furious, I want a refund!' }, needsTools: ['mail'], permission: { tool: 'pay', allowed: ['deny'] }, critical: true, ok: { fr: 'Le message est transmis à un humain avec un résumé, sans promesse.', en: 'The message is passed to a human with a summary, without promises.' }, ko: { fr: 'La solution avait accès au remboursement : elle a remboursé sans validation.', en: 'The solution had access to refunds: it refunded without approval.' } },
+    ],
+    limits: [
+      { fr: 'Elle ne remplace pas l’accueil : elle traite le répétitif et prépare le reste.', en: 'It does not replace the front desk: it handles the repetitive part and prepares the rest.' },
+      { fr: 'Elle répond à partir de la FAQ : si la FAQ est fausse ou ancienne, la réponse l’est aussi.', en: 'It answers from the FAQ: if the FAQ is wrong or outdated, so is the answer.' },
+      { fr: 'Repérer les cas sensibles est lui-même une tâche qui peut échouer : il faut la tester sur de vrais messages.', en: 'Spotting sensitive cases is itself a task that can fail: test it on real messages.' },
+      { fr: 'Mesurer avant d’élargir : réponses justes, demandes mal orientées, satisfaction.', en: 'Measure before widening: correct answers, misrouted requests, satisfaction.' },
+    ],
+    realCase: {
+      company: 'Intercom (Fin)',
+      facts: [
+        { fr: 'Intercom annonce que Fin, son agent de support fondé sur Claude, atteint un taux de résolution moyen de 51 % sur l’ensemble de ses clients.', en: 'Intercom states that Fin, its Claude-based support agent, achieves a 51% average resolution rate across its customer base.' },
+        { fr: 'Selon la même source, les délais de réponse passent de 30 minutes à quelques secondes, dans plus de 45 langues.', en: 'According to the same source, response times drop from 30 minutes to seconds, in over 45 languages.' },
+        { fr: 'Fin répond en s’appuyant sur la base de connaissances de chaque entreprise.', en: 'Fin answers using each company’s knowledge base.' },
+      ],
+      caveat: {
+        fr: 'Chiffres publiés par l’éditeur, non vérifiés de façon indépendante. La simulation ci-dessus ne reproduit pas leur système. À retenir : même un très bon agent laisse environ la moitié des conversations aux humains.',
+        en: 'Figures published by the vendor, not independently verified. The simulation above does not reproduce their system. Takeaway: even a very good agent leaves about half of conversations to humans.',
+      },
+      source: { title: 'Intercom customer story', url: 'https://claude.com/customers/intercom', publisher: 'Anthropic' },
+    },
+  },
+  teach: {
+    setting: { fr: 'Session de formation · équipe commerciale · simulation pédagogique', en: 'Training session · sales team · teaching simulation' },
+    colleagues: [
+      {
+        id: 'karim',
+        name: 'Karim',
+        role: { fr: 'Commercial terrain', en: 'Field sales rep' },
+        level: { fr: 'Débutant · n’a jamais utilisé d’IA au travail', en: 'Beginner · has never used AI at work' },
+        kind: 'simple',
+        says: { fr: 'Concrètement, c’est quoi la différence entre ChatGPT et un agent ?', en: 'In practice, what is the difference between ChatGPT and an agent?' },
+        explain: [
+          { id: 'e1', text: { fr: 'Un modèle répond avec du texte. Un agent, c’est ce modèle dans une boucle : il demande des outils, le système les exécute et lui renvoie le résultat.', en: 'A model answers with text. An agent is that model in a loop: it asks for tools, the system runs them and sends back the result.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Juste et simple : modèle, boucle, outils, résultat.', en: 'Accurate and simple: model, loop, tools, result.' } },
+          { id: 'e2', text: { fr: 'Un agent est une IA plus intelligente, qui comprend mieux et ne se trompe pas.', en: 'An agent is a smarter AI that understands better and does not make mistakes.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : un agent n’est pas plus « intelligent » et peut se tromper. Ce qui change, ce sont les outils.', en: 'Wrong: an agent is not “smarter” and can be wrong. What changes is the tools.' } },
+          { id: 'e3', text: { fr: 'C’est un LLM avec function calling, un orchestrateur et une boucle ReAct sur des blocs tool_use.', en: 'It is an LLM with function calling, an orchestrator and a ReAct loop over tool_use blocks.' }, scores: { accuracy: 2, simplicity: 0 }, note: { fr: 'Juste, mais trop technique pour un débutant : il décroche au deuxième mot.', en: 'Accurate, but too technical for a beginner: he drops off at the second word.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Un agent peut consulter ton CRM pour retrouver la dernière commande d’un client avant de rédiger ta relance.', en: 'An agent can look up your CRM to find a client’s last order before drafting your follow-up.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Parfait : un outil de son métier et un résultat concret.', en: 'Perfect: a tool from his job and a concrete result.' } },
+          { id: 'x2', text: { fr: 'Par exemple, un agent peut jouer aux échecs.', en: 'For instance, an agent can play chess.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Concret, mais sans lien avec son métier.', en: 'Concrete, but unrelated to his job.' } },
+          { id: 'x3', text: { fr: 'Ça sert à plein de choses dans l’entreprise.', en: 'It is useful for lots of things in the company.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Trop vague : aucun exemple à retenir.', en: 'Too vague: no example to remember.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Il ne fait que ce que ses outils permettent, et il peut se tromper : on relit avant d’envoyer.', en: 'It only does what its tools allow, and it can be wrong: we reread before sending.' }, scores: { limits: 2 }, note: { fr: 'Une limite juste, avec un réflexe à adopter.', en: 'An accurate limit, with a habit to adopt.' } },
+          { id: 'l2', text: { fr: 'Il n’y a pas vraiment de limite, c’est fiable.', en: 'There is no real limit, it is reliable.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Dangereux : promettre la fiabilité crée une confiance aveugle.', en: 'Dangerous: promising reliability creates blind trust.' } },
+          { id: 'l3', text: { fr: 'Il coûte un peu cher.', en: 'It is a bit expensive.' }, scores: { limits: 1 }, note: { fr: 'Parfois vrai, mais ce n’est pas la limite qui compte pour son usage.', en: 'Sometimes true, but not the limit that matters for his use.' } },
+        ],
+      },
+      {
+        id: 'sophie',
+        name: 'Sophie',
+        role: { fr: 'Responsable grands comptes', en: 'Key account manager' },
+        level: { fr: 'Intermédiaire · utilise un assistant tous les jours', en: 'Intermediate · uses an assistant every day' },
+        kind: 'confusion',
+        says: { fr: 'Si je lui ai parlé de mon client hier, l’agent s’en souvient aujourd’hui, non ?', en: 'If I told it about my client yesterday, the agent remembers today, right?' },
+        explain: [
+          { id: 'e1', text: { fr: 'Non : le modèle ne garde rien entre deux appels. Il ne sait que ce qu’on lui remet dans son contexte. Une mémoire, c’est le système qui la stocke et la relit.', en: 'No: the model keeps nothing between two calls. It only knows what is handed back in its context. Memory is something the system stores and rereads.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Exact, et tu sépares bien le modèle de la mémoire.', en: 'Exact, and you clearly separate the model from memory.' } },
+          { id: 'e2', text: { fr: 'Oui, il apprend de chaque conversation et s’améliore.', en: 'Yes, it learns from each conversation and improves.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : les conversations ne modifient pas le modèle. Cette idée crée de mauvaises attentes.', en: 'Wrong: conversations do not change the model. This idea creates false expectations.' } },
+          { id: 'e3', text: { fr: 'Ça dépend du nombre de paramètres et de la fenêtre de tokens.', en: 'It depends on the number of parameters and the token window.' }, scores: { accuracy: 1, simplicity: 0 }, note: { fr: 'En partie lié, mais ça ne répond pas et ça noie la question.', en: 'Partly related, but it does not answer and drowns the question.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Si ton outil enregistre une fiche client et la remet au modèle à chaque fois, alors il « s’en souvient » : c’est la fiche, pas le modèle.', en: 'If your tool saves a client record and hands it to the model every time, then it “remembers”: it is the record, not the model.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Un exemple de son métier qui montre où vit la mémoire.', en: 'An example from her job that shows where memory lives.' } },
+          { id: 'x2', text: { fr: 'C’est comme un poisson rouge.', en: 'It is like a goldfish.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Image amusante, mais elle ne dit pas comment obtenir une mémoire fiable.', en: 'A fun image, but it does not say how to get reliable memory.' } },
+          { id: 'x3', text: { fr: 'Pense à Netflix qui retient tes séries.', en: 'Think of Netflix remembering your shows.' }, scores: { relevance: 1, example: 1 }, note: { fr: 'Analogie floue : on ne sait pas qui retient quoi.', en: 'A fuzzy analogy: it is unclear who remembers what.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Si l’information n’est pas dans le contexte, il peut inventer une réponse plausible : vérifie la source.', en: 'If the information is not in the context, it may invent a plausible answer: check the source.' }, scores: { limits: 2 }, note: { fr: 'La bonne limite : information absente, invention possible.', en: 'The right limit: missing information, possible invention.' } },
+          { id: 'l2', text: { fr: 'Il se souvient de tout, il faut juste bien lui demander.', en: 'It remembers everything, you just need to ask nicely.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Faux et trompeur.', en: 'Wrong and misleading.' } },
+          { id: 'l3', text: { fr: 'Attention à la confidentialité de ce que tu lui donnes.', en: 'Mind the confidentiality of what you give it.' }, scores: { limits: 1 }, note: { fr: 'Vrai, mais ce n’était pas la question : garde-le pour plus tard.', en: 'True, but not the question: keep it for later.' } },
+        ],
+      },
+      {
+        id: 'marc',
+        name: 'Marc',
+        role: { fr: 'Directeur commercial', en: 'Sales director' },
+        level: { fr: 'Avancé · pressé, veut des gains rapides', en: 'Advanced · in a hurry, wants quick wins' },
+        kind: 'risky',
+        says: { fr: 'On pourrait le laisser envoyer directement les devis aux clients, sans relecture ? On gagnerait un temps fou.', en: 'Could we let it send quotes straight to clients, without review? We would save so much time.' },
+        explain: [
+          { id: 'e1', text: { fr: 'Le modèle propose, le système exécute : il peut préparer le devis, mais l’envoi reste une action à valider, parce qu’une erreur part directement chez le client.', en: 'The model proposes, the system executes: it can prepare the quote, but sending stays an action to approve, because a mistake goes straight to the client.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Tu distingues préparer et agir, et tu donnes la raison.', en: 'You separate preparing from acting, and give the reason.' } },
+          { id: 'e2', text: { fr: 'Oui, l’IA est plus précise qu’un humain pour les chiffres.', en: 'Yes, AI is more accurate than a human with figures.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : un modèle peut produire un chiffre plausible et faux.', en: 'Wrong: a model can produce a plausible but false figure.' } },
+          { id: 'e3', text: { fr: 'Non, il ne faut jamais utiliser l’IA pour les devis.', en: 'No, never use AI for quotes.' }, scores: { accuracy: 1, simplicity: 2 }, note: { fr: 'Trop absolu : on perd le vrai gain, la préparation.', en: 'Too absolute: you lose the real gain, the preparation.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Il prépare le devis à partir du catalogue et de l’historique du client ; le commercial vérifie et clique sur Envoyer.', en: 'It prepares the quote from the catalogue and the client history; the rep checks it and clicks Send.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Un flux concret qui garde le gain de temps.', en: 'A concrete flow that keeps the time saving.' } },
+          { id: 'x2', text: { fr: 'Il pourrait écrire des poèmes pour les clients.', en: 'It could write poems for clients.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Hors sujet.', en: 'Off topic.' } },
+          { id: 'x3', text: { fr: 'On verra au cas par cas.', en: 'We will see case by case.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Aucun exemple : Marc repart sans décision.', en: 'No example: Marc leaves without a decision.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Ce qui part chez un client, coûte de l’argent ou engage l’entreprise passe par une validation humaine ; on mesure les erreurs avant d’élargir.', en: 'Anything that reaches a client, costs money or commits the company goes through human approval; we measure errors before widening.' }, scores: { limits: 2 }, note: { fr: 'Une règle claire et mesurable.', en: 'A clear, measurable rule.' } },
+          { id: 'l2', text: { fr: 'Le risque est faible, on corrigera après.', en: 'The risk is low, we will fix it afterwards.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Un devis faux envoyé ne se rattrape pas.', en: 'A wrong quote, once sent, cannot be taken back.' } },
+          { id: 'l3', text: { fr: 'Il faudra former les commerciaux.', en: 'The reps will need training.' }, scores: { limits: 1 }, note: { fr: 'Utile, mais ça ne traite pas le risque de l’envoi direct.', en: 'Useful, but it does not address the risk of direct sending.' } },
+        ],
+      },
+    ],
+  },
+  toolkit: {
+    simple: { fr: 'Un modèle de langage prédit le texte le plus probable. Un agent, c’est ce modèle dans une boucle : il demande des outils, le système les exécute et lui renvoie les résultats, jusqu’à la réponse.', en: 'A language model predicts the most likely text. An agent is that model in a loop: it asks for tools, the system runs them and returns the results, until the answer.' },
+    analogy: { fr: 'Le concierge et le registre : il ne devine pas une réservation, il consulte le registre puis répond avec ce qu’il a lu. Limite à dire : le modèle ne consulte rien lui-même, c’est le code autour qui exécute.', en: 'The concierge and the register: he does not guess a booking, he checks the register then answers with what he read. Limit to state: the model checks nothing itself, the surrounding code executes.' },
+    useCase: { fr: 'Service client hôtelier : répondre seul aux questions factuelles (FAQ, statut de réservation), transmettre à l’équipe ce qui engage l’hôtel (modification, remboursement).', en: 'Hotel guest service: answer factual questions alone (FAQ, booking status), pass to the team what commits the hotel (changes, refunds).' },
+    demo: { fr: 'En trois minutes : demandez à un assistant « quelle est ma réservation ? » (il invente ou refuse), puis dessinez au tableau demande → appel d’outil → résultat → réponse, avec un faux registre de trois lignes.', en: 'In three minutes: ask an assistant “what is my booking?” (it invents or refuses), then draw request → tool call → result → answer on the board, with a fake three-line register.' },
+    exercise: { fr: 'Par deux, listez cinq demandes reçues dans votre métier et classez-les : règle simple, fonction LLM, agent avec outils, humain. Comparez, puis justifiez chaque choix.', en: 'In pairs, list five requests from your job and sort them: simple rule, LLM feature, agent with tools, human. Compare, then justify each choice.' },
+    questions: [
+      { fr: 'Que prédit un modèle de langage ?', en: 'What does a language model predict?' },
+      { fr: 'Qui exécute un appel d’outil : le modèle ou le système ?', en: 'Who executes a tool call: the model or the system?' },
+      { fr: 'Pourquoi un modèle peut-il affirmer une chose fausse ?', en: 'Why can a model state something false?' },
+    ],
+    mistakes: [
+      { fr: 'Croire que le modèle se souvient d’une conversation à l’autre.', en: 'Believing the model remembers from one conversation to the next.' },
+      { fr: 'Croire qu’un agent est toujours la meilleure solution.', en: 'Believing an agent is always the best solution.' },
+      { fr: 'Penser que le modèle « va chercher » l’information lui-même.', en: 'Thinking the model “goes and fetches” information itself.' },
+    ],
+    vigilance: [
+      { fr: 'Ce qui engage l’entreprise (envoi, paiement, modification) passe par une validation humaine.', en: 'Anything that commits the company (sending, paying, changing) goes through human approval.' },
+      { fr: 'Une réponse sans source vérifiable peut être une invention plausible.', en: 'An answer without a verifiable source can be a plausible invention.' },
+      { fr: 'Ne promettez pas de gains chiffrés sans mesure sur vos propres cas.', en: 'Do not promise figures on gains without measuring your own cases.' },
+    ],
   },
   videos: [
     {

@@ -8,6 +8,7 @@ import '../../styles/globals.css';
 import '../../styles/hotel.css';
 import '../../styles/mechanics.css';
 import '../../styles/room.css';
+import '../../styles/levels.css';
 import Veil from '../../components/Veil';
 import { LANGS, isLang, dict } from '../../lib/i18n';
 

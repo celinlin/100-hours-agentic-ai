@@ -709,6 +709,9 @@
   .room {
     grid-template-rows: auto auto 1fr;
   }
+  .room:has(.journey) {
+    grid-template-rows: auto auto auto 1fr;
+  }
   .room-bar {
     flex-wrap: wrap;
     gap: 8px 12px;
@@ -1120,6 +1123,12 @@ a.register2__name:hover {
     grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
   }
+  .room:has(.journey) {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  .journey {
+    grid-column: 1 / -1;
+  }
   .room-bar {
     grid-column: 1 / -1;
     flex-wrap: nowrap;
@@ -1137,11 +1146,11 @@ a.register2__name:hover {
   .room-stage {
     height: auto;
     grid-column: 1;
-    grid-row: 2;
+    grid-row: -2;
   }
   .room-list {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: -2;
     padding-top: 8px;
   }
   .room-list__item {

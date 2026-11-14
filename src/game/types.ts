@@ -95,7 +95,33 @@ export interface LoopMechanic {
   finalLabel: T;
 }
 
+/**
+ * Everyday analogy made playable: a desk with limited room. The learner places documents
+ * (only `slots` fit); each upcoming question can be answered only if the documents it needs
+ * are on the desk. Solved when every question is answered.
+ */
+export interface DeskMechanic {
+  kind: 'desk';
+  prompt: T;
+  slots: number;
+  docs: { id: string; label: T; detail?: T }[];
+  questions: { q: T; needs: string[]; answer: T; missing: T }[];
+}
+
+/**
+ * An animation the learner steps through (each step lights an actor of the scene),
+ * followed by a check question that validates the mechanism was understood.
+ */
+export interface StepperMechanic {
+  kind: 'stepper';
+  prompt: T;
+  steps: { actor: 'guest' | 'model' | 'tool' | 'system' | 'human'; label: T; detail: T }[];
+  check: ChoiceMechanic;
+}
+
 export type Mechanic =
+  | DeskMechanic
+  | StepperMechanic
   | OrderMechanic
   | SortMechanic
   | MatchMechanic
@@ -118,6 +144,8 @@ export interface Station {
   /** One or two sentences shown before the interaction. */
   show: T;
   mechanic: Mechanic;
+  /** Optional second, harder activity on the same object, shown once the first is solved. */
+  then?: Mechanic;
   /** What to remember, shown after success (≤ 2 sentences). */
   takeaway: T;
   /** Optional deeper explanation, collapsed by default. Plain text with line breaks. */
@@ -128,6 +156,95 @@ export interface Station {
   at: { x: number; y: number };
   /** Optional: a video id (from `videos`) suggested after success. */
   video?: string;
+  /** Everyday analogy shown before the activity, with the point where it stops being true. */
+  everyday?: { analogy: T; limit: T };
+}
+
+/* ------------------------------------------------------------------ */
+/* Learning experience 2.0: story, business mission, teaching, toolkit */
+/* ------------------------------------------------------------------ */
+
+/** The opening scene at the concierge desk: a first success within seconds. */
+export interface IntroScene {
+  guest: string; // fictional guest name
+  request: T;
+  /** What the concierge says if it answers without a tool (a plausible invention). */
+  guess: T;
+  tools: { id: string; label: T; result: T }[];
+  correct: string;
+  answer: T; // the concierge's answer once the right result is in
+  wrongTool: T; // feedback when another tool is chosen
+  lesson: { model: T; call: T; result: T };
+}
+
+export type PermissionLevel = 'read' | 'draft' | 'approve' | 'auto' | 'deny';
+
+/** APPLY — a client brief turned into a workflow that is tested on synthetic requests. */
+export interface BusinessMission {
+  sector: T;
+  client: T; // fictional company name + context
+  brief: T;
+  constraints: { label: T; detail: T }[];
+  problem: ChoiceMechanic;
+  /** bins must be: rule (classic automation), llm (LLM feature), agent, human */
+  tasks: SortMechanic;
+  tools: { id: string; label: T; desc: T; role: 'needed' | 'optional' | 'forbidden'; why: T }[];
+  permissions: { tool: string; options: PermissionLevel[]; allowed: PermissionLevel[]; why: T }[];
+  /** Each test passes if its tools were selected and its permission rule is respected. */
+  tests: {
+    id: string;
+    request: T;
+    needsTools: string[];
+    permission?: { tool: string; allowed: PermissionLevel[] };
+    critical?: boolean;
+    ok: T;
+    ko: T;
+  }[];
+  limits: T[];
+  realCase?: {
+    company: string;
+    facts: T[];
+    source: { title: string; url: string; publisher: string };
+    caveat: T;
+  };
+}
+
+export type Criterion = 'accuracy' | 'simplicity' | 'relevance' | 'limits' | 'example';
+
+export interface TeachOption {
+  id: string;
+  text: T;
+  /** 0, 1 or 2 on the criteria this part contributes to */
+  scores: Partial<Record<Criterion, 0 | 1 | 2>>;
+  note: T; // pedagogical feedback on this choice
+}
+
+/** TEACH — the learner trains a fictional team: three colleagues, three kinds of questions. */
+export interface TeachMission {
+  setting: T;
+  colleagues: {
+    id: string;
+    name: string;
+    role: T;
+    level: T;
+    kind: 'simple' | 'confusion' | 'risky';
+    says: T;
+    explain: TeachOption[];
+    example: TeachOption[];
+    limit: TeachOption[];
+  }[];
+}
+
+/** A reusable kit to teach the chapter to a team. */
+export interface Toolkit {
+  simple: T;
+  analogy: T;
+  useCase: T;
+  demo: T;
+  exercise: T;
+  questions: T[];
+  mistakes: T[];
+  vigilance: T[];
 }
 
 export interface Challenge {
@@ -174,6 +291,12 @@ export interface RoomStyle {
 export interface ChapterGame {
   id: string; // "01"
   room: { name: T; style: RoomStyle };
+  /** The hotel concierge's new capability, gained in this chapter (the common thread). */
+  capability?: T;
+  intro?: IntroScene;
+  mission?: BusinessMission;
+  teach?: TeachMission;
+  toolkit?: Toolkit;
   /** Skills validated by the chapter, one line each. */
   skills: T[];
   /** Notions from formation-ia-gratuite.com integrated here (for the notions index). */
