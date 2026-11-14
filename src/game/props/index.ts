@@ -14,6 +14,7 @@ import * as ch11 from './ch11';
 import * as ch12 from './ch12';
 import * as ch13 from './ch13';
 import * as ch14 from './ch14';
+import * as chHall from './chHall';
 
 /** Every drawable prop, by name. Chapter files only export PropFn values. */
 function collect(mod: Record<string, unknown>): Record<string, PropFn> {
@@ -38,4 +39,5 @@ export const PROPS: Record<string, PropFn> = {
   ...collect(ch12),
   ...collect(ch13),
   ...collect(ch14),
+  ...collect(chHall),
 };
