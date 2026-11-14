@@ -9,6 +9,7 @@ import { useChrono, chrono, fmtTotal, GOAL_MS } from '../game/chrono';
 import { revealPage } from '../lib/transition';
 import Chronometer from './Chronometer';
 import { NOTION_INDEX } from '../game/notions';
+import { pdf } from '../lib/pdf';
 
 interface Item {
   id: string;
@@ -180,6 +181,31 @@ export default function ProgressView({ lang, chapters }: { lang: Lang; chapters:
         ) : (
           <p className="register2__small">{t.none}</p>
         )}
+      </section>
+
+      <section className="register2__docs">
+        <h2 className="register2__block-title">{lang === 'fr' ? 'Documents à télécharger' : 'Documents to download'}</h2>
+        <p className="register2__small">{lang === 'fr' ? 'Le programme original, en PDF (français).' : 'The original programme, as PDF (French).'}</p>
+        <div className="docs__volumes">
+          {pdf.volumes().map((v) => (
+            <a key={v.href} className="pdf-card pdf-card--night" href={v.href} download>
+              <span className="pdf-card__icon" aria-hidden="true">PDF</span>
+              <span className="pdf-card__text">
+                <b>{v.label[lang]}</b>
+                <span>{v.size}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+        <ul className="docs__steps">
+          {chapters.map((x) => (
+            <li key={x.id}>
+              <a href={pdf.chapter(x.id)} download>
+                <span className="register2__num">{x.id}</span> {x.title}
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="register2__notions">

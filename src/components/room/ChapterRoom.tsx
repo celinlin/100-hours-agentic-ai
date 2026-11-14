@@ -12,6 +12,7 @@ import { sfx } from '../../game/sound';
 import { coverAndGo, revealPage, prefersReducedMotion } from '../../lib/transition';
 import { routes, type Lang } from '../../lib/i18n';
 import LiteVideo from './LiteVideo';
+import { pdf } from '../../lib/pdf';
 import IntroSceneView from './levels/IntroScene';
 import MissionBoard from './levels/MissionBoard';
 import TeachRoom from './levels/TeachRoom';
@@ -283,6 +284,11 @@ export default function ChapterRoom({
             <Link className="room-btn room-btn--ghost" href={`${routes.chapter(lang, game.id)}programme/`}>
               {t.deeper}
             </Link>
+          )}
+          {!annex && (
+            <a className="room-btn room-btn--ghost" href={pdf.chapter(game.id)} download title={lang === 'fr' ? 'Télécharger le PDF de l’étape (français)' : 'Download the step PDF (French)'}>
+              PDF
+            </a>
           )}
         </div>
       </div>
@@ -693,6 +699,15 @@ function LibraryView({ lang, game }: { lang: Lang; game: ChapterGame }) {
     <div className="library">
       <p className="station__kicker">{game.room.name[lang]}</p>
       <h2 className="station__title">{t.library}</h2>
+      {/^\d{2}$/.test(game.id) && game.id !== '00' && (
+        <a className="pdf-card" href={pdf.chapter(game.id)} download>
+          <span className="pdf-card__icon" aria-hidden="true">PDF</span>
+          <span className="pdf-card__text">
+            <b>{lang === 'fr' ? `Le programme de l’étape ${game.id}` : `Step ${game.id} programme`}</b>
+            <span>{lang === 'fr' ? '11 pages · français · à télécharger et imprimer' : '11 pages · French · download and print'}</span>
+          </span>
+        </a>
+      )}
       <section className="library__skills">
         <h3>{t.skills}</h3>
         <ul>
