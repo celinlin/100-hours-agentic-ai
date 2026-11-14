@@ -456,7 +456,7 @@ function SuiteWindow({
   const href = routes.chapter(lang, cw.id);
   return (
     <a
-      href={href}
+      href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}${href}`}
       className={`cw cw--${status}${active ? ' is-active' : ''}${celebrate ? ' is-celebrating' : ''}`}
       data-chapter={cw.id}
       aria-label={`${t.chapter} ${num} — ${title}. ${t.status[status]}.`}

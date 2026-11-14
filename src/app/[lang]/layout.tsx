@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: { default: '100 Hours of Agentic AI', template: '%s · 100 Hours of Agentic AI' },
     description: `${t.tagline} ${t.intro}`,
-    icons: { icon: '/favicon.svg' },
+    icons: { icon: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/favicon.svg` },
   };
 }
 
