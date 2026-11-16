@@ -836,3 +836,12 @@
     animation: none;
   }
 }
+
+/* lobby shopfronts: glossary and laboratory */
+.hx-shop__sign {
+  font-family: var(--mono);
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  fill: #e3cf8f;
+  pointer-events: none;
+}

@@ -146,8 +146,8 @@ export default function ChapterRoom({
       if (!g.chapters[game.id]?.visited)
         setGreeting(
           lang === 'fr'
-            ? `Bienvenue : ${game.room.name.fr}. Touche un objet doré, je reste là si besoin.`
-            : `Welcome: ${game.room.name.en}. Tap a golden object, I’m here if needed.`,
+            ? 'Bienvenue. Touche un objet doré ; si tu bloques, touche-moi.'
+            : 'Welcome. Tap a golden object; if you get stuck, tap me.',
         );
       markVisited(game.id);
       sfx('enter');

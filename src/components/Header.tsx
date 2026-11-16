@@ -108,6 +108,12 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
               {hydrated ? `${done}/${ids.length}` : `–/${ids.length}`}
             </span>
           </Link>
+          <Link href={routes.cards(lang)} className="site-nav__progress" onClick={() => setMore(false)} aria-current={route?.kind === 'cards' ? 'page' : undefined}>
+            <span className="site-nav__progress-label">{lang === 'fr' ? 'Lexique' : 'Glossary'}</span>
+          </Link>
+          <Link href={routes.lab(lang)} className="site-nav__progress" onClick={() => setMore(false)} aria-current={route?.kind === 'lab' ? 'page' : undefined}>
+            <span className="site-nav__progress-label">{lang === 'fr' ? 'Laboratoire' : 'Lab'}</span>
+          </Link>
           <MusicPlayer lang={lang} />
           <SoundToggle lang={lang} />
           <button type="button" className="sound-toggle help-btn" aria-label={lang === 'fr' ? 'Revoir le tutoriel' : 'Replay the tutorial'} title={lang === 'fr' ? 'Revoir le tutoriel' : 'Replay the tutorial'} onClick={() => (setMore(false), openOnboarding())}>

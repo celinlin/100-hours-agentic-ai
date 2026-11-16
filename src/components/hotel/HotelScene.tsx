@@ -38,6 +38,10 @@ const L = {
     facade: 'Façade de l’hôtel : quatorze fenêtres, une par étape',
     hall: 'Le salon du hall',
     hallHint: 'Accès libre · les outils du quotidien',
+    cards: 'Le lexique',
+    cardsHint: 'Les mots techniques, en clair · jeu de cartes',
+    lab: 'Le laboratoire',
+    labHint: 'Les bases du machine learning · accès libre',
   },
   en: {
     step: 'Step',
@@ -55,6 +59,10 @@ const L = {
     facade: 'Hotel façade: fourteen windows, one per step',
     hall: 'The lobby lounge',
     hallHint: 'Open access · everyday tools',
+    cards: 'The glossary',
+    cardsHint: 'Technical words, in plain terms · card game',
+    lab: 'The laboratory',
+    labHint: 'Machine learning basics · open access',
   },
 };
 
@@ -73,6 +81,7 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
   const [unlocking, setUnlocking] = useState<string | null>(null);
   const [shake, setShake] = useState<string | null>(null);
   const [hallHover, setHallHover] = useState(false);
+  const [annexHover, setAnnexHover] = useState<null | 'cards' | 'lab'>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const camRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -216,6 +225,28 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
     setTimeout(() => coverAndGo(href, 'warm'), 700);
   };
 
+  /** the two shopfronts either side of the lobby: the glossary (left) and the laboratory (right) */
+  const shopfront = (side: 'cards' | 'lab') => {
+    const lob = model.lobby;
+    return { x: side === 'cards' ? lob.x + 26 : lob.x + lob.w - 276, y: lob.y + 30, w: 250, h: lob.h - 30 };
+  };
+  const enterAnnex = (side: 'cards' | 'lab') => {
+    if (opening) return;
+    const href = side === 'cards' ? routes.cards(lang) : routes.lab(lang);
+    if (prefersReducedMotion()) {
+      router.push(href);
+      return;
+    }
+    setOpening('hall');
+    sfx('open');
+    router.prefetch(href);
+    const r = shopfront(side);
+    const stage = stageRef.current!;
+    const k = Math.min(MAX_ZOOM, Math.max(stage.clientWidth / (r.w * scaleNow()), stage.clientHeight / (r.h * scaleNow())));
+    camera(r, k, true);
+    setTimeout(() => coverAndGo(href, 'warm'), 700);
+  };
+
   const pick = (s: Suite) => {
     if (isTouch()) {
       // contextual magnifier: first tap brings the tier close and previews the window
@@ -335,6 +366,33 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
               <rect className="hx-door__glow" x={CX - 86} y={model.lobby.y + 63} width={172} height={model.lobby.h - 63} />
               <rect className="sw__focus" x={CX - 96} y={model.lobby.y + 52} width={192} height={model.lobby.h - 50} rx={4} />
             </a>
+            {(['cards', 'lab'] as const).map((side) => {
+              const r = shopfront(side);
+              return (
+                <a
+                  key={side}
+                  className="hx-suite hx-door hx-shop"
+                  href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}${side === 'cards' ? routes.cards(lang) : routes.lab(lang)}`}
+                  aria-label={`${t[side]}. ${side === 'cards' ? t.cardsHint : t.labHint}.`}
+                  onMouseEnter={() => setAnnexHover(side)}
+                  onMouseLeave={() => setAnnexHover(null)}
+                  onFocus={() => setAnnexHover(side)}
+                  onBlur={() => setAnnexHover(null)}
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                    e.preventDefault();
+                    enterAnnex(side);
+                  }}
+                >
+                  <rect x={r.x} y={r.y} width={r.w} height={r.h} fill="transparent" />
+                  <rect className="hx-door__glow" x={r.x + 6} y={r.y + 8} width={r.w - 12} height={r.h - 20} />
+                  <rect className="sw__focus" x={r.x} y={r.y} width={r.w} height={r.h} rx={4} />
+                  <text className="hx-shop__sign" x={r.x + r.w / 2} y={r.y + 2} textAnchor="middle">
+                    {(side === 'cards' ? t.cards : t.lab).toUpperCase()}
+                  </text>
+                </a>
+              );
+            })}
           </svg>
           </div>
           {hydrated && !opening && !Object.keys(game.chapters).length && !hover && !selected && (() => {
@@ -365,6 +423,22 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
               <span className="hx-label__title">{t.hall}</span>
             </div>
           )}
+          {annexHover && (() => {
+            const r = shopfront(annexHover);
+            return (
+              <div
+                className="hx-label hx-label--hall"
+                aria-hidden="true"
+                style={{
+                  left: `${(frameRef.current?.offsetLeft ?? 0) + (annexHover === 'cards' ? r.x : r.x + r.w) * scaleNow()}px`,
+                  top: `${(frameRef.current?.offsetTop ?? 0) + (r.y - 70) * scaleNow()}px`,
+                }}
+              >
+                <span className="hx-label__num">{annexHover === 'cards' ? t.cardsHint : t.labHint}</span>
+                <span className="hx-label__title">{t[annexHover]}</span>
+              </div>
+            );
+          })()}
           {/* label pinned in façade coordinates (desktop hover) */}
           {hover && shownSuite && shownCh && (
             <div
