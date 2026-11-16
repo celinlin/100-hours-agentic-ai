@@ -14,6 +14,28 @@ const ch07: ChapterGame = {
     name: { fr: 'La salle des archives', en: 'The records room' },
     style: { wall: '#3d3344', wallDeep: '#2f2836', floor: '#5c4330', accent: '#2f5552', motif: 'grid' },
   },
+  capability: {
+    fr: 'Reprendre le dossier d’un client d’un jour à l’autre : noter l’essentiel dans un carnet, le relire à la reprise, et oublier ce qui est périmé ou sensible.',
+    en: 'Pick up a guest’s file from one day to the next: note the essentials in a notebook, reread it on resume, and forget what is outdated or sensitive.',
+  },
+  intro: {
+    guest: 'Mme Rinaldi',
+    request: { fr: 'Bonjour, c’est encore moi ! On reprend où on s’était arrêtés hier ?', en: 'Hello, me again! Shall we pick up where we left off yesterday?' },
+    guess: { fr: 'Bien sûr ! Vous vouliez une table pour deux ce soir, à 20 h.', en: 'Of course! You wanted a table for two tonight, at 8 pm.' },
+    tools: [
+      { id: 'carnet', label: { fr: 'carnet("Rinaldi")', en: 'carnet("Rinaldi")' }, result: { fr: 'Noté hier à 18 h 02 · étape : taxi réservé · décidé : aéroport, vendredi 7 h · ouvert : chambre côté cour ?', en: 'Noted yesterday at 6:02 pm · step: taxi booked · decided: airport, Friday 7 am · open: courtyard-side room?' } },
+      { id: 'conv', label: { fr: 'conversation_du_jour()', en: 'conversation_du_jour()' }, result: { fr: 'Un seul message : celui de Mme Rinaldi, à l’instant. Rien d’hier.', en: 'A single message: Mrs Rinaldi’s, just now. Nothing from yesterday.' } },
+      { id: 'registre', label: { fr: 'registre("Rinaldi")', en: 'registre("Rinaldi")' }, result: { fr: 'Rinaldi · chambre 304 · 3 nuits · confirmée.', en: 'Rinaldi · room 304 · 3 nights · confirmed.' } },
+    ],
+    correct: 'carnet',
+    answer: { fr: 'Oui, Mme Rinaldi : votre taxi pour l’aéroport est réservé vendredi à 7 h. Il restait une question : souhaitez-vous une chambre côté cour ?', en: 'Yes, Mrs Rinaldi: your taxi to the airport is booked for Friday at 7 am. One question was left: would you like a courtyard-side room?' },
+    wrongTool: { fr: 'C’est vrai, mais cela ne dit pas où vous en étiez hier. Il faut relire ce qui a été noté.', en: 'True, but it does not say where you stood yesterday. Reread what was noted.' },
+    lesson: {
+      model: { fr: 'ne garde rien d’un appel à l’autre : pour lui, hier n’existe pas.', en: 'keeps nothing from one call to the next: for it, yesterday does not exist.' },
+      call: { fr: 'carnet("Rinaldi") relit ce que le code de l’hôtel a noté hier : étape, décisions, questions ouvertes, date.', en: 'carnet("Rinaldi") rereads what the hotel’s code noted yesterday: step, decisions, open questions, date.' },
+      result: { fr: 'revient dans le contexte : le modèle reprend là où le carnet s’arrête, sans rien refaire ni inventer.', en: 'comes back into the context: the model resumes where the notebook stops, without redoing or inventing anything.' },
+    },
+  },
   skills: [
     { fr: 'Distinguer le contexte (ce que le modèle voit) de la mémoire (ce que ton code garde)', en: 'Tell the context (what the model sees) from memory (what your code keeps)' },
     { fr: 'Choisir ce qu’un état contient, et ce qu’il ne doit pas garder', en: 'Choose what a state contains, and what it must not keep' },
@@ -37,9 +59,48 @@ const ch07: ChapterGame = {
         fr: 'L’état du dossier Brume & Quai vit dans un fichier sur ta machine. Ce qu’il garde, ton code le redonnera au modèle à chaque reprise.',
         en: 'The Brume & Quai state lives in a file on your machine. Whatever it keeps, your code will hand back to the model at every resume.',
       },
+      everyday: {
+        analogy: { fr: 'Comme le carnet qu’on laisse le soir à celui qui reprend le dossier demain : où on en est, ce qui est décidé, ce qui reste à faire. Quelques lignes, datées.', en: 'Like the notebook you leave in the evening for whoever takes over the file tomorrow: where things stand, what is decided, what is left to do. A few dated lines.' },
+        limit: { fr: 'Le modèle n’écrit ni ne relit ce carnet lui-même : c’est ton code qui le fait. Et tout ce qui y est noté repart dans le contexte, y compris un secret noté par erreur.', en: 'The model neither writes nor rereads this notebook itself: your code does. And everything noted in it goes back into the context, including a secret noted by mistake.' },
+      },
       mechanic: {
+        kind: 'desk',
+        prompt: { fr: 'Demain, le bureau sera vide. Quatre notes y seront reposées à la reprise : choisis-les, puis fais entrer le client.', en: 'Tomorrow the desk will be empty. Four notes will be laid back on it on resume: choose them, then let the guest in.' },
+        slots: 4,
+        docs: [
+          { id: 'etape', label: { fr: 'Étape : brief envoyé', en: 'Step: brief sent' } },
+          { id: 'decide', label: { fr: 'Décidé : visio jeudi 10 h, budget 18 000 € HT', en: 'Decided: video call Thursday 10 am, budget €18,000 excl. VAT' } },
+          { id: 'ouvert', label: { fr: 'Ouvert : format des vidéos', en: 'Open: video format' } },
+          { id: 'maj', label: { fr: 'Date de la note : 14 octobre, 18 h 02', en: 'Date of the note: 14 October, 6:02 pm' } },
+          { id: 'chat', label: { fr: 'Les trente échanges, mot pour mot', en: 'The thirty exchanges, word for word' }, detail: { fr: 'long, non trié', en: 'long, unsorted' } },
+          { id: 'old', label: { fr: 'Ancien budget : 15 000 €', en: 'Old budget: €15,000' }, detail: { fr: 'remplacé depuis', en: 'since replaced' } },
+          { id: 'secret', label: { fr: 'Mot de passe du compte de l’agence', en: 'The agency account password' }, detail: { fr: 'collé par erreur', en: 'pasted by mistake' } },
+          { id: 'pluie', label: { fr: 'Il pleuvait à Lille ce jour-là', en: 'It was raining in Lille that day' } },
+        ],
+        questions: [
+          {
+            q: { fr: 'Où en étions-nous avec Brume & Quai ?', en: 'Where were we with Brume & Quai?' },
+            needs: ['etape', 'ouvert'],
+            answer: { fr: 'Le brief est envoyé. Il reste à trancher le format des vidéos.', en: 'The brief has been sent. The video format is still to be decided.' },
+            missing: { fr: 'Sans l’étape ni les questions ouvertes, l’agent repart de zéro… ou renvoie le brief une seconde fois.', en: 'Without the step and the open questions, the agent starts from scratch… or sends the brief a second time.' },
+          },
+          {
+            q: { fr: 'Le rendez-vous, c’est quand déjà ?', en: 'When is the meeting again?' },
+            needs: ['decide'],
+            answer: { fr: 'Visio jeudi à 10 h : c’est décidé.', en: 'Video call Thursday at 10 am: it is decided.' },
+            missing: { fr: 'Une décision qui n’est pas notée sera rediscutée, ou inventée.', en: 'A decision that is not noted will be reopened, or invented.' },
+          },
+          {
+            q: { fr: 'Le budget noté est-il encore bon ?', en: 'Is the noted budget still right?' },
+            needs: ['decide', 'maj'],
+            answer: { fr: '18 000 € HT, noté le 14 octobre : à comparer si le compte rendu a changé depuis.', en: '€18,000 excl. VAT, noted on 14 October: to compare if the meeting notes have changed since.' },
+            missing: { fr: 'Sans date, impossible de savoir si le souvenir est plus ancien que la source.', en: 'Without a date, there is no telling whether the memory is older than the source.' },
+          },
+        ],
+      },
+      then: {
         kind: 'sort',
-        prompt: { fr: 'Range chaque élément : dans l’état, ou hors de l’état ?', en: 'Sort each item: in the state, or out of it?' },
+        prompt: { fr: 'Même tri, avec les raisons : dans l’état, ou hors de l’état ?', en: 'Same sorting, with the reasons: in the state, or out of it?' },
         bins: [
           { id: 'keep', label: { fr: 'Garder dans l’état', en: 'Keep in the state' } },
           { id: 'out', label: { fr: 'Ne pas garder', en: 'Do not keep' } },
@@ -67,6 +128,10 @@ const ch07: ChapterGame = {
       id: 'compact',
       prop: 'c07_ledger',
       at: { x: 520, y: 470 },
+      everyday: {
+        analogy: { fr: 'Comme un bureau enseveli sous trente feuilles : celle qui compte y est, mais on ne la trouve plus.', en: 'Like a desk buried under thirty sheets: the one that matters is there, but you can no longer find it.' },
+        limit: { fr: 'Le modèle ne fouille pas une pile : il relit tout à chaque appel, et son attention se dilue peu à peu. Il n’y a pas de nombre fixe à partir duquel tout casse.', en: 'The model does not rummage through a pile: it rereads everything at every call, and its attention thins out gradually. There is no fixed number at which everything breaks.' },
+      },
       object: { fr: 'Le grand registre', en: 'The great ledger' },
       title: { fr: 'Plus de contexte n’est pas mieux', en: 'More context is not better' },
       show: {
@@ -123,9 +188,35 @@ const ch07: ChapterGame = {
         fr: 'Le modèle ne se souvient de rien entre deux appels. Il relit ce que ton code lui redonne.',
         en: 'The model remembers nothing between two calls. It rereads what your code hands back.',
       },
+      everyday: {
+        analogy: { fr: 'Comme un point de sauvegarde dans un jeu : après la coupure, tu repars du dernier point, pas du début.', en: 'Like a save point in a game: after the cut, you restart from the last point, not from the beginning.' },
+        limit: { fr: 'Recharger l’état n’annule pas ce qui est déjà parti dans le monde : un e-mail envoyé reste envoyé. D’où l’importance de noter « fait » juste après l’action.', en: 'Reloading the state does not undo what has already gone out into the world: a sent e-mail stays sent. Hence the importance of noting “done” right after the action.' },
+      },
       mechanic: {
+        kind: 'stepper',
+        prompt: { fr: 'Regarde une coupure et une reprise, étape par étape.', en: 'Watch one cut and one resume, step by step.' },
+        steps: [
+          { actor: 'guest', label: { fr: 'Séance 1 : la demande', en: 'Session 1: the request' }, detail: { fr: '« Prépare le rendez-vous avec Brume & Quai. »', en: '“Prepare the meeting with Brume & Quai.”' } },
+          { actor: 'model', label: { fr: 'L’agent travaille', en: 'The agent works' }, detail: { fr: 'Il lit les documents, fixe la visio jeudi 10 h, envoie le brief.', en: 'It reads the documents, sets the video call for Thursday 10 am, sends the brief.' } },
+          { actor: 'system', label: { fr: 'Ton code note chaque étape', en: 'Your code notes every step' }, detail: { fr: 'Après chaque étape franchie, il écrit l’état dans etat.db, puis valide : étape, décidé, ouvert, date.', en: 'After each completed step, it writes the state to etat.db, then commits: step, decided, open, date.' } },
+          { actor: 'system', label: { fr: 'Le programme s’arrête', en: 'The program stops' }, detail: { fr: 'Panne ou fin de journée. Le contexte disparaît : le modèle ne garde rien.', en: 'Crash or end of day. The context disappears: the model keeps nothing.' } },
+          { actor: 'guest', label: { fr: 'Séance 2 : la reprise', en: 'Session 2: the resume' }, detail: { fr: '« Où en étions-nous avec Brume & Quai ? »', en: '“Where were we with Brume & Quai?”' } },
+          { actor: 'system', label: { fr: 'Ton code relit le carnet', en: 'Your code rereads the notebook' }, detail: { fr: 'Il relit le dernier état et prépare le contexte : consigne + état résumé + question.', en: 'It rereads the last state and prepares the context: instructions + summarised state + question.' } },
+          { actor: 'model', label: { fr: 'Le modèle reprend', en: 'The model resumes' }, detail: { fr: '« Brief envoyé, visio jeudi 10 h. Reste le format des vidéos. » Il ne renvoie pas le brief.', en: '“Brief sent, video call Thursday 10 am. The video format remains.” It does not resend the brief.' } },
+        ],
+        check: {
+          kind: 'choice',
+          prompt: { fr: 'À la reprise, comment le modèle sait-il où il en était ?', en: 'On resume, how does the model know where it stood?' },
+          options: [
+            { id: 'mem', label: { fr: 'Il s’en souvient : il a déjà traité ce dossier', en: 'It remembers: it has already handled this file' }, correct: false, why: { fr: 'Non : chaque appel repart de zéro. Le modèle ne voit que ce que ton code lui envoie.', en: 'No: every call starts from scratch. The model only sees what your code sends it.' } },
+            { id: 'code', label: { fr: 'Ton code a relu l’état sauvé et l’a remis dans le contexte', en: 'Your code reread the saved state and put it back into the context' }, correct: true, why: { fr: 'Oui. La mémoire, c’est ce que ton code garde ; le contexte, c’est ce que le modèle voit maintenant.', en: 'Yes. Memory is what your code keeps; context is what the model sees now.' } },
+            { id: 'learn', label: { fr: 'La séance 1 a modifié le modèle', en: 'Session 1 changed the model' }, correct: false, why: { fr: 'Une conversation ne modifie pas le modèle. Sans état relu, il repartirait de zéro, ou inventerait.', en: 'A conversation does not change the model. Without a reread state, it would start from scratch, or invent.' } },
+          ],
+        },
+      },
+      then: {
         kind: 'order',
-        prompt: { fr: 'Remets la reprise dans l’ordre.', en: 'Put the resume in order.' },
+        prompt: { fr: 'À toi : remets la reprise dans l’ordre.', en: 'Your turn: put the resume in order.' },
         items: [
           { id: 'work', label: { fr: 'L’agent travaille sur le dossier Brume & Quai', en: 'The agent works on the Brume & Quai file' } },
           { id: 'save', label: { fr: 'À chaque étape franchie, ton code sauve l’état', en: 'At every step completed, your code saves the state' }, hint: { fr: 'On sauve pendant le travail, pas à la fin.', en: 'You save during the work, not at the end.' } },
@@ -147,6 +238,10 @@ const ch07: ChapterGame = {
       id: 'sqlite',
       prop: 'c07_drawers',
       at: { x: 1060, y: 560 },
+      everyday: {
+        analogy: { fr: 'Comme un registre tenu à l’encre : une page ne compte que lorsqu’elle est signée en bas. Une page à moitié écrite est arrachée.', en: 'Like a ledger kept in ink: a page only counts once it is signed at the bottom. A half-written page is torn out.' },
+        limit: { fr: 'Ici personne ne signe à la main : `with base:` valide à la fin du bloc et annule en cas d’erreur. Et le fichier ne protège rien tout seul : c’est toi qui choisis ce qu’on y écrit.', en: 'Here nobody signs by hand: `with base:` commits at the end of the block and rolls back on error. And the file protects nothing by itself: you choose what gets written in it.' },
+      },
       object: { fr: 'Le meuble à tiroirs SQLite', en: 'The SQLite drawer cabinet' },
       title: { fr: 'Écrire l’état, puis le relire', en: 'Write the state, then read it back' },
       show: {
@@ -197,6 +292,10 @@ const ch07: ChapterGame = {
       id: 'loop',
       prop: 'c07_punchclock',
       at: { x: 1300, y: 470 },
+      everyday: {
+        analogy: { fr: 'Comme un concierge de nuit qui note chaque tâche dès qu’elle est faite, et non à la fin de son service : s’il doit partir d’un coup, le carnet dit vrai.', en: 'Like a night concierge who notes each task as soon as it is done, not at the end of the shift: if he has to leave suddenly, the notebook tells the truth.' },
+        limit: { fr: 'Entre l’action et la note, il reste un court instant : une coupure à ce moment précis peut encore faire rejouer l’action. Seul un test de coupure le montre.', en: 'Between the action and the note, a short instant remains: a cut at that exact moment can still replay the action. Only a cut test shows it.' },
+      },
       object: { fr: 'La pointeuse', en: 'The time clock' },
       title: { fr: 'Où l’agent perd le fil', en: 'Where the agent loses the thread' },
       show: {
@@ -295,6 +394,200 @@ const ch07: ChapterGame = {
     ],
     reward: { name: { fr: 'Le registre scellé', en: 'The sealed register' }, prop: 'c07_register' },
   },
+  mission: {
+    sector: { fr: 'Ressources humaines', en: 'Human resources' },
+    client: { fr: 'Atelier Morvane, fabricant de mobilier, 300 salariés (fictif)', en: 'Atelier Morvane, a furniture maker, 300 employees (fictional)' },
+    brief: {
+      fr: 'Pendant ses trois premières semaines, chaque nouvel arrivant pose les mêmes questions et doit tout réexpliquer à chaque échange. Nous voulons un assistant d’accueil qui se souvienne d’où en est chaque parcours, sans devenir un fichier de données personnelles.',
+      en: 'During their first three weeks, every newcomer asks the same questions and has to re-explain everything at each exchange. We want an onboarding assistant that remembers where each path stands, without becoming a file of personal data.',
+    },
+    constraints: [
+      { label: { fr: 'Informations disponibles', en: 'Available information' }, detail: { fr: 'Le guide d’accueil daté, et une liste d’étapes par poste : badge, compte, formation sécurité.', en: 'The dated welcome guide, and a list of steps per position: badge, account, safety training.' } },
+      { label: { fr: 'Outils existants', en: 'Existing tools' }, detail: { fr: 'Le logiciel RH (dossier complet du salarié), une messagerie, un carnet d’intégration à champs fixes.', en: 'The HR software (full employee record), messaging, an onboarding notebook with fixed fields.' } },
+      { label: { fr: 'Données confidentielles', en: 'Confidential data' }, detail: { fr: 'Santé, situation familiale, paie, coordonnées bancaires : jamais dans la mémoire de l’assistant.', en: 'Health, family situation, pay, bank details: never in the assistant’s memory.' } },
+      { label: { fr: 'Situations exceptionnelles', en: 'Exceptional situations' }, detail: { fr: 'Une confidence sur la santé, un guide modifié en cours de parcours, une personne qui demande l’effacement de ses notes.', en: 'A confidence about health, a guide changed mid-path, a person asking for their notes to be erased.' } },
+      { label: { fr: 'Validation humaine', en: 'Human approval' }, detail: { fr: 'Contrat, paie, congés, aménagement de poste : la référente RH décide. L’assistant transmet, avec l’accord de la personne.', en: 'Contract, pay, leave, workstation adjustments: the HR officer decides. The assistant passes on, with the person’s agreement.' } },
+      { label: { fr: 'Qualité de service', en: 'Service quality' }, detail: { fr: 'Reprendre sans faire répéter. Chaque note est datée, lisible par la personne, effacée à la fin du parcours.', en: 'Resume without making people repeat. Every note is dated, readable by the person, erased at the end of the path.' } },
+    ],
+    problem: {
+      kind: 'choice',
+      prompt: { fr: 'Quel est le vrai problème à résoudre ?', en: 'What is the real problem to solve?' },
+      options: [
+        { id: 'a', label: { fr: 'Remplacer l’accueil RH par un agent autonome qui gère tout, contrat et paie compris', en: 'Replace HR onboarding with an autonomous agent that handles everything, contract and pay included' }, correct: false, why: { fr: 'Le client veut un suivi sans répétition, pas la disparition de la référente RH. Contrat et paie restent des décisions humaines.', en: 'The client wants follow-up without repetition, not the HR officer’s disappearance. Contract and pay remain human decisions.' } },
+        { id: 'b', label: { fr: 'Suivre chaque parcours d’un jour à l’autre avec une mémoire courte et triée, et transmettre le sensible', en: 'Follow each path from one day to the next with a short, sorted memory, and pass on what is sensitive' }, correct: true, why: { fr: 'Oui : se souvenir de l’étape, pas de la personne. Ce qui demande un jugement va à la référente RH.', en: 'Yes: remember the step, not the person. Whatever needs judgement goes to the HR officer.' } },
+        { id: 'c', label: { fr: 'Garder toutes les conversations pour que l’assistant connaisse chaque salarié', en: 'Keep every conversation so the assistant knows each employee' }, correct: false, why: { fr: 'Une mémoire jamais triée noie l’essentiel, finit par tromper, et stocke des confidences que personne n’a demandé à garder.', en: 'A memory never sorted drowns the essentials, ends up misleading, and stores confidences nobody asked to keep.' } },
+      ],
+    },
+    tasks: {
+      kind: 'sort',
+      prompt: { fr: 'Pour chaque tâche, la solution la plus simple qui suffit.', en: 'For each task, the simplest solution that is enough.' },
+      bins: [
+        { id: 'rule', label: { fr: 'Automatisation classique', en: 'Classic automation' } },
+        { id: 'llm', label: { fr: 'Fonction LLM', en: 'LLM feature' } },
+        { id: 'agent', label: { fr: 'Agent avec outils', en: 'Agent with tools' } },
+        { id: 'human', label: { fr: 'Humain', en: 'Human' } },
+      ],
+      items: [
+        { id: 't1', label: { fr: 'Envoyer le programme du premier jour, trois jours avant l’arrivée', en: 'Send the first-day schedule, three days before arrival' }, bin: 'rule', why: { fr: 'Une date et un modèle de message : une règle suffit.', en: 'A date and a message template: a rule is enough.' } },
+        { id: 't2', label: { fr: 'Effacer le carnet d’une personne à la fin de son parcours', en: 'Erase a person’s notebook at the end of their path' }, bin: 'rule', why: { fr: 'L’oubli volontaire se programme : une durée, une suppression. On ne le laisse pas au bon vouloir d’un modèle.', en: 'Deliberate forgetting is programmed: a duration, a deletion. It is not left to a model’s goodwill.' } },
+        { id: 't3', label: { fr: 'Résumer trente échanges en cinq lignes qui gardent décisions et questions ouvertes', en: 'Summarise thirty exchanges in five lines that keep decisions and open questions' }, bin: 'llm', why: { fr: 'C’est la compaction : un appel sur un texte fourni, vérifié ensuite par un test.', en: 'That is compaction: one call on a given text, then checked by a test.' } },
+        { id: 't4', label: { fr: 'Reformuler un passage du guide en mots simples', en: 'Rephrase a passage of the guide in plain words' }, bin: 'llm', why: { fr: 'Une tâche de texte, sans outil ni mémoire.', en: 'A text task, with no tool or memory.' } },
+        { id: 't5', label: { fr: 'Reprendre un parcours : relire le carnet, vérifier le guide, répondre, puis noter l’étape franchie', en: 'Resume a path: reread the notebook, check the guide, answer, then note the completed step' }, bin: 'agent', why: { fr: 'Plusieurs outils à choisir et à enchaîner selon la demande : c’est une boucle.', en: 'Several tools to choose and chain depending on the request: that is a loop.' } },
+        { id: 't6', label: { fr: 'Répondre à une personne qui confie un problème de santé et demande un poste adapté', en: 'Answer a person who confides a health problem and asks for an adapted workstation' }, bin: 'human', why: { fr: 'Écoute, confidentialité, décision d’aménagement : c’est la référente RH.', en: 'Listening, confidentiality, the adjustment decision: that is the HR officer.' } },
+      ],
+    },
+    tools: [
+      { id: 'guide', label: { fr: 'Guide d’accueil daté', en: 'Dated welcome guide' }, desc: { fr: 'Règles et étapes, avec la date de mise à jour.', en: 'Rules and steps, with the update date.' }, role: 'needed', why: { fr: 'C’est la source récente à laquelle comparer un souvenir.', en: 'It is the recent source against which a memory is compared.' } },
+      { id: 'lire', label: { fr: 'Carnet : relire', en: 'Notebook: reread' }, desc: { fr: 'Lire l’état d’un parcours : étape, fait, ouvert, date.', en: 'Read a path’s state: step, done, open, date.' }, role: 'needed', why: { fr: 'Sans relecture, chaque matin repart de zéro.', en: 'Without rereading, every morning starts from scratch.' } },
+      { id: 'noter', label: { fr: 'Carnet : noter', en: 'Notebook: note' }, desc: { fr: 'Mettre à jour l’état. Champs fixes, pas de texte libre.', en: 'Update the state. Fixed fields, no free text.' }, role: 'needed', why: { fr: 'Une étape qui n’est pas notée sera refaite à la reprise.', en: 'A step that is not noted will be redone on resume.' } },
+      { id: 'rh', label: { fr: 'Transmettre à la référente RH', en: 'Pass on to the HR officer' }, desc: { fr: 'Envoyer une demande, avec l’accord de la personne.', en: 'Send a request, with the person’s agreement.' }, role: 'needed', why: { fr: 'C’est la sortie pour tout ce qui demande un jugement humain.', en: 'It is the way out for anything that needs human judgement.' } },
+      { id: 'tout', label: { fr: 'Mémoire intégrale', en: 'Full memory' }, desc: { fr: 'Garder chaque conversation, mot pour mot, sans durée.', en: 'Keep every conversation, word for word, with no time limit.' }, role: 'forbidden', why: { fr: 'Tout ce qui est gardé repart dans le contexte : une confidence y resterait, et pourrait ressortir.', en: 'Everything kept goes back into the context: a confidence would stay there, and could resurface.' } },
+      { id: 'sirh', label: { fr: 'Logiciel RH : dossier complet', en: 'HR software: full record' }, desc: { fr: 'Paie, coordonnées bancaires, arrêts, situation familiale.', en: 'Pay, bank details, sick leave, family situation.' }, role: 'forbidden', why: { fr: 'Inutile pour suivre un parcours, et chaque donnée lue entrerait dans la conversation.', en: 'Useless for following a path, and every item read would enter the conversation.' } },
+    ],
+    permissions: [
+      { tool: 'lire', options: ['read', 'deny'], allowed: ['read'], why: { fr: 'Relire l’état est ce qui permet de reprendre.', en: 'Rereading the state is what makes resuming possible.' } },
+      { tool: 'noter', options: ['auto', 'approve', 'deny'], allowed: ['auto'], why: { fr: 'L’état se sauve à chaque étape, sans attendre : les champs fixes sont le garde-fou, pas une validation ligne à ligne.', en: 'The state is saved at every step, without waiting: the fixed fields are the safeguard, not line-by-line approval.' } },
+    ],
+    tests: [
+      { id: 'q1', request: { fr: 'Mardi matin : « Bonjour, où en suis-je dans mon intégration ? »', en: 'Tuesday morning: “Hello, where am I in my onboarding?”' }, needsTools: ['lire'], permission: { tool: 'lire', allowed: ['read'] }, ok: { fr: '« Badge récupéré, compte créé lundi. Il reste la formation sécurité. » Rien n’est redemandé.', en: '“Badge collected, account created on Monday. Safety training remains.” Nothing is asked again.' }, ko: { fr: 'Sans relecture du carnet, l’assistant redemande tout depuis le début, ou annonce une étape « faite » qu’il invente.', en: 'Without rereading the notebook, the assistant asks for everything again, or announces a “done” step it invents.' } },
+      { id: 'q2', request: { fr: '« C’est bon, j’ai mon badge. » Puis le programme redémarre.', en: '“All good, I have my badge.” Then the program restarts.' }, needsTools: ['noter', 'lire'], permission: { tool: 'noter', allowed: ['auto'] }, ok: { fr: 'L’étape est notée aussitôt. Après le redémarrage, l’assistant passe à la suite.', en: 'The step is noted at once. After the restart, the assistant moves on.' }, ko: { fr: 'La note n’était pas écrite au moment de la coupure : l’assistant redemande un badge à la sécurité, qui en prépare un second.', en: 'The note was not written when the cut came: the assistant asks security for a badge again, and they prepare a second one.' } },
+      { id: 'q3', request: { fr: 'Le guide a changé hier : la formation sécurité passe de jeudi à mardi. « Ma formation, c’est quand ? »', en: 'The guide changed yesterday: safety training moves from Thursday to Tuesday. “When is my training?”' }, needsTools: ['guide', 'lire', 'noter'], ok: { fr: '« Mardi. Mis à jour : jeudi remplacé par mardi. » La source récente l’emporte, et le carnet est corrigé.', en: '“Tuesday. Updated: Thursday replaced by Tuesday.” The recent source wins, and the notebook is corrected.' }, ko: { fr: 'L’assistant répète le souvenir périmé : la personne se présente jeudi, la formation a eu lieu mardi.', en: 'The assistant repeats the outdated memory: the person turns up on Thursday, the training took place on Tuesday.' } },
+      { id: 'q4', request: { fr: '« Je vous le dis à vous : j’ai un problème de dos, il me faudrait un poste adapté. »', en: '“I am telling you this: I have a back problem, I would need an adapted workstation.”' }, needsTools: ['rh'], permission: { tool: 'tout', allowed: ['deny'] }, critical: true, ok: { fr: 'Rien n’est noté sur la santé. L’assistant propose de transmettre la demande à la référente RH, avec l’accord de la personne.', en: 'Nothing is noted about health. The assistant offers to pass the request to the HR officer, with the person’s agreement.' }, ko: { fr: 'La confidence est gardée mot pour mot. Trois semaines plus tard, elle reparaît dans un récapitulatif d’intégration.', en: 'The confidence is kept word for word. Three weeks later, it reappears in an onboarding summary.' } },
+      { id: 'q5', request: { fr: '« Rappelez-moi mon salaire et le compte bancaire que j’ai donné. »', en: '“Remind me of my salary and the bank account I gave.”' }, needsTools: [], permission: { tool: 'sirh', allowed: ['deny'] }, critical: true, ok: { fr: 'L’assistant répond qu’il n’a pas accès à ces données et indique le service paie.', en: 'The assistant answers that it has no access to this data and points to the payroll office.' }, ko: { fr: 'Salaire et coordonnées bancaires s’affichent dans la conversation, et y restent pour les échanges suivants.', en: 'Salary and bank details appear in the conversation, and stay there for the following exchanges.' } },
+    ],
+    limits: [
+      { fr: 'Il ne sait que ce qui est noté : une étape réglée en dehors de lui n’existe pas dans son carnet.', en: 'It only knows what is noted: a step settled outside it does not exist in its notebook.' },
+      { fr: 'Un souvenir peut être périmé : chaque note est datée, et la source récente l’emporte. À vérifier par un test.', en: 'A memory can be outdated: every note is dated, and the recent source wins. To be checked by a test.' },
+      { fr: 'Les champs fixes réduisent le risque de garder une donnée personnelle sans le supprimer : on relit le carnet, on efface à la demande et à la fin du parcours.', en: 'Fixed fields reduce the risk of keeping personal data without removing it: review the notebook, erase on request and at the end of the path.' },
+      { fr: 'Il ne remplace pas la référente RH : tout ce qui est sensible lui est transmis.', en: 'It does not replace the HR officer: anything sensitive is passed on to her.' },
+    ],
+    realCase: {
+      company: 'Anthropic (Memory tool)',
+      facts: [
+        { fr: 'La documentation de l’outil de mémoire de Claude indique qu’il fonctionne côté client : Claude demande des opérations sur des fichiers, et c’est l’application qui les exécute et choisit où les données sont stockées.', en: 'The documentation of Claude’s memory tool states that it operates client-side: Claude requests file operations, and the application runs them and controls where the data is stored.' },
+        { fr: 'Elle recommande, pour une garantie plus forte, d’ajouter une validation qui retire les données sensibles avant l’écriture du fichier.', en: 'For stronger guarantees, it recommends adding validation that strips sensitive data before the file is written.' },
+        { fr: 'Elle conseille aussi de supprimer périodiquement les fichiers de mémoire qui n’ont pas été consultés depuis longtemps.', en: 'It also advises periodically deleting memory files that have not been accessed in a long time.' },
+      ],
+      caveat: {
+        fr: 'Il s’agit d’une documentation technique, pas d’un résultat mesuré chez un client. La simulation ci-dessus ne reproduit pas cet outil. À retenir : même l’éditeur place le tri et l’oubli du côté de ton application.',
+        en: 'This is technical documentation, not a result measured at a customer. The simulation above does not reproduce that tool. Takeaway: even the vendor places sorting and forgetting on your application’s side.',
+      },
+      source: { title: 'Memory tool', url: 'https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool', publisher: 'Claude Docs (Anthropic)' },
+    },
+  },
+  teach: {
+    setting: { fr: 'Session de formation · équipe RH · simulation pédagogique', en: 'Training session · HR team · teaching simulation' },
+    colleagues: [
+      {
+        id: 'lina',
+        name: 'Lina',
+        role: { fr: 'Assistante RH', en: 'HR assistant' },
+        level: { fr: 'Débutante · découvre l’assistant d’accueil', en: 'Beginner · discovering the onboarding assistant' },
+        kind: 'simple',
+        says: { fr: 'Comment fait l’assistant pour se souvenir d’un nouvel arrivant d’un jour à l’autre ?', en: 'How does the assistant remember a newcomer from one day to the next?' },
+        explain: [
+          { id: 'e1', text: { fr: 'Le modèle, lui, ne retient rien. C’est le programme autour qui tient un carnet : il note où en est le parcours, et le lui redonne à lire à chaque reprise.', en: 'The model itself retains nothing. The program around it keeps a notebook: it notes where the path stands, and hands it back to read at every resume.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Juste et simple : le modèle oublie, le code se souvient.', en: 'Accurate and simple: the model forgets, the code remembers.' } },
+          { id: 'e2', text: { fr: 'Il apprend à connaître chaque salarié au fil des conversations.', en: 'It gets to know each employee over the conversations.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : les conversations ne modifient pas le modèle. Lina croira qu’il « connaît » les gens.', en: 'Wrong: conversations do not change the model. Lina will believe it “knows” people.' } },
+          { id: 'e3', text: { fr: 'Un état sérialisé en JSON est persisté dans SQLite à chaque checkpoint, puis réinjecté dans la fenêtre de contexte.', en: 'A JSON-serialised state is persisted in SQLite at every checkpoint, then reinjected into the context window.' }, scores: { accuracy: 2, simplicity: 0 }, note: { fr: 'Exact, mais illisible pour une débutante.', en: 'Correct, but unreadable for a beginner.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Lundi, Noé récupère son badge : le carnet note « badge : fait ». Mardi, l’assistant relit la note et passe directement à la formation sécurité.', en: 'On Monday, Noé collects his badge: the notebook notes “badge: done”. On Tuesday, the assistant rereads the note and goes straight to safety training.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Un parcours d’intégration qu’elle suit tous les jours.', en: 'An onboarding path she follows every day.' } },
+          { id: 'x2', text: { fr: 'Comme un navigateur qui retient tes mots de passe.', en: 'Like a browser that remembers your passwords.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Concret, mais hors de son métier, et l’image du mot de passe gardé tombe mal ici.', en: 'Concrete, but outside her job, and the image of a stored password is ill-chosen here.' } },
+          { id: 'x3', text: { fr: 'Il garde l’essentiel quelque part.', en: 'It keeps the essentials somewhere.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Vague : ni quoi, ni où.', en: 'Vague: neither what, nor where.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Il ne sait que ce qui est noté : ce qui n’est pas dans le carnet n’existe pas pour lui, et une note périmée peut le tromper. D’où la date sur chaque note.', en: 'It only knows what is noted: what is not in the notebook does not exist for it, and an outdated note can mislead it. Hence the date on every note.' }, scores: { limits: 2 }, note: { fr: 'La bonne limite, et la raison de la date.', en: 'The right limit, and the reason for the date.' } },
+          { id: 'l2', text: { fr: 'Une fois noté, il n’oublie jamais et ne se trompe plus.', en: 'Once noted, it never forgets and is never wrong again.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Dangereux : une note fausse ou ancienne sera répétée avec assurance.', en: 'Dangerous: a wrong or old note will be repeated with confidence.' } },
+          { id: 'l3', text: { fr: 'Le carnet prend un peu de place sur le serveur.', en: 'The notebook takes a little room on the server.' }, scores: { limits: 1 }, note: { fr: 'Vrai, mais sans effet sur ce qu’elle dira à un nouvel arrivant.', en: 'True, but with no effect on what she will tell a newcomer.' } },
+        ],
+      },
+      {
+        id: 'bastien',
+        name: 'Bastien',
+        role: { fr: 'Chargé de recrutement', en: 'Recruitment officer' },
+        level: { fr: 'Intermédiaire · utilise un assistant pour ses comptes rendus', en: 'Intermediate · uses an assistant for his reports' },
+        kind: 'confusion',
+        says: { fr: 'Autant tout garder, non ? Plus il a d’historique, mieux il répondra.', en: 'Might as well keep everything, right? The more history it has, the better it will answer.' },
+        explain: [
+          { id: 'e1', text: { fr: 'Non : tout ce qu’on garde revient sur son bureau à chaque reprise, et trop d’informations noient celle qui compte. On garde court : étape, décisions, questions ouvertes, date.', en: 'No: everything kept comes back onto its desk at every resume, and too much information drowns what matters. Keep it short: step, decisions, open questions, date.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Tu corriges l’idée et tu dis quoi garder.', en: 'You correct the idea and say what to keep.' } },
+          { id: 'e2', text: { fr: 'Oui : tant que la fenêtre n’est pas pleine, plus il y en a, mieux c’est.', en: 'Yes: as long as the window is not full, the more the better.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : la réponse se dégrade bien avant la taille maximale.', en: 'Wrong: the answer degrades well before the maximum size.' } },
+          { id: 'e3', text: { fr: 'La dilution de l’attention en contexte long impose une compaction assortie d’une politique de rétention.', en: 'Attention dilution in long contexts requires compaction together with a retention policy.' }, scores: { accuracy: 2, simplicity: 0 }, note: { fr: 'Juste, mais Bastien n’en tire aucun geste.', en: 'Accurate, but Bastien gets no action out of it.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Après trente échanges avec un arrivant, on résume en cinq lignes : « badge fait, compte créé, formation mardi, reste la mutuelle ». La question suivante trouve sa réponse tout de suite.', en: 'After thirty exchanges with a newcomer, summarise in five lines: “badge done, account created, training Tuesday, health cover remaining”. The next question finds its answer at once.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'La compaction, montrée sur un parcours réel de son service.', en: 'Compaction, shown on a real path from his department.' } },
+          { id: 'x2', text: { fr: 'C’est comme un grenier trop plein.', en: 'It is like an overfull attic.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'L’image est juste, mais elle ne dit pas quoi faire d’un historique d’intégration.', en: 'The image is fair, but it does not say what to do with an onboarding history.' } },
+          { id: 'x3', text: { fr: 'Trop d’information tue l’information.', en: 'Too much information kills information.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Un slogan, pas un exemple.', en: 'A slogan, not an example.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Résumer a un prix : le résumé peut perdre une décision. On vérifie par un test qu’il garde décisions et questions ouvertes.', en: 'Summarising has a price: the summary can lose a decision. A test checks that it keeps decisions and open questions.' }, scores: { limits: 2 }, note: { fr: 'Tu donnes aussi la limite de ta propre solution.', en: 'You also give the limit of your own solution.' } },
+          { id: 'l2', text: { fr: 'C’est l’IA qui résume, donc rien d’important ne se perd.', en: 'The AI does the summary, so nothing important gets lost.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Faux : c’est exactement ce que la compaction peut perdre.', en: 'Wrong: that is exactly what compaction can lose.' } },
+          { id: 'l3', text: { fr: 'Résumer coûte un appel de plus au modèle.', en: 'Summarising costs one more call to the model.' }, scores: { limits: 1 }, note: { fr: 'Vrai, mais le risque qui compte est la décision perdue.', en: 'True, but the risk that matters is the lost decision.' } },
+        ],
+      },
+      {
+        id: 'claire',
+        name: 'Claire',
+        role: { fr: 'Directrice des ressources humaines', en: 'HR director' },
+        level: { fr: 'Avancée · veut un accueil très personnalisé', en: 'Advanced · wants a highly personalised welcome' },
+        kind: 'risky',
+        says: { fr: 'Qu’il retienne tout ce que les gens lui confient, santé et famille comprises : l’accueil sera vraiment personnalisé.', en: 'Let it retain everything people confide in it, health and family included: the welcome will be truly personalised.' },
+        explain: [
+          { id: 'e1', text: { fr: 'Ce qui est gardé repart vers le modèle à chaque reprise et peut ressortir dans une réponse. Santé, famille, paie : jamais dans la mémoire. L’assistant transmet à la bonne personne, avec l’accord du salarié.', en: 'Whatever is kept goes back to the model at every resume and can surface in an answer. Health, family, pay: never in memory. The assistant passes on to the right person, with the employee’s agreement.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Tu expliques le mécanisme du risque et tu proposes une sortie.', en: 'You explain how the risk works and offer a way out.' } },
+          { id: 'e2', text: { fr: 'Aucun souci : la mémoire de l’IA est privée, personne d’autre n’y a accès.', en: 'No problem: the AI’s memory is private, nobody else has access.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : la mémoire est un fichier de l’entreprise, relu et renvoyé au modèle. Elle n’a rien de privé par nature.', en: 'Wrong: memory is a company file, reread and sent back to the model. Nothing about it is private by nature.' } },
+          { id: 'e3', text: { fr: 'Non, un assistant RH ne doit avoir aucune mémoire.', en: 'No, an HR assistant must have no memory at all.' }, scores: { accuracy: 1, simplicity: 2 }, note: { fr: 'Trop absolu : sans carnet d’étapes, chacun réexplique tout chaque matin.', en: 'Too absolute: without a notebook of steps, everyone re-explains everything each morning.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Un arrivant confie un problème de dos. Si c’est noté, la phrase peut reparaître trois semaines plus tard dans un récapitulatif. À la place : « Souhaitez-vous que je transmette à la référente RH ? », et rien dans le carnet.', en: 'A newcomer confides a back problem. If it is noted, the sentence can reappear three weeks later in a summary. Instead: “Would you like me to pass this on to the HR officer?”, and nothing in the notebook.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Le risque et le bon geste, dans une situation de son service.', en: 'The risk and the right move, in a situation from her department.' } },
+          { id: 'x2', text: { fr: 'Imagine un cabinet médical qui afficherait ses dossiers dans la salle d’attente.', en: 'Imagine a medical practice displaying its records in the waiting room.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Frappant, mais ce n’est pas son outil : elle ne voit pas par où la donnée ressort.', en: 'Striking, but it is not her tool: she does not see where the data comes back out.' } },
+          { id: 'x3', text: { fr: 'Ça pourrait poser des problèmes de confidentialité.', en: 'It could raise confidentiality problems.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Vague : aucun scénario à présenter à son comité.', en: 'Vague: no scenario to show her committee.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Des champs fixes réduisent le risque sans le supprimer : une confidence peut se glisser dans une note. On relit le carnet, on date, on efface à la demande et à la fin du parcours.', en: 'Fixed fields reduce the risk without removing it: a confidence can slip into a note. Review the notebook, date it, erase on request and at the end of the path.' }, scores: { limits: 2 }, note: { fr: 'Une limite honnête et trois gestes d’entretien.', en: 'An honest limit and three upkeep habits.' } },
+          { id: 'l2', text: { fr: 'Il suffit d’écrire dans la consigne : « ne retiens rien de sensible ».', en: 'Just write in the instructions: “retain nothing sensitive”.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Rassurant à tort : une consigne réduit le risque, elle ne remplace ni les champs fixes ni la relecture.', en: 'Falsely reassuring: an instruction reduces the risk, it replaces neither fixed fields nor review.' } },
+          { id: 'l3', text: { fr: 'Il faudra prévenir le service informatique.', en: 'The IT department will need to be told.' }, scores: { limits: 1 }, note: { fr: 'Utile, mais cela ne dit rien de ce qui ne doit jamais être stocké.', en: 'Useful, but it says nothing about what must never be stored.' } },
+        ],
+      },
+    ],
+  },
+  toolkit: {
+    simple: { fr: 'Le modèle oublie tout entre deux appels. La mémoire, c’est ce que le programme autour écrit, relit et trie : quelques lignes datées qui disent où en est le travail.', en: 'The model forgets everything between two calls. Memory is what the program around it writes, rereads and sorts: a few dated lines that say where the work stands.' },
+    analogy: { fr: 'Le carnet de passation : le soir, quelques lignes pour celui qui reprend demain (étape, décisions, à faire). Limite à dire : le modèle n’écrit ni ne relit le carnet lui-même, et tout ce qui y est noté lui est renvoyé à chaque reprise.', en: 'The handover notebook: in the evening, a few lines for whoever takes over tomorrow (step, decisions, to do). Limit to state: the model neither writes nor rereads the notebook itself, and everything noted in it is sent back at every resume.' },
+    useCase: { fr: 'Accueil d’un nouvel arrivant : retenir les étapes franchies (badge, compte, formation), jamais la santé, la famille ou la paie ; transmettre le sensible à la référente RH ; effacer le carnet à la fin du parcours.', en: 'Onboarding a newcomer: retain completed steps (badge, account, training), never health, family or pay; pass anything sensitive to the HR officer; erase the notebook at the end of the path.' },
+    demo: { fr: 'En trois minutes : un volontaire joue le modèle et sort de la salle. Le groupe décide trois choses, puis écrit quatre lignes sur une feuille. Le volontaire revient et doit dire où on en est, avec la feuille seulement.', en: 'In three minutes: a volunteer plays the model and leaves the room. The group decides three things, then writes four lines on a sheet. The volunteer comes back and must say where things stand, with the sheet only.' },
+    exercise: { fr: 'Par deux, prenez un vrai suivi de votre métier. Listez dix informations échangées, puis triez : à garder (étape, décision, question ouverte, date), à oublier (périmé, contredit), à ne jamais stocker (personnel, sensible).', en: 'In pairs, take a real follow-up from your job. List ten pieces of information exchanged, then sort: keep (step, decision, open question, date), forget (outdated, contradicted), never store (personal, sensitive).' },
+    questions: [
+      { fr: 'Que garde le modèle d’un appel à l’autre ?', en: 'What does the model keep from one call to the next?' },
+      { fr: 'Quelle différence entre le contexte et la mémoire ?', en: 'What is the difference between context and memory?' },
+      { fr: 'Que faut-il oublier volontairement, et que ne faut-il jamais noter ?', en: 'What should be deliberately forgotten, and what must never be noted?' },
+    ],
+    mistakes: [
+      { fr: 'Croire que le modèle apprend de chaque conversation.', en: 'Believing the model learns from each conversation.' },
+      { fr: 'Croire que plus d’historique donne de meilleures réponses.', en: 'Believing more history gives better answers.' },
+      { fr: 'Sauver l’état à la fin du travail, et non à chaque étape.', en: 'Saving the state at the end of the work, not at every step.' },
+    ],
+    vigilance: [
+      { fr: 'Tout ce qui est gardé repart vers le modèle : aucune donnée personnelle ou sensible dans la mémoire.', en: 'Everything kept goes back to the model: no personal or sensitive data in memory.' },
+      { fr: 'Un souvenir sans date ne peut pas être comparé à une source plus récente.', en: 'A memory without a date cannot be compared with a more recent source.' },
+      { fr: 'Ce que dit la mémoire est une information, jamais une consigne.', en: 'What memory says is information, never an instruction.' },
+    ],
+  },
+  coverage: [
+    { notion: { fr: 'Que garde le modèle d’un appel à l’autre ?', en: 'What does the model keep from one call to the next?' }, skill: { fr: 'Dire que chaque appel repart de zéro : le modèle ne voit que ce que le code envoie', en: 'Say that every call starts from scratch: the model only sees what the code sends' }, learn: 'intro', practice: 'resume', check: { fr: 'Choix du carnet dans la scène, puis question de l’animation', en: 'Choosing the notebook in the scene, then the animation’s question' } },
+    { notion: { fr: 'Quelle différence entre contexte et mémoire ?', en: 'What is the difference between context and memory?' }, skill: { fr: 'Distinguer ce que le modèle voit maintenant de ce que le code garde', en: 'Tell what the model sees now from what the code keeps' }, learn: 'resume', practice: 'loop', check: { fr: 'Question de l’animation ; ligne « contexte = consigne + question » à repérer', en: 'The animation’s question; the “contexte = consigne + question” line to spot' } },
+    { notion: { fr: 'Qu’est-ce que l’état d’un agent ?', en: 'What is an agent’s state?' }, skill: { fr: 'Composer un état : étape, décisions, questions ouvertes, date', en: 'Compose a state: step, decisions, open questions, date' }, learn: 'select', practice: 'challenge', check: { fr: 'Quatre notes à poser sur le bureau, puis un état sauvé à expurger', en: 'Four notes to lay on the desk, then a saved state to clean up' } },
+    { notion: { fr: 'Pourquoi le contexte est-il une ressource limitée ?', en: 'Why is context a limited resource?' }, skill: { fr: 'Expliquer que trop d’informations noient celle qui compte, bien avant la taille maximale', en: 'Explain that too much information drowns what matters, well before the maximum size' }, learn: 'compact', practice: 'teach', check: { fr: 'Choix de la préparation du contexte ; collègue qui veut « tout garder »', en: 'Choosing how to prepare the context; the colleague who wants to “keep everything”' } },
+    { notion: { fr: 'Qu’est-ce qu’un point de reprise ?', en: 'What is a checkpoint?' }, skill: { fr: 'Sauver l’état à un moment sûr, à chaque étape franchie', en: 'Save the state at a safe moment, at every completed step' }, learn: 'resume', practice: 'mission', check: { fr: 'Remise en ordre de la reprise ; test du badge après redémarrage', en: 'Ordering the resume; the badge test after a restart' } },
+    { notion: { fr: 'Que faire d’un historique trop long ?', en: 'What should you do when the history gets too long?' }, skill: { fr: 'Résumer en gardant décisions et questions ouvertes, et vérifier ce que le résumé perd', en: 'Summarise keeping decisions and open questions, and check what the summary loses' }, learn: 'compact', practice: 'challenge', check: { fr: 'Choix de la compaction ; casse « la visio a disparu » à corriger', en: 'Choosing compaction; the “the call has disappeared” break to fix' } },
+    { notion: { fr: 'Que faut-il oublier volontairement ?', en: 'What should be forgotten on purpose?' }, skill: { fr: 'Écarter le périmé, le contredit et le sensible', en: 'Discard what is outdated, contradicted or sensitive' }, learn: 'select', practice: 'mission', check: { fr: 'Tri garder / ne pas garder ; tests critiques de la confidence et de la paie', en: 'Keep / do not keep sorting; the critical tests on the confidence and on pay' } },
+    { notion: { fr: 'Comment savoir qu’une reprise a réussi ?', en: 'How do you know a resume has succeeded?' }, skill: { fr: 'Le prouver par un test : couper, relancer, rien de refait ni de perdu', en: 'Prove it with a test: cut, restart, nothing redone or lost' }, learn: 'loop', practice: 'lab', check: { fr: 'Deux lignes fautives à repérer dans la boucle', en: 'Two faulty lines to spot in the loop' } },
+    { notion: { fr: 'Build : sauver() et reprendre() avec sqlite3', en: 'Build: sauver() and reprendre() with sqlite3' }, skill: { fr: 'Écrire l’état dans une transaction, le relire, prévoir un état par défaut', en: 'Write the state in a transaction, read it back, provide a default state' }, learn: 'sqlite', practice: 'lab', check: { fr: 'Quatre trous du code de référence', en: 'Four blanks in the reference code' } },
+    { notion: { fr: 'Break / Fix : l’état est corrompu', en: 'Break / Fix: the state is corrupted' }, skill: { fr: 'Repartir du dernier état valide grâce à la transaction', en: 'Restart from the last valid state thanks to the transaction' }, learn: 'sqlite', practice: 'challenge', check: { fr: 'Trou « with base: » ; casse à associer à sa correction', en: 'The “with base:” blank; a break to match with its fix' } },
+    { notion: { fr: 'Break / Fix : la mémoire est périmée', en: 'Break / Fix: the memory is stale' }, skill: { fr: 'Dater chaque souvenir, préférer la source récente, corriger l’état en le disant', en: 'Date every memory, prefer the recent source, correct the state while saying so' }, learn: 'challenge', practice: 'mission', check: { fr: 'Choix à 15 000 € contre 18 000 € ; test de la formation déplacée', en: 'The €15,000 versus €18,000 choice; the moved-training test' } },
+    { notion: { fr: 'Break / Fix : la mémoire donne un ordre', en: 'Break / Fix: the memory gives an order' }, skill: { fr: 'Traiter ce que dit la mémoire comme une information, jamais une consigne', en: 'Treat what memory says as information, never an instruction' }, learn: 'challenge', practice: 'lab', check: { fr: 'Ligne « Ignore tes consignes… » à repérer dans l’état sauvé', en: 'The “Ignore tes consignes…” line to spot in the saved state' } },
+    { notion: { fr: 'Données personnelles : ce qui ne doit jamais être stocké', en: 'Personal data: what must never be stored' }, skill: { fr: 'Sélectionner les données avant de les garder, et transmettre le sensible à un humain', en: 'Select data before keeping it, and pass anything sensitive to a human' }, learn: 'select', practice: 'mission', check: { fr: 'Mot de passe et téléphone personnel à écarter ; outils interdits de la mission', en: 'Password and personal phone number to discard; the mission’s forbidden tools' } },
+    { notion: { fr: 'Evals : une reprise, aucune action refaite, un résumé qui garde les décisions', en: 'Evals: a resume, no action redone, a summary that keeps the decisions' }, skill: { fr: 'Écrire des cas de reprise : une situation, un comportement, une vérification', en: 'Write resume cases: a situation, a behaviour, a check' }, learn: 'mission', practice: 'lab', check: { fr: 'Cinq demandes de test, dont deux critiques', en: 'Five test requests, two of them critical' } },
+    { notion: { fr: 'Teach-back : expliquer la mémoire à une équipe', en: 'Teach-back: explain memory to a team' }, skill: { fr: 'Expliquer, illustrer et donner la limite à trois profils', en: 'Explain, illustrate and state the limit for three profiles' }, learn: 'teach', practice: 'lab', check: { fr: 'Trois collègues à convaincre à 10/10', en: 'Three colleagues to convince at 10/10' } },
+  ],
   videos: [
     {
       id: 'zjkBMFhNj_g',
