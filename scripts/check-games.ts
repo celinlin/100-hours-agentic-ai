@@ -5,6 +5,7 @@
  */
 import { GAMES } from '../src/game/chapters';
 import { PROPS } from '../src/game/props';
+import { SIGNATURE_GAMES } from '../src/game/signature/list';
 import type { ChapterGame, PermissionLevel, TeachOption, Criterion, Mechanic } from '../src/game/types';
 
 const CRIT: Criterion[] = ['accuracy', 'simplicity', 'relevance', 'limits', 'example'];
@@ -52,6 +53,7 @@ function mech(m: Mechanic, path: string, errs: string[]) {
     if (m.docs.length <= m.slots) errs.push(`${path}: no real choice (docs ≤ slots)`);
   }
   if (m.kind === 'stepper') mech(m.check, `${path}.check`, errs);
+  if (m.kind === 'custom' && !(SIGNATURE_GAMES as readonly string[]).includes(m.game)) errs.push(`${path}: unknown signature game ${m.game}`);
 }
 
 const only = process.argv.slice(2);
@@ -122,7 +124,8 @@ for (const [id, g] of Object.entries(GAMES).sort()) {
     const ok = new Set(['intro', 'mission', 'teach', 'challenge', 'lab', ...ids]);
     for (const r of g.coverage) for (const k of [r.learn, r.practice]) if (!ok.has(k)) errs.push(`coverage: unknown target ${k}`);
   }
-  const lvl = [g.intro && 'intro', g.mission && 'mission', g.teach && 'teach', g.toolkit && 'kit', g.coverage && `coverage:${g.coverage.length}`, g.capability && 'capability'].filter(Boolean).join(' ');
+  const sig = [...g.stations.flatMap((s) => [s.mechanic, s.then]), ...g.challenge.steps].filter((m) => m && m.kind === 'custom').length;
+  const lvl = [sig ? `signature:${sig}` : '', g.intro && 'intro', g.mission && 'mission', g.teach && 'teach', g.toolkit && 'kit', g.coverage && `coverage:${g.coverage.length}`, g.capability && 'capability'].filter(Boolean).join(' ');
   console.log(`${errs.length ? 'FAIL' : 'ok  '} ${id}  stations=${g.stations.length} everyday=${g.stations.filter((s) => s.everyday).length}  ${lvl}`);
   errs.slice(0, 12).forEach((e) => console.log('     - ' + e));
   bad += errs.length;

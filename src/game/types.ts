@@ -119,7 +119,18 @@ export interface StepperMechanic {
   check: ChoiceMechanic;
 }
 
+/**
+ * A bespoke game built for one room (see src/game/signature/). `game` is its registry key.
+ * The component owns its content (bilingual) and its validation; it calls onSolved when won.
+ */
+export interface CustomMechanic {
+  kind: 'custom';
+  game: string;
+  prompt: T;
+}
+
 export type Mechanic =
+  | CustomMechanic
   | DeskMechanic
   | StepperMechanic
   | OrderMechanic

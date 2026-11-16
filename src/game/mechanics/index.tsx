@@ -11,6 +11,8 @@ import Sampler from './Sampler';
 import Loop from './Loop';
 import Desk from './Desk';
 import Stepper from './Stepper';
+import { SIGNATURE } from '../signature';
+import type { SignatureKey } from '../signature/list';
 
 export type { Lang } from './strings';
 
@@ -42,6 +44,16 @@ export default function MechanicView(props: { m: Mechanic; lang: 'fr' | 'en'; on
       return <Desk key={key} m={m} {...rest} />;
     case 'stepper':
       return <Stepper key={key} m={m} {...rest} />;
+    case 'custom': {
+      const Game = SIGNATURE[m.game as SignatureKey];
+      if (!Game) return null;
+      return (
+        <div className="mg mg-custom" key={key}>
+          <p className="mg-prompt">{m.prompt[rest.lang]}</p>
+          <Game lang={rest.lang} onSolved={rest.onSolved} onMistake={rest.onMistake} />
+        </div>
+      );
+    }
     default: {
       const never: never = m;
       return never;
