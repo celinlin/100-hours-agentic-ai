@@ -12,18 +12,26 @@ export const routes = {
   chapter: (lang: Lang, id: string) => `/${lang}/${lang === 'fr' ? 'etape' : 'step'}-${id}/`,
   progress: (lang: Lang) => `/${lang}/${lang === 'fr' ? 'progression' : 'progress'}/`,
   hall: (lang: Lang) => `/${lang}/${lang === 'fr' ? 'hall' : 'lobby'}/`,
+  /** the word game: every technical term in plain words */
+  cards: (lang: Lang) => `/${lang}/${lang === 'fr' ? 'lexique' : 'glossary'}/`,
+  /** annex room: machine learning basics and evaluating a classifier */
+  lab: (lang: Lang) => `/${lang}/${lang === 'fr' ? 'laboratoire' : 'lab'}/`,
 };
 
 export type Route =
   | { kind: 'hotel' }
   | { kind: 'progress' }
   | { kind: 'hall' }
+  | { kind: 'cards' }
+  | { kind: 'lab' }
   | { kind: 'chapter'; id: string };
 
 /** Parse a `[slug]` segment, in either language. */
 export function parseSlug(slug: string): Route | null {
   if (slug === 'progression' || slug === 'progress') return { kind: 'progress' };
   if (slug === 'hall' || slug === 'lobby') return { kind: 'hall' };
+  if (slug === 'lexique' || slug === 'glossary') return { kind: 'cards' };
+  if (slug === 'laboratoire' || slug === 'lab') return { kind: 'lab' };
   const m = /^(?:etape|step)-(\d{2})$/.exec(slug);
   if (m) return { kind: 'chapter', id: m[1] };
   return null;
@@ -33,6 +41,8 @@ export function hrefFor(lang: Lang, r: Route): string {
   if (r.kind === 'hotel') return routes.hotel(lang);
   if (r.kind === 'progress') return routes.progress(lang);
   if (r.kind === 'hall') return routes.hall(lang);
+  if (r.kind === 'cards') return routes.cards(lang);
+  if (r.kind === 'lab') return routes.lab(lang);
   return routes.chapter(lang, r.id);
 }
 

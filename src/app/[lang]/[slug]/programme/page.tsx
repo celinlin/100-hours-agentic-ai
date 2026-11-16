@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const r = parseSlug(slug);
   if (!r || r.kind === 'hotel') return {};
   const languages = Object.fromEntries(LANGS.map((l) => [l, hrefFor(l, r) + 'programme/']));
-  if (r.kind === 'progress' || r.kind === 'hall') return {};
+  if (r.kind !== 'chapter') return {};
   const m = getChapterMetas(lang).find((c) => c.id === r.id);
   return {
     title: m ? `${dict[lang].chapter} ${m.id} · ${m.title} · Programme` : undefined,
@@ -41,7 +41,7 @@ export default async function ProgrammePage({ params }: { params: Promise<{ lang
   const metas = getChapterMetas(lang);
   const ids = metas.map((m) => m.id);
 
-  if (r.kind === 'progress' || r.kind === 'hall') notFound();
+  if (r.kind !== 'chapter') notFound();
 
   const idx = ids.indexOf(r.id);
   if (idx < 0 || slug !== routes.chapter(lang, r.id).split('/')[2]) notFound();

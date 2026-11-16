@@ -40,7 +40,7 @@ function sanitize(raw: unknown): GameState {
   const r = raw as GameState;
   const chapters: Record<string, ChapterState> = {};
   for (const [id, c] of Object.entries(r.chapters ?? {})) {
-    if (!/^\d{2}$/.test(id) || !c || typeof c !== 'object') continue;
+    if (!/^(\d{2}|lab)$/.test(id) || !c || typeof c !== 'object') continue;
     chapters[id] = {
       stations: Array.isArray(c.stations) ? c.stations.filter((s) => typeof s === 'string') : [],
       challenge: c.challenge === true,
@@ -141,7 +141,7 @@ function chapter(s: GameState, id: string): ChapterState {
 
 /** Every window is open: the learner chooses where to go. Challenges complete a room, they no longer gate the next one. */
 export function isUnlocked(_s: GameState, ids: string[], id: string): boolean {
-  return ids.includes(id) || id === '00';
+  return ids.includes(id) || id === '00' || id === 'lab';
 }
 
 export function windowState(s: GameState, ids: string[], id: string): WindowState {

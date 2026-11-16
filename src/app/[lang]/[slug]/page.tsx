@@ -5,6 +5,8 @@ import ChapterReader from '../../../components/ChapterReader';
 import ChapterRoom from '../../../components/room/ChapterRoom';
 import { GAMES } from '../../../game/chapters';
 import HALL from '../../../game/chapters/hall';
+import LAB from '../../../game/chapters/lab';
+import CardsRoom from '../../../components/cards/CardsRoom';
 import ProgressView from '../../../components/ProgressView';
 import { getChapter, getChapterMetas } from '../../../lib/content';
 import { LANGS, dict, hrefFor, parseSlug, routes, type Lang } from '../../../lib/i18n';
@@ -17,6 +19,8 @@ export function generateStaticParams() {
     const pathOf = (href: string) => href.split('/').filter(Boolean)[1];
     out.push({ lang, slug: pathOf(routes.progress(lang)) });
     out.push({ lang, slug: pathOf(routes.hall(lang)) });
+    out.push({ lang, slug: pathOf(routes.cards(lang)) });
+    out.push({ lang, slug: pathOf(routes.lab(lang)) });
     for (const m of getChapterMetas(lang)) out.push({ lang, slug: pathOf(routes.chapter(lang, m.id)) });
   }
   return out;
@@ -30,6 +34,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const languages = Object.fromEntries(LANGS.map((l) => [l, hrefFor(l, r)]));
   if (r.kind === 'progress') return { title: dict[lang].progressTitle, alternates: { languages } };
   if (r.kind === 'hall') return { title: HALL.room.name[lang], alternates: { languages } };
+  if (r.kind === 'lab') return { title: LAB.room.name[lang], alternates: { languages } };
+  if (r.kind === 'cards') return { title: lang === 'fr' ? 'Le lexique' : 'The glossary', alternates: { languages } };
   const m = getChapterMetas(lang).find((c) => c.id === r.id);
   return {
     title: m ? `${dict[lang].chapter} ${m.id} · ${m.title}` : undefined,
@@ -75,6 +81,30 @@ export default async function SlugPage({ params }: { params: Promise<{ lang: str
         <Header lang={lang} ids={ids} tone="night" />
         <main id="main">
           <ChapterRoom lang={lang} game={HALL} title={HALL.room.name[lang]} block="" ids={['00']} annex />
+        </main>
+      </div>
+    );
+  }
+
+  if (r.kind === 'lab') {
+    if (slug !== routes.lab(lang).split('/')[2]) notFound();
+    return (
+      <div className="page page--room">
+        <Header lang={lang} ids={ids} tone="night" />
+        <main id="main">
+          <ChapterRoom lang={lang} game={LAB} title={LAB.room.name[lang]} block="" ids={['lab']} annex />
+        </main>
+      </div>
+    );
+  }
+
+  if (r.kind === 'cards') {
+    if (slug !== routes.cards(lang).split('/')[2]) notFound();
+    return (
+      <div className="page page--room">
+        <Header lang={lang} ids={ids} tone="night" />
+        <main id="main">
+          <CardsRoom lang={lang} />
         </main>
       </div>
     );
