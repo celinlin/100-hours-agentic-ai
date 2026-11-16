@@ -223,7 +223,7 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
         setZoomTier(s.tier);
         zoomToTier(s.tier);
         setSelected(s.id);
-        sfx('tick');
+        sfx('select');
         return;
       }
     }
@@ -337,6 +337,21 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
             </a>
           </svg>
           </div>
+          {hydrated && !opening && !Object.keys(game.chapters).length && !hover && !selected && (() => {
+            const s1 = model.suites.find((x) => x.index === 0)!;
+            return (
+              <div
+                className="hx-hint"
+                aria-hidden="true"
+                style={{
+                  left: `${(frameRef.current?.offsetLeft ?? 0) + (s1.x + s1.w / 2) * scaleNow()}px`,
+                  top: `${(frameRef.current?.offsetTop ?? 0) + (s1.y - 6) * scaleNow()}px`,
+                }}
+              >
+                {lang === 'fr' ? 'Commence ici' : 'Start here'}
+              </div>
+            );
+          })()}
           {hallHover && (
             <div
               className="hx-label hx-label--hall"

@@ -12,7 +12,6 @@ import { sfx } from '../../game/sound';
 import { coverAndGo, revealPage, prefersReducedMotion } from '../../lib/transition';
 import { routes, type Lang } from '../../lib/i18n';
 import LiteVideo from './LiteVideo';
-import { pdf } from '../../lib/pdf';
 import IntroSceneView from './levels/IntroScene';
 import MissionBoard from './levels/MissionBoard';
 import TeachRoom from './levels/TeachRoom';
@@ -23,7 +22,7 @@ const L = {
     step: 'Étape',
     back: 'L’hôtel',
     library: 'Bibliothèque',
-    deeper: 'Le programme complet',
+    deeper: 'Atelier pratique',
     stations: (d: number, t: number) => `${d} / ${t} objets compris`,
     open: 'Examiner',
     done: 'Compris',
@@ -60,7 +59,7 @@ const L = {
     step: 'Step',
     back: 'The hotel',
     library: 'Library',
-    deeper: 'The full programme',
+    deeper: 'Practice Lab',
     stations: (d: number, t: number) => `${d} / ${t} objects understood`,
     open: 'Examine',
     done: 'Understood',
@@ -95,7 +94,7 @@ const L = {
   },
 };
 
-type Panel = { type: 'station'; id: string } | { type: 'challenge' } | { type: 'library' } | { type: 'kit' } | { type: 'mission' } | { type: 'teach' } | { type: 'intro' } | null;
+type Panel = { type: 'station'; id: string } | { type: 'challenge' } | { type: 'library' } | { type: 'kit' } | { type: 'mission' } | { type: 'teach' } | { type: 'intro' } | { type: 'menu' } | null;
 const WIDE = ['mission', 'teach', 'intro'];
 
 export default function ChapterRoom({
@@ -141,6 +140,7 @@ export default function ChapterRoom({
     if (!hydrated) return;
     if (isUnlocked(g, ids, game.id)) {
       markVisited(game.id);
+      sfx('enter');
       // first visit: the concierge desk opens straight away — a first success in seconds
       if (game.intro && !(g.chapters[game.id]?.stations ?? []).includes('intro')) setPanel({ type: 'intro' });
     }
@@ -209,6 +209,27 @@ export default function ChapterRoom({
     return () => window.removeEventListener('keydown', onKey);
   });
 
+  const openLevel = (type: 'intro' | 'mission' | 'teach') => {
+    sfx('open');
+    setPanel({ type });
+    focus(null);
+  };
+  /** The single next thing to do — the primary action on phones. */
+  const firstOpen = game.stations.find((x) => !solved.has(x.id));
+  const nextAction: { label: string; run: () => void } = !introDone
+    ? { label: lang === 'fr' ? 'Commencer au comptoir' : 'Start at the desk', run: () => openLevel('intro') }
+    : firstOpen
+      ? { label: `${lang === 'fr' ? 'Continuer' : 'Continue'} · ${firstOpen.object[lang]}`, run: () => openStation(firstOpen) }
+      : !missionDone
+        ? { label: lang === 'fr' ? 'Mission · Appliquer en entreprise' : 'Mission · Apply at work', run: () => openLevel('mission') }
+        : !teachDone
+          ? { label: lang === 'fr' ? 'Former l’équipe' : 'Train the team', run: () => openLevel('teach') }
+          : !passed
+            ? { label: lang === 'fr' ? 'Défi final' : 'Final challenge', run: () => openDoor() }
+            : { label: t.toHotel, run: () => toHotel() };
+  const totalSteps = game.stations.length + (game.intro ? 1 : 0) + (game.mission ? 1 : 0) + (game.teach ? 1 : 0) + 1;
+  const doneSteps = solvedCount + (game.intro && introDone ? 1 : 0) + (game.mission && missionDone ? 1 : 0) + (game.teach && teachDone ? 1 : 0) + (passed ? 1 : 0);
+
   const toHotel = () => {
     if (!annex) travel.setFrom(game.id);
     coverAndGo(routes.hotel(lang), 'night');
@@ -271,6 +292,9 @@ export default function ChapterRoom({
           </ol>
           <span>{t.stations(solvedCount, game.stations.length)}</span>
         </div>
+        <button type="button" className="room-more" aria-label={lang === 'fr' ? 'Plus : ressources et atelier' : 'More: resources and lab'} onClick={() => (sfx('open'), setPanel({ type: 'menu' }), focus(null))}>
+          <span aria-hidden="true" />
+        </button>
         <div className="room-bar__actions">
           {game.toolkit && (
             <button type="button" className="room-btn room-btn--ghost" onClick={() => (sfx('open'), setPanel({ type: 'kit' }), focus(null))}>
@@ -284,11 +308,6 @@ export default function ChapterRoom({
             <Link className="room-btn room-btn--ghost" href={`${routes.chapter(lang, game.id)}programme/`}>
               {t.deeper}
             </Link>
-          )}
-          {!annex && (
-            <a className="room-btn room-btn--ghost" href={pdf.chapter(game.id)} download title={lang === 'fr' ? 'Télécharger le PDF de l’étape (français)' : 'Download the step PDF (French)'}>
-              PDF
-            </a>
           )}
         </div>
       </div>
@@ -380,6 +399,18 @@ export default function ChapterRoom({
       {/* object list: the room's index (always available; primary navigation on phones) */}
       <nav className="room-list" aria-label={t.objects}>
         <ol>
+          {game.intro && (
+            <li>
+              <button type="button" className={`room-list__item room-list__item--level${introDone ? ' is-done' : ''}`} onClick={() => openLevel('intro')}>
+                <span className="room-list__n" aria-hidden="true">◆</span>
+                <span className="room-list__text">
+                  <span className="room-list__obj">{lang === 'fr' ? 'Accueil' : 'Welcome'}</span>
+                  <span className="room-list__title">{lang === 'fr' ? 'Le comptoir du concierge' : 'The concierge desk'}</span>
+                </span>
+                <span className="room-list__state">{introDone ? t.done : t.open}</span>
+              </button>
+            </li>
+          )}
           {game.stations.map((s, i) => (
             <li key={s.id}>
               <button type="button" className={`room-list__item${solved.has(s.id) ? ' is-done' : ''}`} onClick={() => openStation(s)}>
@@ -392,6 +423,30 @@ export default function ChapterRoom({
               </button>
             </li>
           ))}
+          {game.mission && (
+            <li>
+              <button type="button" className={`room-list__item room-list__item--level${missionDone ? ' is-done' : ''}`} onClick={() => openLevel('mission')}>
+                <span className="room-list__n" aria-hidden="true">◆</span>
+                <span className="room-list__text">
+                  <span className="room-list__obj">{lang === 'fr' ? 'Niveau 2 · Appliquer' : 'Level 2 · Apply'}</span>
+                  <span className="room-list__title">{game.mission.client[lang]}</span>
+                </span>
+                <span className="room-list__state">{missionDone ? t.done : t.open}</span>
+              </button>
+            </li>
+          )}
+          {game.teach && (
+            <li>
+              <button type="button" className={`room-list__item room-list__item--level${teachDone ? ' is-done' : ''}`} onClick={() => openLevel('teach')}>
+                <span className="room-list__n" aria-hidden="true">◆</span>
+                <span className="room-list__text">
+                  <span className="room-list__obj">{lang === 'fr' ? 'Niveau 3 · Transmettre' : 'Level 3 · Teach'}</span>
+                  <span className="room-list__title">{lang === 'fr' ? 'À toi de former l’équipe' : 'Your turn to train the team'}</span>
+                </span>
+                <span className="room-list__state">{teachDone ? t.done : t.open}</span>
+              </button>
+            </li>
+          )}
           <li>
             <button type="button" className={`room-list__item room-list__item--door${passed ? ' is-done' : ''}${doorReady ? ' is-ready' : ''}`} onClick={openDoor}>
               <span className="room-list__n" aria-hidden="true">
@@ -489,9 +544,42 @@ export default function ChapterRoom({
               <ChallengeView lang={lang} game={game} ready={doorReady || passed} passed={passed} solvedCount={solvedCount} onWin={win} />
             )}
             {panel.type === 'library' && <LibraryView lang={lang} game={game} />}
+            {panel.type === 'menu' && (
+              <div className="room-menu">
+                <h2 className="station__title">{game.room.name[lang]}</h2>
+                <button type="button" className="room-menu__item" onClick={() => setPanel({ type: 'library' })}>
+                  <b>{t.library}</b>
+                  <span>{lang === 'fr' ? 'Vidéos, ressources et notions de la chambre' : 'Videos, resources and notions of the room'}</span>
+                </button>
+                {game.toolkit && (
+                  <button type="button" className="room-menu__item" onClick={() => setPanel({ type: 'kit' })}>
+                    <b>{lang === 'fr' ? 'Kit de transmission' : 'Teaching kit'}</b>
+                    <span>{lang === 'fr' ? 'Pour expliquer ce chapitre à une équipe' : 'To explain this chapter to a team'}</span>
+                  </button>
+                )}
+                {!annex && (
+                  <Link className="room-menu__item" href={`${routes.chapter(lang, game.id)}programme/`}>
+                    <b>{t.deeper}</b>
+                    <span>{lang === 'fr' ? 'Construire, casser, mesurer : les exercices approfondis' : 'Build, break, measure: the in-depth exercises'}</span>
+                  </Link>
+                )}
+              </div>
+            )}
             {panel.type === 'kit' && game.toolkit && <ToolkitView lang={lang} kit={game.toolkit} chapter={`${t.step} ${game.id} · ${title}`} />}
           </div>
         </aside>
+      )}
+
+      {/* phones: one primary action, within thumb reach */}
+      {!panel && !ceremony && (
+        <div className="room-next">
+          <span className="room-next__count" aria-label={`${doneSteps} / ${totalSteps}`}>
+            {doneSteps}/{totalSteps}
+          </span>
+          <button type="button" className="hx-cta room-next__btn" onClick={nextAction.run}>
+            {nextAction.label}
+          </button>
+        </div>
       )}
 
       {ceremony && (
@@ -699,15 +787,6 @@ function LibraryView({ lang, game }: { lang: Lang; game: ChapterGame }) {
     <div className="library">
       <p className="station__kicker">{game.room.name[lang]}</p>
       <h2 className="station__title">{t.library}</h2>
-      {/^\d{2}$/.test(game.id) && game.id !== '00' && (
-        <a className="pdf-card" href={pdf.chapter(game.id)} download>
-          <span className="pdf-card__icon" aria-hidden="true">PDF</span>
-          <span className="pdf-card__text">
-            <b>{lang === 'fr' ? `Le programme de l’étape ${game.id}` : `Step ${game.id} programme`}</b>
-            <span>{lang === 'fr' ? '11 pages · français · à télécharger et imprimer' : '11 pages · French · download and print'}</span>
-          </span>
-        </a>
-      )}
       <section className="library__skills">
         <h3>{t.skills}</h3>
         <ul>
@@ -746,6 +825,33 @@ function LibraryView({ lang, game }: { lang: Lang; game: ChapterGame }) {
           ))}
         </ul>
       </section>
+      {game.coverage && game.coverage.length > 0 && (
+        <details className="cov">
+          <summary>{lang === 'fr' ? `Carte des compétences · ${game.coverage.length} notions` : `Skills map · ${game.coverage.length} notions`}</summary>
+          <ol>
+            {game.coverage.map((r, i) => {
+              const where = (k: string) =>
+                k === 'intro' ? (lang === 'fr' ? 'Comptoir' : 'Desk') :
+                k === 'mission' ? (lang === 'fr' ? 'Mission' : 'Mission') :
+                k === 'teach' ? (lang === 'fr' ? 'Former l’équipe' : 'Train the team') :
+                k === 'challenge' ? (lang === 'fr' ? 'Défi final' : 'Final challenge') :
+                k === 'lab' ? t.deeper :
+                game.stations.find((x) => x.id === k)?.object[lang] ?? k;
+              return (
+                <li key={i}>
+                  <p className="cov__notion">{r.notion[lang]}</p>
+                  <p className="cov__skill">{r.skill[lang]}</p>
+                  <p className="cov__path">
+                    <span>{lang === 'fr' ? 'Découvrir' : 'Discover'} : {where(r.learn)}</span>
+                    <span>{lang === 'fr' ? 'Réutiliser' : 'Reuse'} : {where(r.practice)}</span>
+                    <span className="is-check">{r.check[lang]}</span>
+                  </p>
+                </li>
+              );
+            })}
+          </ol>
+        </details>
+      )}
       <section className="library__notions">
         <h3>{t.notions}</h3>
         <ul>

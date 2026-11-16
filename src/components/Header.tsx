@@ -8,6 +8,8 @@ import { leaveToHotel, isPlainClick } from '../lib/transition';
 import Chronometer from './Chronometer';
 import SoundToggle from './SoundToggle';
 import MusicPlayer from './MusicPlayer';
+import Onboarding, { openOnboarding } from './Onboarding';
+import { useState } from 'react';
 import { useGame, isUnlocked, travel } from '../game/state';
 
 export function Monogram({ className }: { className?: string }) {
@@ -33,6 +35,7 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
   void isUnlocked;
   const route = parseSlug(pathname.split('/').filter(Boolean)[1] ?? '');
   const onHotel = !route;
+  const [more, setMore] = useState(false);
 
   const switchTo = (to: Lang) => {
     try {
@@ -100,8 +103,15 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
             </span>
           </Link>
           <Chronometer lang={lang} tone={tone} />
+          <button type="button" className={`site-nav__more-btn${more ? ' is-open' : ''}`} aria-expanded={more} aria-controls="site-more" aria-label={lang === 'fr' ? 'Menu' : 'Menu'} onClick={() => setMore((m) => !m)}>
+            <span aria-hidden="true" />
+          </button>
+          <div id="site-more" className={`site-nav__more${more ? ' is-open' : ''}`}>
           <MusicPlayer lang={lang} />
           <SoundToggle lang={lang} />
+          <button type="button" className="sound-toggle help-btn" aria-label={lang === 'fr' ? 'Revoir le tutoriel' : 'Replay the tutorial'} title={lang === 'fr' ? 'Revoir le tutoriel' : 'Replay the tutorial'} onClick={() => (setMore(false), openOnboarding())}>
+            ?
+          </button>
           <div className="lang-switch" role="group" aria-label={t.language}>
             {LANGS.map((l) => (
               <Link
@@ -127,8 +137,10 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
               </Link>
             ))}
           </div>
+          </div>
         </nav>
       </div>
+      <Onboarding lang={lang} auto={onHotel} />
     </header>
   );
 }

@@ -235,6 +235,20 @@ export interface TeachMission {
   }[];
 }
 
+/**
+ * Coverage matrix: one row per essential notion of the programme chapter (its 8 pre-test
+ * questions are the programme's own list of essentials).
+ */
+export interface CoverageRow {
+  notion: T; // the notion / pre-test question
+  skill: T; // what the learner can do
+  /** where it is learned: 'intro', a station id, 'mission', 'teach' or 'challenge' */
+  learn: string;
+  /** where it is practised again in a new context: same vocabulary, or 'lab' (the Practice Lab) */
+  practice: string;
+  check: T; // how understanding is verified
+}
+
 /** A reusable kit to teach the chapter to a team. */
 export interface Toolkit {
   simple: T;
@@ -297,6 +311,7 @@ export interface ChapterGame {
   mission?: BusinessMission;
   teach?: TeachMission;
   toolkit?: Toolkit;
+  coverage?: CoverageRow[];
   /** Skills validated by the chapter, one line each. */
   skills: T[];
   /** Notions from formation-ia-gratuite.com integrated here (for the notions index). */

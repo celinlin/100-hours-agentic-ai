@@ -19,7 +19,7 @@ const T = {
     convinced: 'C’est clair, merci.',
     unsure: 'Je crois que je vois… mais pas tout à fait.',
     lost: 'Je ne suis pas sûr d’avoir compris.',
-    passHint: 'Pour convaincre : justesse au maximum, aucun critère à zéro, au moins 9 / 10.',
+    passHint: 'Pour convaincre : les cinq critères au maximum.',
     allDone: 'L’équipe a compris. Tu as su expliquer, donner un exemple et poser les limites.',
     pick: 'Choisis à qui répondre',
     retry: 'Change une partie de ta réponse et réessaie.',
@@ -36,7 +36,7 @@ const T = {
     convinced: 'That’s clear, thanks.',
     unsure: 'I think I see… but not quite.',
     lost: 'I’m not sure I understood.',
-    passHint: 'To convince: full accuracy, no criterion at zero, at least 9 / 10.',
+    passHint: 'To convince: all five criteria at their maximum.',
     allDone: 'The team understood. You explained, gave an example and stated the limits.',
     pick: 'Choose who to answer',
     retry: 'Change one part of your answer and try again.',
@@ -53,7 +53,7 @@ export function scoreAnswer(parts: TeachOption[]) {
     out[c] = vals.length ? Math.min(...vals) : 0;
   }
   const total = CRITERIA.reduce((a, c) => a + out[c], 0);
-  return { per: out, total, pass: out.accuracy === 2 && total >= 9 && CRITERIA.every((c) => out[c] >= 1) };
+  return { per: out, total, pass: total === 10 };
 }
 
 const TONES = ['#7c2f2a', '#2f5552', '#9a7b2f'];

@@ -7,7 +7,6 @@ import type { TocEntry } from '../lib/markdown';
 import { useProgress, useHydrated, statusOf, setStatus, visitChapter, saveScroll, getProgress, nav } from '../lib/progress';
 import { leaveToHotel, enterChapter, isPlainClick, revealPage } from '../lib/transition';
 import { enhanceChapter } from '../lib/enhance';
-import { pdf } from '../lib/pdf';
 import { useWorkbookVersion, wbGet } from '../lib/workbook';
 import FocusTimer from './FocusTimer';
 
@@ -350,9 +349,6 @@ export default function ChapterReader({
           {lang === 'fr' ? 'Retour à la pièce' : 'Back to the room'}
         </Link>
         <div className="reader__tools">
-          <a className="reader__focus-btn reader__pdf" href={pdf.chapter(chapter.id)} download>
-            {lang === 'fr' ? 'Télécharger le PDF' : 'Download the PDF (French)'}
-          </a>
           <button type="button" className={`reader__focus-btn${focusPart ? ' is-on' : ''}`} aria-pressed={!!focusPart} onClick={toggleFocus}>
             {focusPart ? r.focusOff : r.focus}
           </button>
@@ -360,6 +356,15 @@ export default function ChapterReader({
             {t.contents}
           </button>
         </div>
+      </div>
+
+      <div className="lab-banner">
+        <b>{lang === 'fr' ? 'Atelier pratique' : 'Practice Lab'}</b>
+        <span>
+          {lang === 'fr'
+            ? 'Ici, tu construis pour de vrai : code, API, tests, sur ta machine. Le site ne lance pas ton code ; il te guide, garde tes notes et tes réponses.'
+            : 'Here you build for real: code, APIs, tests, on your own machine. The site does not run your code; it guides you and keeps your notes and answers.'}
+        </span>
       </div>
 
       <header className="cover">
