@@ -115,6 +115,7 @@ const T = {
       ok: 'Un seul agent suffit : 6 s, 1 000 tokens. Cette tâche ne se découpe pas.',
     },
     done: 'Service terminé.',
+    cooking: 'En cuisine…',
   },
   en: {
     steps: ['The ticket', 'The service', 'The tasting', 'The small order'],
@@ -205,10 +206,13 @@ const T = {
       ok: 'One agent is enough: 6 s, 1,000 tokens. This task does not split.',
     },
     done: 'Service over.',
+    cooking: 'In the kitchen…',
   },
 };
 
-const fmtK = (n: number, lang: Lang) => n.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB').replace(/ | /g, ' ');
+/** Keep amounts on one line (« 15 000 € »). */
+const nb = (s: string) => s.replace(/(\d) (?=\d{3}|€)/g, '$1\u00a0');
+const fmtK = (n: number, lang: Lang) => n.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB').replace(/\u202f/g, '\u00a0');
 
 /* ---------- course 1: one ticket ---------- */
 type Ticket = Record<Part, number | null>;
@@ -513,7 +517,7 @@ export default function Game({ lang, onSolved, onMistake }: SignatureProps) {
     tone = r4.ok ? 'good' : 'bad';
   } else if (!busy) {
     note = [t.hint1, t.hint2, t.hint3, t.hint4][step];
-  }
+  } else note = t.cooking;
 
   const cycle = (p: Part) => {
     sfx('tick');
@@ -637,7 +641,7 @@ export default function Game({ lang, onSolved, onMistake }: SignatureProps) {
               <p className="sg09-tkh">{title}</p>
               {lines.map(([id, text]) => (
                 <button key={id} type="button" className="sg09-rl" data-testid={`line-${id}`} data-on={picked.includes(id)} aria-pressed={picked.includes(id)} disabled={taste === 'ok'} onClick={() => pick(id)}>
-                  {text}
+                  {nb(text)}
                 </button>
               ))}
             </div>
@@ -671,7 +675,7 @@ export default function Game({ lang, onSolved, onMistake }: SignatureProps) {
             </span>
             <b>{phase === 'done' ? `${r1.calls} ${t.calls} · ` : ''}{fmtK(bill, lang)} {t.tokens}</b>
           </div>
-          {phase === 'done' && <p className="sg09-plateline" data-tone={r1.ok ? 'ok' : 'bad'} data-testid="return">{t.r1[r1.ret]}</p>}
+          {phase === 'done' && <p className="sg09-plateline" data-tone={r1.ret === 'good' ? 'ok' : 'bad'} data-testid="return">{nb(t.r1[r1.ret])}</p>}
         </div>
       )}
       {step === 1 && (
@@ -695,7 +699,7 @@ export default function Game({ lang, onSolved, onMistake }: SignatureProps) {
                 r ? (
                   <li key={i} data-tone={r.kind === 'dup' || r.kind === 'stuck' || (r.kind === 'brief' && !(r.b && r.d)) ? 'bad' : 'ok'}>
                     <span>{t.helper(i + 1)}</span>
-                    {r.kind === 'brief' ? t.r2.brief(r.b ? t.r2.full[0] : '[ ? ]', r.d ? t.r2.full[1] : '[ ? ]') : t.r2[r.kind]}
+                    {nb(r.kind === 'brief' ? t.r2.brief(r.b ? t.r2.full[0] : '[ ? ]', r.d ? t.r2.full[1] : '[ ? ]') : t.r2[r.kind])}
                   </li>
                 ) : null,
               )}
@@ -722,7 +726,7 @@ export default function Game({ lang, onSolved, onMistake }: SignatureProps) {
       )}
 
       <p className="sg09-note" role="status" aria-live="polite" data-tone={tone} data-testid="note">
-        {won ? `${note} ${t.done}` : note}
+        {nb(won ? `${note} ${t.done}` : note)}
       </p>
 
       <div className="sg09-actions">

@@ -248,7 +248,11 @@ function voice(name: Sfx, c: Ctx, out: AudioNode, t: number) {
 
 const MIN_GAP: Partial<Record<Sfx, number>> = { tick: 0.05, select: 0.08, place: 0.06 };
 
+/** Every effect is also announced, sound on or off: the companion reacts to successes and mistakes. */
+export const sfxEvents: EventTarget | null = typeof window !== 'undefined' ? new EventTarget() : null;
+
 export function sfx(name: Sfx) {
+  sfxEvents?.dispatchEvent(new CustomEvent('sfx', { detail: name }));
   load();
   const c = ensureCtx();
   if (!c || !master) return;

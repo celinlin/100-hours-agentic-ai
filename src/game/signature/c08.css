@@ -377,7 +377,8 @@
   to { transform: none; opacity: 1; }
 }
 .sg08-slip-n {
-  margin-bottom: 6px !important;
+  min-height: 26px;
+  margin-bottom: 8px !important;
   font-family: var(--mono);
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
@@ -417,17 +418,17 @@
 }
 .sg08-mark {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
-  padding: 3px 10px;
+  right: 8px;
+  top: 5px;
+  padding: 1px 8px;
   border: 3px solid currentColor;
   border-radius: 4px;
   font-family: var(--mono);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   background: var(--paper);
-  transform: rotate(-7deg);
+  transform: rotate(-4deg);
   animation: sg08-stamp 0.28s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
 .sg08-mark[data-tone='ok'] {
@@ -440,8 +441,8 @@
   color: var(--ox);
 }
 @keyframes sg08-stamp {
-  from { transform: rotate(-7deg) scale(1.9); opacity: 0; }
-  to { transform: rotate(-7deg) scale(1); opacity: 1; }
+  from { transform: rotate(-4deg) scale(1.9); opacity: 0; }
+  to { transform: rotate(-4deg) scale(1); opacity: 1; }
 }
 .sg08-note {
   min-height: 2.9em;

@@ -92,7 +92,13 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
               {t.theHotel}
             </Link>
           )}
+          <Chronometer lang={lang} tone={tone} />
+          <button type="button" className={`site-nav__more-btn${more ? ' is-open' : ''}`} aria-expanded={more} aria-controls="site-more" aria-label={lang === 'fr' ? 'Menu' : 'Menu'} onClick={() => setMore((m) => !m)}>
+            <span aria-hidden="true" />
+          </button>
+          <div id="site-more" className={`site-nav__more${more ? ' is-open' : ''}`}>
           <Link
+            onClick={() => setMore(false)}
             href={routes.progress(lang)}
             className="site-nav__progress"
             aria-current={route?.kind === 'progress' ? 'page' : undefined}
@@ -102,11 +108,6 @@ export default function Header({ lang, ids, tone }: { lang: Lang; ids: string[];
               {hydrated ? `${done}/${ids.length}` : `–/${ids.length}`}
             </span>
           </Link>
-          <Chronometer lang={lang} tone={tone} />
-          <button type="button" className={`site-nav__more-btn${more ? ' is-open' : ''}`} aria-expanded={more} aria-controls="site-more" aria-label={lang === 'fr' ? 'Menu' : 'Menu'} onClick={() => setMore((m) => !m)}>
-            <span aria-hidden="true" />
-          </button>
-          <div id="site-more" className={`site-nav__more${more ? ' is-open' : ''}`}>
           <MusicPlayer lang={lang} />
           <SoundToggle lang={lang} />
           <button type="button" className="sound-toggle help-btn" aria-label={lang === 'fr' ? 'Revoir le tutoriel' : 'Replay the tutorial'} title={lang === 'fr' ? 'Revoir le tutoriel' : 'Replay the tutorial'} onClick={() => (setMore(false), openOnboarding())}>

@@ -16,6 +16,8 @@ import IntroSceneView from './levels/IntroScene';
 import MissionBoard from './levels/MissionBoard';
 import TeachRoom from './levels/TeachRoom';
 import ToolkitView from './levels/ToolkitView';
+import Companion from '../Companion';
+import { companion } from '../../game/companion';
 
 const L = {
   fr: {
@@ -117,6 +119,7 @@ export default function ChapterRoom({
   const [hydrated, setHydrated] = useState(false);
   const [panel, setPanel] = useState<Panel>(null);
   const [ceremony, setCeremony] = useState(false);
+  const [greeting, setGreeting] = useState<string | undefined>(undefined);
   const camRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const idx = ids.indexOf(game.id);
@@ -139,6 +142,13 @@ export default function ChapterRoom({
   useEffect(() => {
     if (!hydrated) return;
     if (isUnlocked(g, ids, game.id)) {
+      // Gaspard greets once per room (first visit), then stays quiet unless asked
+      if (!g.chapters[game.id]?.visited)
+        setGreeting(
+          lang === 'fr'
+            ? `Bienvenue : ${game.room.name.fr}. Touche un objet doré, je reste là si besoin.`
+            : `Welcome: ${game.room.name.en}. Tap a golden object, I’m here if needed.`,
+        );
       markVisited(game.id);
       sfx('enter');
       // first visit: the concierge desk opens straight away — a first success in seconds
@@ -179,11 +189,13 @@ export default function ChapterRoom({
 
   const openStation = (s: Station) => {
     sfx('open');
+    companion.setContext({ nudge: s.everyday?.analogy[lang], key: s.takeaway[lang] });
     setPanel({ type: 'station', id: s.id });
     setResume(game.id, s.id);
     // let the panel mount first, then move the camera on the next frame
     requestAnimationFrame(() => requestAnimationFrame(() => focus(s.at)));
   };
+  useEffect(() => () => companion.setContext(null), []);
   const openDoor = () => {
     if (!doorReady && !passed) {
       sfx('wrong');
@@ -197,6 +209,7 @@ export default function ChapterRoom({
   };
   const closePanel = () => {
     sfx('close');
+    companion.setContext(null);
     setPanel(null);
     focus(null);
   };
@@ -568,6 +581,8 @@ export default function ChapterRoom({
           </div>
         </aside>
       )}
+
+      {!ceremony && <Companion lang={lang} greeting={greeting} />}
 
       {/* phones: one primary action, within thumb reach */}
       {!panel && !ceremony && (

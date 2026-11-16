@@ -212,6 +212,9 @@ interface Run {
   over: boolean;
 }
 
+/** Keep amounts on one line (« 15 000 € »). */
+const nb = (s: string) => s.replace(/(\d) (?=\d{3}|€)/g, '$1\u00a0');
+
 const START: Run = { i: -1, stage: 'done', hold: false, bells: 0, inc: 0, mistakes: 0, tiredHit: false, draft: false, sent: false, refusedBad: false, stubs: [], note: null, over: false };
 
 function eligible(s: Slip, run: Run, rules: Rules): boolean {
@@ -523,12 +526,12 @@ export default function Game({ lang, onSolved, onMistake }: SignatureProps) {
               <dl>
                 <div>
                   <dt>{t.tool}</dt>
-                  <dd className="sg08-call">{slip.call}</dd>
+                  <dd className="sg08-call">{nb(slip.call)}</dd>
                 </div>
                 {slip.rows[lang].map(([k, v]) => (
                   <div key={k}>
                     <dt>{k}</dt>
-                    <dd>{v}</dd>
+                    <dd>{nb(v)}</dd>
                   </div>
                 ))}
               </dl>
@@ -541,7 +544,7 @@ export default function Game({ lang, onSolved, onMistake }: SignatureProps) {
           )}
 
           <p className="sg08-note" role="status" aria-live="polite" data-tone={run.over ? (won ? 'good' : 'bad') : tone} data-testid={run.over ? 'verdict' : 'note'}>
-            {run.over ? verdict : status}
+            {nb(run.over ? verdict : status)}
           </p>
 
           {!run.over && run.stage === 'bell' && (
