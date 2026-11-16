@@ -32,13 +32,13 @@ const T = {
     back: 'Revenir à l’étape',
     selected: 'retenu',
     flow: 'Ton workflow',
-    msg: 'Message client',
+    msg: 'Demande',
     sol: 'La solution lit, choisit, rédige',
     autoSend: 'Envoi automatique',
     draftSend: 'Brouillon pour l’équipe',
     approveSend: 'Envoi après validation',
     team: 'Transmis à l’équipe',
-    teamWhy: 'cas sensibles, actions non autorisées',
+    teamWhy: 'tout ce qui n’est pas autorisé',
     uses: 'Outils',
   },
   en: {
@@ -65,13 +65,13 @@ const T = {
     back: 'Back to step',
     selected: 'selected',
     flow: 'Your workflow',
-    msg: 'Guest message',
+    msg: 'Request',
     sol: 'The solution reads, chooses, drafts',
     autoSend: 'Sent automatically',
     draftSend: 'Draft for the team',
     approveSend: 'Sent after approval',
     team: 'Passed to the team',
-    teamWhy: 'sensitive cases, unauthorised actions',
+    teamWhy: 'everything that is not allowed',
     uses: 'Tools',
   },
 };
@@ -270,17 +270,18 @@ export default function MissionBoard({ lang, mission, done, onDone }: { lang: La
                   <div className="mflow__row">
                     <span className="mflow__node">{t.msg}</span>
                     <span className="mflow__arrow" aria-hidden="true" />
-                    <span className="mflow__node mflow__node--core">
-                      {t.sol}
-                      <small>
-                        {t.uses} : {tools.map(label).join(' · ') || '—'}
-                      </small>
-                    </span>
+                    <span className="mflow__node mflow__node--core">{t.sol}</span>
                     <span className="mflow__arrow" aria-hidden="true" />
                     <span className="mflow__out">
-                      <span className={`mflow__node mflow__node--${perms.mail ?? 'none'}`}>
-                        {perms.mail === 'auto' ? t.autoSend : perms.mail === 'approve' ? t.approveSend : t.draftSend}
-                      </span>
+                      {(['auto', 'read', 'draft', 'approve'] as PermissionLevel[]).map((lvl) => {
+                        const list = tools.filter((id) => (perms[id] ?? (mission.permissions.some((p) => p.tool === id) ? null : 'auto')) === lvl);
+                        return list.length ? (
+                          <span key={lvl} className={`mflow__node mflow__node--${lvl}`}>
+                            {t.perm[lvl]}
+                            <small>{list.map(label).join(' · ')}</small>
+                          </span>
+                        ) : null;
+                      })}
                       <span className="mflow__node mflow__node--team">
                         {t.team}
                         <small>{t.teamWhy}</small>
