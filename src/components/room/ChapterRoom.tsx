@@ -31,7 +31,7 @@ const L = {
     takeaway: 'À retenir',
     more: 'En savoir plus',
     watch: 'Une vidéo pour prolonger',
-    door: 'La porte de l’étage suivant',
+    door: 'La porte du défi',
     doorLocked: (n: number) => `Comprends d’abord les ${n} objets de la pièce.`,
     doorReady: 'Le défi final t’attend.',
     doorDone: 'Défi réussi. La porte est ouverte.',
@@ -39,7 +39,7 @@ const L = {
     continue: 'Épreuve suivante',
     retry: 'Une erreur se corrige : relis l’explication et réessaie.',
     earned: 'Tu as obtenu',
-    unlockedNext: (id: string) => `La fenêtre ${id} s’est ouverte sur la façade.`,
+    unlockedNext: (_id: string) => 'La fenêtre de cette chambre est maintenant illuminée sur la façade.',
     lastFloor: 'Tu as terminé le dernier étage de l’hôtel.',
     toHotel: 'Retourner à l’hôtel',
     stay: 'Rester dans la pièce',
@@ -68,7 +68,7 @@ const L = {
     takeaway: 'Remember',
     more: 'Learn more',
     watch: 'A video to go further',
-    door: 'The door to the next floor',
+    door: 'The challenge door',
     doorLocked: (n: number) => `First understand the ${n} objects in the room.`,
     doorReady: 'The final challenge awaits.',
     doorDone: 'Challenge passed. The door is open.',
@@ -76,7 +76,7 @@ const L = {
     continue: 'Next trial',
     retry: 'Mistakes can be fixed: read the explanation and try again.',
     earned: 'You earned',
-    unlockedNext: (id: string) => `Window ${id} has opened on the façade.`,
+    unlockedNext: (_id: string) => 'This room’s window is now lit on the façade.',
     lastFloor: 'You have completed the hotel’s top floor.',
     toHotel: 'Back to the hotel',
     stay: 'Stay in the room',
@@ -238,7 +238,6 @@ export default function ChapterRoom({
   const win = () => {
     passChallenge(game.id);
     sfx('unlock');
-    if (nextId && !annex) travel.setUnlocked(nextId);
     setCeremony(true);
   };
 

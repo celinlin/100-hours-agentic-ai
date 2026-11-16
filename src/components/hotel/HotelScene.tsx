@@ -28,12 +28,12 @@ const L = {
     lockedHint: (prev: string) => `Réussis le défi de l’étape ${prev} pour ouvrir cette fenêtre.`,
     enter: 'Entrer',
     overview: 'Vue d’ensemble',
-    opened: (n: number, t: number) => `${n} / ${t} fenêtres ouvertes`,
-    tagline: 'Un hôtel, quatorze fenêtres. Chacune ouvre une pièce où l’on apprend en manipulant.',
+    opened: (n: number, t: number) => `${n} / ${t} chambres terminées`,
+    tagline: 'Un hôtel, quatorze fenêtres, toutes ouvertes. Choisis ta chambre : chacune a son jeu.',
     begin: 'Ouvrir la fenêtre 01',
     openN: (id: string) => `Ouvrir la fenêtre ${id}`,
     resume: (id: string) => `Reprendre l’étape ${id}`,
-    tap: 'Touche une fenêtre pour t’en approcher.',
+    tap: 'Touche la fenêtre de ton choix.',
     hover: 'Choisis une fenêtre éclairée.',
     facade: 'Façade de l’hôtel : quatorze fenêtres, une par étape',
     hall: 'Le salon du hall',
@@ -45,12 +45,12 @@ const L = {
     lockedHint: (prev: string) => `Pass the challenge of step ${prev} to open this window.`,
     enter: 'Enter',
     overview: 'Whole hotel',
-    opened: (n: number, t: number) => `${n} / ${t} windows open`,
-    tagline: 'One hotel, fourteen windows. Each opens a room where you learn by doing.',
+    opened: (n: number, t: number) => `${n} / ${t} rooms completed`,
+    tagline: 'One hotel, fourteen windows, all open. Pick your room: each has its own game.',
     begin: 'Open window 01',
     openN: (id: string) => `Open window ${id}`,
     resume: (id: string) => `Resume step ${id}`,
-    tap: 'Tap a window to get closer.',
+    tap: 'Tap the window of your choice.',
     hover: 'Choose a lit window.',
     facade: 'Hotel façade: fourteen windows, one per step',
     hall: 'The lobby lounge',
@@ -78,8 +78,8 @@ export default function HotelScene({ lang, chapters }: { lang: Lang; chapters: S
   const svgRef = useRef<SVGSVGElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
 
-  const stateOf = useCallback((id: string): WindowState => (hydrated ? windowState(game, ids, id) : id === ids[0] ? 'available' : 'locked'), [game, ids, hydrated]);
-  const openedCount = ids.filter((id) => stateOf(id) !== 'locked').length;
+  const stateOf = useCallback((id: string): WindowState => (hydrated ? windowState(game, ids, id) : 'available'), [game, ids, hydrated]);
+  const openedCount = ids.filter((id) => stateOf(id) === 'completed').length;
   const upNext = hydrated ? nextUp(game, ids) : ids[0];
 
   /* ---------- camera ---------- */

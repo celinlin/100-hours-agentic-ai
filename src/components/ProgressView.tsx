@@ -23,7 +23,7 @@ const L = {
   fr: {
     kicker: 'Ma progression',
     title: 'Le registre de l’hôtel',
-    lede: 'Tout est enregistré sur cet appareil, sans compte. Une fenêtre s’ouvre quand le défi de la précédente est réussi.',
+    lede: 'Tout est enregistré sur cet appareil, sans compte. Toutes les fenêtres sont ouvertes : une chambre est terminée quand son défi est réussi.',
     hours: 'Vers les 100 heures',
     windows: 'Fenêtres',
     open: 'ouvertes',
@@ -50,7 +50,7 @@ const L = {
   en: {
     kicker: 'My progress',
     title: 'The hotel register',
-    lede: 'Everything is saved on this device, no account needed. A window opens when the previous one’s challenge is passed.',
+    lede: 'Everything is saved on this device, no account needed. Every window is open: a room is completed when its challenge is passed.',
     hours: 'Towards 100 hours',
     windows: 'Windows',
     open: 'open',
@@ -86,8 +86,7 @@ export default function ProgressView({ lang, chapters }: { lang: Lang; chapters:
     revealPage();
   }, []);
   const ids = chapters.map((x) => x.id);
-  const st = (id: string): WindowState => (hydrated ? windowState(g, ids, id) : id === ids[0] ? 'available' : 'locked');
-  const openN = ids.filter((id) => st(id) !== 'locked').length;
+  const st = (id: string): WindowState => (hydrated ? windowState(g, ids, id) : 'available');
   const doneN = ids.filter((id) => st(id) === 'completed').length;
   const next = hydrated ? nextUp(g, ids) : ids[0];
   const earned = chapters.filter((x) => st(x.id) === 'completed' && x.reward);
@@ -119,9 +118,6 @@ export default function ProgressView({ lang, chapters }: { lang: Lang; chapters:
 
         <section className="register2__card">
           <p className="register2__label">{t.windows}</p>
-          <p className="register2__big">
-            {openN} <span>{t.open}</span>
-          </p>
           <p className="register2__big">
             {doneN} <span>/ {ids.length} {t.done}</span>
           </p>

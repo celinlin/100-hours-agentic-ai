@@ -2,7 +2,7 @@
 
 /**
  * Learning progress v2: stations solved, challenge passed, unlocks.
- * Rule: chapter 01 is open; chapter n opens when the challenge of chapter n-1 is passed.
+ * Rule: every chapter is open from the start; passing a chapter's final challenge completes it.
  * Migration from v1 (self-declared "completed"): those chapters and the one after them stay
  * open (nothing the learner had access to is taken away), but "completed" now requires the challenge.
  */
@@ -139,10 +139,9 @@ function chapter(s: GameState, id: string): ChapterState {
   return s.chapters[id] ?? { stations: [], challenge: false };
 }
 
-export function isUnlocked(s: GameState, ids: string[], id: string): boolean {
-  const i = ids.indexOf(id);
-  if (i <= 0) return i === 0;
-  return chapter(s, ids[i - 1]).challenge || s.legacyUnlocked.includes(id) || chapter(s, id).challenge;
+/** Every window is open: the learner chooses where to go. Challenges complete a room, they no longer gate the next one. */
+export function isUnlocked(_s: GameState, ids: string[], id: string): boolean {
+  return ids.includes(id) || id === '00';
 }
 
 export function windowState(s: GameState, ids: string[], id: string): WindowState {

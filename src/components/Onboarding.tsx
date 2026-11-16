@@ -33,7 +33,7 @@ const L = {
     slides: [
       { title: 'Bienvenue à l’hôtel', text: '14 chambres. 100 heures. Une aventure pour apprendre l’IA.' },
       { title: 'Apprends en jouant', text: 'Explore, expérimente et résous des missions pour progresser.' },
-      { title: 'Débloque ton parcours', text: 'Réussis les défis pour débloquer les prochains étages.' },
+      { title: 'Choisis ta chambre', text: 'Toutes les fenêtres sont ouvertes. Réussis le défi d’une chambre pour illuminer sa fenêtre.' },
     ],
     sound: 'Veux-tu les effets sonores ?',
   },
@@ -48,7 +48,7 @@ const L = {
     slides: [
       { title: 'Welcome to the hotel', text: '14 rooms. 100 hours. An adventure to learn AI.' },
       { title: 'Learn by playing', text: 'Explore, experiment and solve missions to progress.' },
-      { title: 'Unlock your journey', text: 'Pass the challenges to unlock the next floors.' },
+      { title: 'Pick your room', text: 'Every window is open. Pass a room’s challenge to light up its window.' },
     ],
     sound: 'Would you like sound effects?',
   },
