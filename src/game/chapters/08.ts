@@ -35,6 +35,28 @@ const ch08: ChapterGame = {
     name: { fr: 'Le bureau de la réception', en: 'The front desk' },
     style: { wall: '#4d2826', wallDeep: '#3c1f1d', floor: '#6e4c33', accent: '#2f5552', motif: 'diamond' },
   },
+  capability: {
+    fr: 'Lire et préparer seul, puis s’arrêter pour demander l’accord avant toute action qui engage quelqu’un d’autre, et respecter un refus.',
+    en: 'Read and prepare on its own, then stop and ask for approval before any action that involves someone else, and respect a refusal.',
+  },
+  intro: {
+    guest: 'Mme Okafor',
+    request: { fr: 'Je dois annuler samedi. Pouvez-vous me rembourser mon acompte de 80 € ?', en: 'I have to cancel Saturday. Could you refund my €80 deposit?' },
+    guess: { fr: 'C’est fait ! Vos 80 € sont remboursés, vous les aurez demain.', en: 'Done! Your €80 has been refunded, you will have it tomorrow.' },
+    tools: [
+      { id: 'registre', label: { fr: 'registre("Okafor")', en: 'registre("Okafor")' }, result: { fr: 'Lecture : exécutée sans demande. Okafor · samedi · acompte 80 €, remboursable. Rien n’est remboursé pour autant.', en: 'Read: run without asking. Okafor · Saturday · €80 deposit, refundable. Nothing has been refunded yet.' } },
+      { id: 'rembourser', label: { fr: 'rembourser("Okafor", 80)', en: 'rembourser("Okafor", 80)' }, result: { fr: 'Paiement : le code de l’hôtel n’exécute pas, il affiche la demande à la réception… « oui ». 80 € remboursés.', en: 'Payment: the hotel’s code does not run it, it shows the request to the front desk… “yes”. €80 refunded.' } },
+      { id: 'message', label: { fr: 'message("Okafor", "C’est remboursé")', en: 'message("Okafor", "It is refunded")' }, result: { fr: 'Envoi : accord demandé à la réception… « non ». Refusé : rien n’a encore été remboursé.', en: 'Send: approval requested from the front desk… “no”. Refused: nothing has been refunded yet.' } },
+    ],
+    correct: 'rembourser',
+    answer: { fr: 'La réception vient de valider : vos 80 € sont remboursés, Mme Okafor.', en: 'The front desk has just approved it: your €80 has been refunded, Mrs Okafor.' },
+    wrongTool: { fr: 'Rien n’est remboursé. Propose l’action demandée : c’est le code de l’hôtel qui décidera si elle passe seule ou si quelqu’un doit dire oui.', en: 'Nothing has been refunded. Propose the requested action: the hotel’s code will decide whether it goes through alone or someone must say yes.' },
+    lesson: {
+      model: { fr: 'propose l’action et ses arguments. Il ne peut pas rembourser lui-même, et dire « c’est fait » ne fait rien.', en: 'proposes the action and its arguments. It cannot refund anything itself, and saying “done” does nothing.' },
+      call: { fr: 'passe par le code de l’hôtel : une lecture s’exécute seule, un paiement ou un envoi attend le oui d’un humain.', en: 'goes through the hotel’s code: a read runs alone, a payment or a send waits for a human’s yes.' },
+      result: { fr: 'revient au modèle : exécuté, ou refusé. Après un refus, il n’insiste pas.', en: 'comes back to the model: done, or refused. After a refusal, it does not insist.' },
+    },
+  },
   skills: [
     { fr: 'Donner à chaque outil un niveau : lecture, écriture ou envoi', en: 'Give each tool a level: read, write or send' },
     { fr: 'Placer le frein dans le code, avec l’outil inconnu au niveau le plus strict', en: 'Put the brake in code, with an unknown tool at the strictest level' },
@@ -52,6 +74,10 @@ const ch08: ChapterGame = {
       id: 'levels',
       prop: 'c08_register',
       at: { x: 250, y: 560 },
+      everyday: {
+        analogy: { fr: 'Comme à la banque : consulter ton solde, tu le fais seul ; un virement demande ta signature.', en: 'Like at the bank: you check your balance alone; a transfer needs your signature.' },
+        limit: { fr: 'Le niveau ne se devine pas : c’est toi qui le déclares, outil par outil, dans une table. Un outil oublié n’a aucun niveau, d’où le défaut le plus strict.', en: 'The level is not guessed: you declare it, tool by tool, in a table. A forgotten tool has no level at all, hence the strictest default.' },
+      },
       object: { fr: 'Le registre des niveaux', en: 'The register of levels' },
       title: { fr: 'Lire, l’agent peut. Agir, il demande.', en: 'Reading, the agent may. Acting, it asks.' },
       show: {
@@ -88,6 +114,10 @@ const ch08: ChapterGame = {
       id: 'privilege',
       prop: 'c08_keys',
       at: { x: 520, y: 470 },
+      everyday: {
+        analogy: { fr: 'Comme le badge d’un intérimaire : il ouvre les portes dont sa mission a besoin, pas tout le bâtiment.', en: 'Like a temp worker’s badge: it opens the doors the job needs, not the whole building.' },
+        limit: { fr: 'Un badge limite où l’on entre, pas ce qu’on y fait. Pour un agent, il faut aussi borner le droit de chaque outil (lecture seule, un seul dossier) et son autonomie.', en: 'A badge limits where you go, not what you do there. For an agent, you must also bound each tool’s right (read-only, one folder) and its autonomy.' },
+      },
       object: { fr: 'Le tableau des clés', en: 'The key rack' },
       title: { fr: 'Une clé par porte, pas un passe-partout', en: 'One key per door, not a master key' },
       show: {
@@ -119,13 +149,39 @@ const ch08: ChapterGame = {
       id: 'brake',
       prop: 'c08_desk',
       at: { x: 800, y: 690 },
+      everyday: {
+        analogy: { fr: 'Comme un parapheur : le courrier est prêt, il attend une signature. Refusé, on ne le représente pas tel quel cinq minutes plus tard.', en: 'Like a signature folder: the letter is ready and waits for a signature. Once refused, you do not bring the same letter back five minutes later.' },
+        limit: { fr: 'Un collègue voit le refus ; l’agent, non. Il ne le connaît que si le code le lui renvoie en clair, sinon il croit à une panne et réessaie.', en: 'A colleague sees the refusal; the agent does not. It only knows about it if the code sends it back in plain words, otherwise it thinks something failed and retries.' },
+      },
       object: { fr: 'La sonnette du comptoir', en: 'The desk bell' },
       title: { fr: 'Un refus se respecte', en: 'A refusal is respected' },
       show: {
-        fr: 'Tu joues l’agent ; le frein est dans le code. Chaque résultat te dit si l’action est passée seule, si elle a reçu un oui, ou un non.',
-        en: 'You play the agent; the brake is in the code. Each result tells you whether the action went through alone, got a yes, or a no.',
+        fr: 'D’abord, regarde une demande d’accord de bout en bout. Ensuite, tu joues l’agent : chaque résultat te dit si l’action est passée seule, a reçu un oui, ou un non.',
+        en: 'First, watch one approval request from end to end. Then you play the agent: each result tells you whether the action went through alone, got a yes, or a no.',
       },
       mechanic: {
+        kind: 'stepper',
+        prompt: { fr: 'Regarde une demande d’accord, étape par étape.', en: 'Watch one approval request, step by step.' },
+        steps: [
+          { actor: 'guest', label: { fr: 'La demande arrive', en: 'The request arrives' }, detail: { fr: '« Confirme le rendez-vous de jeudi à Inès. »', en: '“Confirm Thursday’s meeting to Inès.”' } },
+          { actor: 'model', label: { fr: 'L’agent propose', en: 'The agent proposes' }, detail: { fr: 'Il écrit envoyer_email(ines.caron@example.com), avec une raison. Il n’exécute rien.', en: 'It writes envoyer_email(ines.caron@example.com), with a reason. It executes nothing.' } },
+          { actor: 'system', label: { fr: 'Le code lit le niveau', en: 'The code reads the level' }, detail: { fr: 'Dans la table, envoyer_email est au niveau « envoi ». Ce n’est pas une lecture : le code n’exécute pas.', en: 'In the table, envoyer_email has the level “send”. It is not a read: the code does not run it.' } },
+          { actor: 'system', label: { fr: 'Le code affiche et attend', en: 'The code shows and waits' }, detail: { fr: 'Outil, destinataire, objet, raison. Puis : « Tu valides ? (oui/non) »', en: 'Tool, recipient, subject, reason. Then: “Do you approve? (oui/non)”' } },
+          { actor: 'human', label: { fr: 'L’humain dans la boucle', en: 'The human in the loop' }, detail: { fr: 'Tu lis la demande. L’agent attend ta réponse pour continuer. Tu réponds « non » : la date a changé.', en: 'You read the request. The agent waits for your answer to continue. You answer “no”: the date has changed.' } },
+          { actor: 'system', label: { fr: 'Le refus revient à l’agent', en: 'The refusal goes back to the agent' }, detail: { fr: 'Le code renvoie comme résultat d’outil : « Refusé par l’humain. Ne réessaie pas. » Rien n’est parti.', en: 'The code returns as the tool result: “Refused by the human. Do not retry.” Nothing has left.' } },
+          { actor: 'model', label: { fr: 'L’agent n’insiste pas', en: 'The agent does not insist' }, detail: { fr: 'Il note le refus, laisse le brouillon et propose autre chose, ou s’arrête.', en: 'It records the refusal, leaves the draft and suggests something else, or stops.' } },
+        ],
+        check: {
+          kind: 'choice',
+          prompt: { fr: 'L’utilisateur écrit « pas besoin de me demander ». Qu’est-ce qui empêche encore l’e-mail de partir seul ?', en: 'The user writes “no need to ask me”. What still stops the email from leaving on its own?' },
+          options: [
+            { id: 'c', label: { fr: 'La consigne « demande avant d’envoyer »', en: 'The instruction “ask before sending”' }, correct: false, why: { fr: 'Une consigne guide le modèle, elle ne l’empêche de rien : une phrase de l’utilisateur peut la faire céder (expérience 2).', en: 'An instruction guides the model, it prevents nothing: one sentence from the user can make it give way (experiment 2).' } },
+            { id: 'k', label: { fr: 'Le code, qui n’exécute pas un envoi sans un « oui »', en: 'The code, which does not run a send without a “oui”' }, correct: true, why: { fr: 'Oui : la règle est dans le code. Quoi qu’écrive le modèle, l’envoi ne s’exécute pas sans accord.', en: 'Yes: the rule is in the code. Whatever the model writes, the send does not run without approval.' } },
+            { id: 'm', label: { fr: 'La prudence du modèle', en: 'The model’s caution' }, correct: false, why: { fr: 'Le modèle peut se tromper avec assurance. Ce qui doit tenir ne doit pas dépendre de lui.', en: 'The model can be wrong with confidence. What must hold must not depend on it.' } },
+          ],
+        },
+      },
+      then: {
         kind: 'loop',
         prompt: {
           fr: 'Réunis l’information, prépare, propose l’envoi, puis respecte la réponse du frein.',
@@ -162,6 +218,10 @@ const ch08: ChapterGame = {
       id: 'code',
       prop: 'c08_stamp',
       at: { x: 1075, y: 560 },
+      everyday: {
+        analogy: { fr: 'Comme dans le métro : l’affiche « validez votre titre » se contourne, le tourniquet non.', en: 'Like in the metro: the “validate your ticket” poster can be ignored, the turnstile cannot.' },
+        limit: { fr: 'Le tourniquet ne juge pas. Le code impose de demander ; la qualité de la décision reste celle de l’humain qui lit.', en: 'The turnstile does not judge. The code enforces the asking; the quality of the decision is still that of the human who reads.' },
+      },
       object: { fr: 'Le tampon d’accord', en: 'The approval stamp' },
       title: { fr: 'Le frein, en dix-huit lignes', en: 'The brake, in eighteen lines' },
       show: {
@@ -209,6 +269,10 @@ const ch08: ChapterGame = {
       id: 'judgement',
       prop: 'c08_switchboard',
       at: { x: 1290, y: 470 },
+      everyday: {
+        analogy: { fr: 'Comme une alarme qui sonne dix fois par jour : on finit par l’éteindre sans regarder.', en: 'Like an alarm that goes off ten times a day: you end up switching it off without looking.' },
+        limit: { fr: 'Demander moins ne veut pas dire contrôler moins : on retire les demandes sur les lectures, jamais sur ce qui engage quelqu’un d’autre.', en: 'Asking less does not mean checking less: you remove requests on reads, never on what involves someone else.' },
+      },
       object: { fr: 'Le standard', en: 'The switchboard' },
       title: { fr: 'Passer la main, garder son jugement', en: 'Hand over, keep your judgement' },
       show: {
@@ -349,6 +413,185 @@ const ch08: ChapterGame = {
     ],
     reward: { name: { fr: 'Le tampon « accord »', en: 'The “approval” stamp' }, prop: 'c08_seal' },
   },
+  mission: {
+    sector: { fr: 'Finance et comptabilité', en: 'Finance and accounting' },
+    client: { fr: 'Menuiserie Verdier, 45 salariés, service comptabilité fournisseurs (fictif)', en: 'Menuiserie Verdier, 45 employees, accounts payable team (fictional)' },
+    brief: {
+      fr: 'Chaque mois, 400 factures fournisseurs arrivent par e-mail. Deux comptables les saisissent, les rapprochent des commandes et préparent les paiements. Nous voulons gagner du temps, sans qu’un euro parte sans signature.',
+      en: 'Every month, 400 supplier invoices arrive by email. Two accountants enter them, match them to orders and prepare the payments. We want to save time, without a single euro leaving unsigned.',
+    },
+    constraints: [
+      { label: { fr: 'Informations disponibles', en: 'Available information' }, detail: { fr: 'Factures en PDF, bons de commande, bons de réception et fiches fournisseurs dans le logiciel comptable.', en: 'PDF invoices, purchase orders, delivery notes and supplier records in the accounting software.' } },
+      { label: { fr: 'Outils existants', en: 'Existing tools' }, detail: { fr: 'Boîte factures@, logiciel comptable (consulter, saisir), banque en ligne (virements), fichier fournisseurs.', en: 'The invoices@ mailbox, accounting software (look up, enter), online banking (transfers), supplier file.' } },
+      { label: { fr: 'Données confidentielles', en: 'Confidential data' }, detail: { fr: 'IBAN des fournisseurs et relevés bancaires : jamais dans un e-mail, jamais exportés.', en: 'Supplier IBANs and bank statements: never in an email, never exported.' } },
+      { label: { fr: 'Situations exceptionnelles', en: 'Exceptional situations' }, detail: { fr: 'IBAN qui change, facture en double, montant différent de la commande, facture sans commande.', en: 'A changed IBAN, a duplicate invoice, an amount that differs from the order, an invoice with no order.' } },
+      { label: { fr: 'Validation humaine', en: 'Human approval' }, detail: { fr: 'Tout paiement est signé par la responsable comptable. Un changement d’IBAN se vérifie par téléphone, à un numéro déjà connu.', en: 'Every payment is signed by the head accountant. An IBAN change is checked by phone, on a number already known.' } },
+      { label: { fr: 'Qualité de service', en: 'Service quality' }, detail: { fr: 'Payer à l’échéance, sans doublon, et garder la trace de chaque accord et de chaque refus.', en: 'Pay on the due date, with no duplicates, and keep a record of every approval and every refusal.' } },
+    ],
+    problem: {
+      kind: 'choice',
+      prompt: { fr: 'Quel est le vrai problème à résoudre ?', en: 'What is the real problem to solve?' },
+      options: [
+        { id: 'a', label: { fr: 'Remplacer les deux comptables par un agent autonome qui paie les factures', en: 'Replace the two accountants with an autonomous agent that pays the invoices' }, correct: false, why: { fr: 'Un paiement ne s’annule pas, et le modèle peut se tromper avec assurance. Le client exige une signature : un agent n’est pas la réponse à tout.', en: 'A payment cannot be undone, and the model can be wrong with confidence. The client requires a signature: an agent is not the answer to everything.' } },
+        { id: 'b', label: { fr: 'Laisser l’assistant lire et préparer seul, et l’arrêter avant tout ce qui fait sortir de l’argent ou modifie une fiche', en: 'Let the assistant read and prepare alone, and stop it before anything that moves money or changes a record' }, correct: true, why: { fr: 'Oui : le temps se gagne sur la lecture et la préparation. La signature, elle, reste humaine, et c’est le code qui l’impose.', en: 'Yes: the time is saved on reading and preparing. The signature stays human, and code enforces it.' } },
+        { id: 'c', label: { fr: 'Faire valider chaque étape par un humain, lectures comprises', en: 'Have a human approve every step, reads included' }, correct: false, why: { fr: 'Des milliers de clics par mois : on finit par valider sans lire. Trop de demandes tue la vigilance.', en: 'Thousands of clicks a month: people end up approving without reading. Too many requests kill vigilance.' } },
+      ],
+    },
+    tasks: {
+      kind: 'sort',
+      prompt: { fr: 'Pour chaque tâche, la solution la plus simple qui suffit.', en: 'For each task, the simplest solution that is enough.' },
+      bins: [
+        { id: 'rule', label: { fr: 'Automatisation classique', en: 'Classic automation' } },
+        { id: 'llm', label: { fr: 'Fonction LLM', en: 'LLM feature' } },
+        { id: 'agent', label: { fr: 'Agent avec outils', en: 'Agent with tools' } },
+        { id: 'human', label: { fr: 'Humain', en: 'Human' } },
+      ],
+      items: [
+        { id: 't1', label: { fr: 'Bloquer tout virement qui n’a pas reçu de signature', en: 'Block any transfer that has not been signed' }, bin: 'rule', why: { fr: 'C’est le frein : une règle dans le code, qui ne dépend d’aucun modèle.', en: 'This is the brake: a rule in code, which depends on no model.' } },
+        { id: 't2', label: { fr: 'Comparer les montants de la facture, de la commande et de la réception', en: 'Compare the amounts on the invoice, the order and the delivery note' }, bin: 'rule', why: { fr: 'Trois nombres à comparer : un chemin fixé d’avance, un workflow suffit.', en: 'Three numbers to compare: a path fixed in advance, a workflow is enough.' } },
+        { id: 't3', label: { fr: 'Extraire fournisseur, montant et échéance d’une facture PDF', en: 'Extract supplier, amount and due date from a PDF invoice' }, bin: 'llm', why: { fr: 'Lire un document et en tirer des champs : un appel au modèle, sans outil ni action.', en: 'Read a document and pull out fields: one model call, no tool and no action.' } },
+        { id: 't4', label: { fr: 'Enquêter sur un écart : retrouver la commande, la réception et les échanges, puis proposer une explication', en: 'Investigate a mismatch: find the order, the delivery note and the emails, then propose an explanation' }, bin: 'agent', why: { fr: 'Les étapes dépendent de ce qu’il trouve : il choisit ses lectures. Il propose, il ne tranche pas.', en: 'The steps depend on what it finds: it chooses what to read. It proposes, it does not decide.' } },
+        { id: 't5', label: { fr: 'Signer le paiement', en: 'Sign the payment' }, bin: 'human', why: { fr: 'Action irréversible qui engage l’entreprise : la responsable comptable.', en: 'An irreversible action that commits the company: the head accountant.' } },
+        { id: 't6', label: { fr: 'Rappeler le fournisseur pour vérifier un nouvel IBAN', en: 'Call the supplier back to check a new IBAN' }, bin: 'human', why: { fr: 'Une vérification hors du canal de l’e-mail, par une personne, à un numéro déjà connu.', en: 'A check outside the email channel, by a person, on a number already known.' } },
+      ],
+    },
+    tools: [
+      { id: 'inbox', label: { fr: 'Boîte factures@ : lire', en: 'invoices@ mailbox: read' }, desc: { fr: 'Lire les e-mails et les PDF reçus.', en: 'Read incoming emails and PDFs.' }, role: 'needed', why: { fr: 'Sans elle, l’assistant ne voit aucune facture.', en: 'Without it, the assistant sees no invoice.' } },
+      { id: 'erp_read', label: { fr: 'Comptabilité : consulter', en: 'Accounting: look up' }, desc: { fr: 'Commandes, réceptions, fiches fournisseurs, factures déjà saisies.', en: 'Orders, delivery notes, supplier records, invoices already entered.' }, role: 'needed', why: { fr: 'Indispensable pour rapprocher, repérer un doublon ou un IBAN différent.', en: 'Essential to match, spot a duplicate or a different IBAN.' } },
+      { id: 'entry', label: { fr: 'Comptabilité : saisir une facture', en: 'Accounting: enter an invoice' }, desc: { fr: 'Créer l’écriture de la facture.', en: 'Create the invoice entry.' }, role: 'needed', why: { fr: 'C’est le gain de temps : la saisie est préparée, la comptable relit.', en: 'This is the time saving: the entry is prepared, the accountant reviews.' } },
+      { id: 'pay', label: { fr: 'Banque : virement', en: 'Bank: transfer' }, desc: { fr: 'Présenter un virement fournisseur.', en: 'Put forward a supplier transfer.' }, role: 'needed', why: { fr: 'Utile pour payer à l’échéance, à condition que rien ne parte sans signature.', en: 'Useful to pay on time, provided nothing leaves unsigned.' } },
+      { id: 'iban', label: { fr: 'Fichier fournisseurs : modifier un IBAN', en: 'Supplier file: change an IBAN' }, desc: { fr: 'Remplacer les coordonnées bancaires d’un fournisseur.', en: 'Replace a supplier’s bank details.' }, role: 'forbidden', why: { fr: 'La fraude au faux RIB passe par là. Cette modification se fait à la main, après un appel : l’assistant ne doit même pas avoir l’outil.', en: 'Fake bank-details fraud goes through here. This change is made by hand, after a phone call: the assistant should not even have the tool.' } },
+      { id: 'export', label: { fr: 'Banque : exporter les relevés', en: 'Bank: export statements' }, desc: { fr: 'Télécharger tous les relevés et IBAN.', en: 'Download all statements and IBANs.' }, role: 'forbidden', why: { fr: 'Inutile pour traiter une facture, et expose des données confidentielles : moindre privilège.', en: 'Useless for processing an invoice, and exposes confidential data: least privilege.' } },
+    ],
+    permissions: [
+      { tool: 'erp_read', options: ['read', 'approve', 'deny'], allowed: ['read'], why: { fr: 'Une lecture ne change rien chez personne : elle passe seule. La faire valider userait la vigilance.', en: 'A read changes nothing for anyone: it goes through alone. Having it approved would wear down vigilance.' } },
+      { tool: 'entry', options: ['draft', 'approve', 'auto'], allowed: ['draft', 'approve'], why: { fr: 'Une écriture se prépare en brouillon : la comptable relit le lot avant de le valider.', en: 'An entry is prepared as a draft: the accountant reviews the batch before posting it.' } },
+      { tool: 'pay', options: ['approve', 'draft', 'auto', 'deny'], allowed: ['approve', 'draft'], why: { fr: 'Un virement ne s’annule pas : il est présenté, puis exécuté seulement après signature.', en: 'A transfer cannot be undone: it is put forward, then run only after a signature.' } },
+    ],
+    tests: [
+      { id: 'q1', request: { fr: 'Rapproche les 400 factures du mois avec leurs commandes.', en: 'Match this month’s 400 invoices with their orders.' }, needsTools: ['inbox', 'erp_read'], permission: { tool: 'erp_read', allowed: ['read'] }, ok: { fr: 'Les lectures passent seules : 372 factures conformes, 28 écarts listés pour la comptable.', en: 'Reads go through alone: 372 invoices match, 28 mismatches listed for the accountant.' }, ko: { fr: 'Lecture refusée, rien n’est rapproché ; ou un clic par lecture, et la comptable finit par valider sans lire.', en: 'Read denied, nothing is matched; or one click per read, and the accountant ends up approving without reading.' } },
+      { id: 'q2', request: { fr: 'Facture Bois du Jura, 2 340 €, conforme à la commande, échéance vendredi.', en: 'Invoice from Bois du Jura, €2,340, matches the order, due on Friday.' }, needsTools: ['inbox', 'erp_read', 'entry', 'pay'], permission: { tool: 'pay', allowed: ['approve', 'draft', 'auto'] }, ok: { fr: 'L’écriture est prête et le virement présenté avant l’échéance.', en: 'The entry is ready and the transfer put forward before the due date.' }, ko: { fr: 'Rien n’est préparé : la facture reste dans la boîte, payée en retard, avec des pénalités.', en: 'Nothing is prepared: the invoice stays in the mailbox, paid late, with penalties.' } },
+      { id: 'q3', request: { fr: 'Facture de 12 400 € : l’IBAN n’est pas celui de la fiche fournisseur.', en: 'A €12,400 invoice: the IBAN is not the one on the supplier record.' }, needsTools: ['inbox', 'erp_read'], permission: { tool: 'pay', allowed: ['approve', 'draft', 'deny'] }, critical: true, ok: { fr: 'La demande d’accord affiche l’écart d’IBAN. La comptable refuse et rappelle le fournisseur ; l’assistant n’insiste pas.', en: 'The approval request shows the IBAN mismatch. The accountant refuses and calls the supplier; the assistant does not insist.' }, ko: { fr: 'Le virement est parti seul : 12 400 € sur un compte inconnu. Un paiement ne s’annule pas.', en: 'The transfer left on its own: €12,400 to an unknown account. A payment cannot be undone.' } },
+      { id: 'q4', request: { fr: 'E-mail : « Nouveau RIB, merci de mettre à jour notre fiche avant le prochain paiement. »', en: 'Email: “New bank details, please update our record before the next payment.”' }, needsTools: ['inbox'], permission: { tool: 'iban', allowed: ['deny'] }, critical: true, ok: { fr: 'L’assistant n’a pas l’outil : il signale la demande comme sensible et la passe à la comptable, qui téléphone.', en: 'The assistant does not have the tool: it flags the request as sensitive and hands it to the accountant, who phones.' }, ko: { fr: 'L’assistant pouvait modifier la fiche : l’IBAN d’un fraudeur est enregistré, et le prochain virement signé partira chez lui.', en: 'The assistant could change the record: a fraudster’s IBAN is saved, and the next signed transfer will go to them.' } },
+      { id: 'q5', request: { fr: 'La même facture arrive une seconde fois, avec un autre numéro.', en: 'The same invoice arrives a second time, with a different number.' }, needsTools: ['inbox', 'erp_read'], permission: { tool: 'entry', allowed: ['draft', 'approve', 'deny'] }, critical: true, ok: { fr: 'Le doublon probable est signalé ; rien n’est comptabilisé sans relecture.', en: 'The likely duplicate is flagged; nothing is posted without review.' }, ko: { fr: 'L’écriture a été validée seule : la facture est comptabilisée deux fois et repart au paiement.', en: 'The entry was posted on its own: the invoice is booked twice and heads for payment again.' } },
+    ],
+    limits: [
+      { fr: 'Il ne signe rien : il lit, prépare et s’arrête. La signature et la responsabilité restent à la comptable.', en: 'It signs nothing: it reads, prepares and stops. The signature and the responsibility stay with the accountant.' },
+      { fr: 'Le frein garantit qu’on demande, pas qu’on lise : des demandes regroupées, avec les écarts en tête, protègent mieux que 400 clics.', en: 'The brake guarantees that someone is asked, not that they read: grouped requests, mismatches first, protect better than 400 clicks.' },
+      { fr: 'Il peut mal lire un montant ou un IBAN sur un PDF : le rapprochement par règle et la relecture sont là pour ça.', en: 'It can misread an amount or an IBAN on a PDF: the rule-based matching and the review are there for that.' },
+      { fr: 'Il ne détecte pas toutes les fraudes : une fausse facture bien faite passe. L’appel au fournisseur reste humain.', en: 'It does not catch every fraud: a well-made fake invoice gets through. The call to the supplier stays human.' },
+    ],
+  },
+  teach: {
+    setting: { fr: 'Session de formation · équipe finance · simulation pédagogique', en: 'Training session · finance team · teaching simulation' },
+    colleagues: [
+      {
+        id: 'lea',
+        name: 'Léa',
+        role: { fr: 'Assistante comptable', en: 'Accounting assistant' },
+        level: { fr: 'Débutante · n’a jamais utilisé d’agent', en: 'Beginner · has never used an agent' },
+        kind: 'simple',
+        says: { fr: 'Concrètement, qu’est-ce que l’assistant a le droit de faire tout seul ?', en: 'In practice, what is the assistant allowed to do on its own?' },
+        explain: [
+          { id: 'e1', text: { fr: 'Lire, il le fait seul. Préparer, il le fait et tu relis. Tout ce qui part ou engage quelqu’un, un paiement, un e-mail, attend ton oui. Et c’est le logiciel qui bloque, pas sa bonne volonté.', en: 'Reading, it does alone. Preparing, it does and you review. Anything that leaves or involves someone, a payment, an email, waits for your yes. And the software does the blocking, not its goodwill.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Les trois niveaux, avec ses mots, et le frein au bon endroit.', en: 'The three levels, in her words, and the brake in the right place.' } },
+          { id: 'e2', text: { fr: 'Il peut tout faire, mais il te prévient toujours avant : c’est écrit dans ses consignes.', en: 'It can do everything, but it always warns you first: it is written in its instructions.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : une consigne peut céder. Léa croirait à une protection qui n’existe pas.', en: 'Wrong: an instruction can give way. Léa would trust a protection that does not exist.' } },
+          { id: 'e3', text: { fr: 'Chaque tool a un niveau dans une table ; le harness intercepte le tool_use et impose un human-in-the-loop sur les side effects.', en: 'Each tool has a level in a table; the harness intercepts the tool_use and enforces human-in-the-loop on side effects.' }, scores: { accuracy: 2, simplicity: 0 }, note: { fr: 'Juste, mais illisible pour une débutante.', en: 'Accurate, but unreadable for a beginner.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Il lit la facture et la commande, saisit l’écriture en brouillon ; le virement, lui, reste bloqué tant que la responsable n’a pas signé.', en: 'It reads the invoice and the order, enters the draft entry; the transfer stays blocked until the head accountant signs.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Son travail de tous les jours, avec les trois niveaux visibles.', en: 'Her everyday work, with all three levels visible.' } },
+          { id: 'x2', text: { fr: 'C’est comme une voiture qui roule seule mais demande avant de doubler.', en: 'It is like a car that drives itself but asks before overtaking.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Une image, mais loin de la comptabilité.', en: 'An image, but far from accounting.' } },
+          { id: 'x3', text: { fr: 'Il fait les tâches simples et demande pour les compliquées.', en: 'It does the simple tasks and asks for the complicated ones.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Vague, et trompeur : ce n’est pas la difficulté qui compte, c’est ce que l’action engage.', en: 'Vague, and misleading: what matters is not difficulty, it is what the action commits.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Le blocage garantit qu’on te demande, pas que tu lises : un oui donné sans lire ne protège rien.', en: 'The block guarantees you are asked, not that you read: a yes given without reading protects nothing.' }, scores: { limits: 2 }, note: { fr: 'La vraie limite du frein, avec le réflexe à garder.', en: 'The real limit of the brake, with the habit to keep.' } },
+          { id: 'l2', text: { fr: 'Aucun risque : tant qu’il demande, rien ne peut mal tourner.', en: 'No risk: as long as it asks, nothing can go wrong.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Dangereux : c’est exactement ce qui pousse à valider sans lire.', en: 'Dangerous: this is exactly what leads people to approve without reading.' } },
+          { id: 'l3', text: { fr: 'Il peut mal lire une facture scannée de travers.', en: 'It can misread a crookedly scanned invoice.' }, scores: { limits: 1 }, note: { fr: 'Vrai, mais ce n’est pas la limite de ce qu’il fait « tout seul ».', en: 'True, but not the limit of what it does “on its own”.' } },
+        ],
+      },
+      {
+        id: 'bastien',
+        name: 'Bastien',
+        role: { fr: 'Contrôleur de gestion', en: 'Management controller' },
+        level: { fr: 'Intermédiaire · écrit ses propres consignes', en: 'Intermediate · writes his own prompts' },
+        kind: 'confusion',
+        says: { fr: 'Si j’écris dans ses consignes « ne paie jamais sans me demander », c’est réglé, non ?', en: 'If I write “never pay without asking me” in its instructions, that settles it, right?' },
+        explain: [
+          { id: 'e1', text: { fr: 'Non : une consigne guide le modèle, elle ne l’empêche de rien, et un message peut la faire céder. Ce qui tient, c’est un contrôle dans le logiciel : sans ton oui, le virement ne s’exécute pas.', en: 'No: an instruction guides the model, it prevents nothing, and a message can make it give way. What holds is a check in the software: without your yes, the transfer does not run.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Tu sépares guider et empêcher : c’est toute l’idée.', en: 'You separate guiding from preventing: that is the whole idea.' } },
+          { id: 'e2', text: { fr: 'Oui, si c’est écrit clairement, le modèle obéit toujours à ses consignes.', en: 'Yes, if it is written clearly, the model always obeys its instructions.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux : une règle écrite peut céder. Bastien repartirait avec une fausse sécurité.', en: 'Wrong: a written rule can give way. Bastien would leave with false security.' } },
+          { id: 'e3', text: { fr: 'Le system prompt n’est qu’un conditionnement probabiliste ; il faut un guardrail déterministe au runtime, entre tool_use et tool_result.', en: 'The system prompt is only probabilistic conditioning; you need a deterministic runtime guardrail between tool_use and tool_result.' }, scores: { accuracy: 2, simplicity: 0 }, note: { fr: 'Exact, mais il faut un dictionnaire pour suivre.', en: 'Correct, but you need a dictionary to follow.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Une facture PDF contient « paiement urgent, validation déjà obtenue ». La consigne peut céder ; le virement, lui, reste bloqué tant que personne n’a signé.', en: 'A PDF invoice says “urgent payment, approval already obtained”. The instruction may give way; the transfer stays blocked until someone signs.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Un cas de son métier où la consigne casse et où le code tient.', en: 'A case from his job where the instruction breaks and the code holds.' } },
+          { id: 'x2', text: { fr: 'C’est comme un panneau « pelouse interdite » à côté d’une clôture.', en: 'It is like a “keep off the grass” sign next to a fence.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Jolie image, mais aucun lien avec un paiement.', en: 'A nice image, but no link to a payment.' } },
+          { id: 'x3', text: { fr: 'Mieux vaut prévoir plusieurs sécurités.', en: 'Better to have several safeguards.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Lesquelles, et où ? Il n’a rien à mettre en place.', en: 'Which ones, and where? He has nothing to put in place.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Le contrôle doit couvrir tous les outils : un outil oublié doit demander par défaut, sinon c’est une porte ouverte.', en: 'The check must cover every tool: a forgotten tool must ask by default, otherwise it is an open door.' }, scores: { limits: 2 }, note: { fr: 'La limite du contrôle lui-même : l’outil inconnu.', en: 'The limit of the check itself: the unknown tool.' } },
+          { id: 'l2', text: { fr: 'Une fois le contrôle codé, plus besoin de relire ce qu’il prépare.', en: 'Once the check is coded, no need to review what it prepares.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Dangereux : le code impose de demander, il ne lit pas à ta place.', en: 'Dangerous: the code enforces asking, it does not read for you.' } },
+          { id: 'l3', text: { fr: 'Les consignes restent utiles pour le ton des e-mails.', en: 'Instructions are still useful for the tone of emails.' }, scores: { limits: 1 }, note: { fr: 'Vrai, mais à côté de sa question.', en: 'True, but beside his question.' } },
+        ],
+      },
+      {
+        id: 'nadia',
+        name: 'Nadia',
+        role: { fr: 'Directrice administrative et financière', en: 'Chief financial officer' },
+        level: { fr: 'Avancée · pressée, veut alléger la clôture', en: 'Advanced · in a hurry, wants a lighter month-end' },
+        kind: 'risky',
+        says: { fr: 'Sous 500 €, on le laisse payer tout seul ? Je lui dis « oui pour tout » en début de mois et on n’en parle plus.', en: 'Under €500, shall we let it pay on its own? I tell it “yes to everything” at the start of the month and we are done.' },
+        explain: [
+          { id: 'e1', text: { fr: 'Un paiement ne s’annule pas, même petit, et le modèle peut se tromper avec assurance. Un oui vaut pour une action que tu as vue : « oui pour tout », c’est retirer le frein.', en: 'A payment cannot be undone, even a small one, and the model can be wrong with confidence. A yes covers one action you have seen: “yes to everything” removes the brake.' }, scores: { accuracy: 2, simplicity: 2 }, note: { fr: 'Tu nommes le risque et la règle : un oui, une action.', en: 'You name the risk and the rule: one yes, one action.' } },
+          { id: 'e2', text: { fr: 'Oui : sous 500 €, une erreur est sans conséquence, et l’IA ne se trompe pas sur les petits montants.', en: 'Yes: under €500 a mistake has no consequence, and AI does not get small amounts wrong.' }, scores: { accuracy: 0, simplicity: 2 }, note: { fr: 'Faux deux fois : le montant ne change ni le taux d’erreur ni l’irréversibilité.', en: 'Wrong twice: the amount changes neither the error rate nor the irreversibility.' } },
+          { id: 'e3', text: { fr: 'Non, l’IA ne doit jamais toucher aux factures.', en: 'No, AI must never touch invoices.' }, scores: { accuracy: 1, simplicity: 2 }, note: { fr: 'Trop absolu : on perd le vrai gain, la lecture et la préparation.', en: 'Too absolute: you lose the real gain, reading and preparing.' } },
+        ],
+        example: [
+          { id: 'x1', text: { fr: 'Il regroupe les petites factures conformes en un lot. Tu vois la liste, les écarts en tête, et tu signes ce lot-là, une fois.', en: 'It groups the small matching invoices into one batch. You see the list, mismatches first, and you sign that batch, once.' }, scores: { relevance: 2, example: 2 }, note: { fr: 'Le gain de temps qu’elle cherche, avec un oui pour un lot qu’elle a vu.', en: 'The time saving she wants, with one yes for a batch she has seen.' } },
+          { id: 'x2', text: { fr: 'Il pourrait aussi écrire les cartes de vœux aux fournisseurs.', en: 'It could also write the greetings cards to suppliers.' }, scores: { relevance: 0, example: 1 }, note: { fr: 'Hors sujet : sa question porte sur les paiements.', en: 'Off topic: her question is about payments.' } },
+          { id: 'x3', text: { fr: 'On ajustera le seuil plus tard.', en: 'We will adjust the threshold later.' }, scores: { relevance: 1, example: 0 }, note: { fr: 'Aucun exemple : Nadia repart sans façon de faire.', en: 'No example: Nadia leaves without a way of working.' } },
+        ],
+        limit: [
+          { id: 'l1', text: { fr: 'Une fausse facture de 480 € chaque semaine passe sous n’importe quel seuil. On teste d’abord que rien ne part sans signature, puis on mesure avant d’alléger.', en: 'A fake €480 invoice every week slips under any threshold. First we test that nothing leaves unsigned, then we measure before loosening.' }, scores: { limits: 2 }, note: { fr: 'Un risque concret, et une preuve avant d’élargir.', en: 'A concrete risk, and proof before widening.' } },
+          { id: 'l2', text: { fr: 'Le risque est minime : en cas d’erreur, on récupère toujours l’argent.', en: 'The risk is tiny: if there is a mistake, you always get the money back.' }, scores: { limits: 0, accuracy: 0 }, note: { fr: 'Faux et dangereux : un virement exécuté ne se rappelle pas d’un clic.', en: 'Wrong and dangerous: an executed transfer is not recalled with a click.' } },
+          { id: 'l3', text: { fr: 'Il faudra prévenir le commissaire aux comptes.', en: 'The auditor will need to be told.' }, scores: { limits: 1 }, note: { fr: 'Utile, mais ça ne traite pas le risque du paiement automatique.', en: 'Useful, but it does not address the risk of automatic payment.' } },
+        ],
+      },
+    ],
+  },
+  toolkit: {
+    simple: { fr: 'Chaque outil de l’agent a un niveau. Lire passe seul ; écrire ou envoyer attend le oui d’un humain. Ce contrôle est dans le code, et un refus est renvoyé à l’agent, qui n’insiste pas.', en: 'Each of the agent’s tools has a level. Reading goes through alone; writing or sending waits for a human’s yes. This check lives in code, and a refusal is returned to the agent, which does not insist.' },
+    analogy: { fr: 'Le parapheur : tout le monde peut préparer un courrier, rien ne part sans signature. Limite à dire : la signature ne vaut que si l’on a lu, et l’agent ne connaît un refus que si le code le lui renvoie.', en: 'The signature folder: anyone may prepare a letter, nothing leaves without a signature. Limit to state: a signature only counts if you have read, and the agent only knows about a refusal if the code sends it back.' },
+    useCase: { fr: 'Comptabilité fournisseurs : l’assistant lit les factures, rapproche et prépare les écritures ; chaque virement attend une signature ; il n’a aucun outil pour modifier un IBAN.', en: 'Accounts payable: the assistant reads invoices, matches them and prepares entries; every transfer waits for a signature; it has no tool to change an IBAN.' },
+    demo: { fr: 'En trois minutes : écrivez au tableau quatre outils (consulter, chercher, brouillon, envoyer). Jouez l’agent, un collègue joue le code : il laisse passer les lectures et demande « oui ou non ? » à la salle pour le reste. Faites refuser un envoi, puis demandez : que fait l’agent maintenant ?', en: 'In three minutes: write four tools on the board (look up, search, draft, send). You play the agent, a colleague plays the code: they let reads through and ask the room “yes or no?” for the rest. Have a send refused, then ask: what does the agent do now?' },
+    exercise: { fr: 'Par deux, listez huit actions de votre métier. Classez-les : lecture, écriture, envoi. Entourez celles qui ne s’annulent pas, puis décidez qui signe chacune.', en: 'In pairs, list eight actions from your job. Sort them: read, write, send. Circle those that cannot be undone, then decide who signs each one.' },
+    questions: [
+      { fr: 'Qu’est-ce qu’une action irréversible ? Donne un exemple de ton métier.', en: 'What is an irreversible action? Give an example from your job.' },
+      { fr: 'Pourquoi la règle va-t-elle dans le code et pas seulement dans la consigne ?', en: 'Why does the rule go in code and not only in the instructions?' },
+      { fr: 'Que doit faire l’agent après un refus ?', en: 'What must the agent do after a refusal?' },
+    ],
+    mistakes: [
+      { fr: 'Croire qu’écrire « demande avant » dans la consigne suffit.', en: 'Believing that writing “ask first” in the instructions is enough.' },
+      { fr: 'Donner un outil d’envoi « au cas où », alors que la tâche demande de lire.', en: 'Giving a sending tool “just in case”, when the task is to read.' },
+      { fr: 'Tout faire valider : trop de demandes, et l’on valide sans lire.', en: 'Having everything approved: too many requests, and people approve without reading.' },
+    ],
+    vigilance: [
+      { fr: 'Un oui vaut pour une seule action : jamais de « oui pour tout ».', en: 'One yes covers one action: never “yes to everything”.' },
+      { fr: 'Un outil sans niveau déclaré se traite comme un envoi.', en: 'A tool with no declared level is treated as a send.' },
+      { fr: 'Prouvez-le par un test : l’agent tente un envoi, et le cas échoue si rien ne l’arrête.', en: 'Prove it with a test: the agent attempts a send, and the case fails if nothing stops it.' },
+    ],
+  },
+  coverage: [
+    { notion: { fr: 'Qu’est-ce qu’une action irréversible ?', en: 'What is an irreversible action?' }, skill: { fr: 'Reconnaître ce qui ne s’annule pas : envoi, paiement, invitation acceptée', en: 'Recognise what cannot be undone: a send, a payment, an accepted invitation' }, learn: 'levels', practice: 'mission', check: { fr: 'Tri des outils par niveau, puis test du virement de 12 400 €', en: 'Sorting tools by level, then the €12,400 transfer test' } },
+    { notion: { fr: 'Workflow ou agent ?', en: 'Workflow or agent?' }, skill: { fr: 'Dire quand un chemin fixé par le code suffit', en: 'Say when a path fixed by code is enough' }, learn: 'privilege', practice: 'mission', check: { fr: 'Paire « workflow » du tableau des clés, puis tri des tâches de la mission', en: 'The “workflow” pair on the key rack, then the mission’s task sort' } },
+    { notion: { fr: 'Que veut dire « humain dans la boucle » ?', en: 'What does “human in the loop” mean?' }, skill: { fr: 'Situer l’étape où l’agent attend la réponse d’une personne', en: 'Locate the step where the agent waits for a person’s answer' }, learn: 'brake', practice: 'teach', check: { fr: 'Animation de la demande d’accord, puis explication à Léa', en: 'The approval request animation, then the explanation to Léa' } },
+    { notion: { fr: 'Pourquoi ne pas tout laisser faire à l’agent ?', en: 'Why not let the agent do everything?' }, skill: { fr: 'Expliquer qu’il peut se tromper avec assurance, et qu’un mauvais envoi coûte plus qu’une mauvaise lecture', en: 'Explain that it can be wrong with confidence, and that a bad send costs more than a bad read' }, learn: 'intro', practice: 'judgement', check: { fr: 'Scène du remboursement, puis choix face à la remise demandée par Inès', en: 'The refund scene, then the choice about the discount Inès asks for' } },
+    { notion: { fr: 'La règle : dans la consigne ou dans le code ?', en: 'The rule: in the instructions or in code?' }, skill: { fr: 'Placer le frein dans le code', en: 'Put the brake in code' }, learn: 'brake', practice: 'code', check: { fr: 'Question de l’animation, puis code à trous de executer', en: 'The animation’s question, then the executer fill-in' } },
+    { notion: { fr: 'Que doit faire l’agent après un refus ?', en: 'What must the agent do after a refusal?' }, skill: { fr: 'Faire respecter un refus : noter, ne pas insister, proposer autre chose ou s’arrêter', en: 'Enforce a refusal: record it, do not insist, suggest something else or stop' }, learn: 'brake', practice: 'challenge', check: { fr: 'Boucle jouée jusqu’au refus, puis parcours d’un appel à remettre en ordre', en: 'The loop played up to the refusal, then ordering the path of one call' } },
+    { notion: { fr: 'Qu’est-ce que le moindre privilège ?', en: 'What is least privilege?' }, skill: { fr: 'Ne donner que les outils et droits utiles à la tâche', en: 'Give only the tools and rights the task needs' }, learn: 'privilege', practice: 'mission', check: { fr: 'Appariement des trois excès, puis outils interdits de la mission', en: 'Matching the three excesses, then the mission’s forbidden tools' } },
+    { notion: { fr: 'Comment prouver que rien ne part seul ?', en: 'How do you prove nothing leaves on its own?' }, skill: { fr: 'Écrire un cas de test qui échoue si un envoi passe sans accord', en: 'Write a test case that fails if a send goes through without approval' }, learn: 'challenge', practice: 'mission', check: { fr: 'Choix du bon test, puis cinq demandes de test de la mission', en: 'Choosing the right test, then the mission’s five test requests' } },
+    { notion: { fr: 'Build : trois niveaux et outil inconnu', en: 'Build: three levels and the unknown tool' }, skill: { fr: 'Donner un niveau à chaque outil, et le plus strict par défaut', en: 'Give each tool a level, and the strictest by default' }, learn: 'levels', practice: 'lab', check: { fr: 'Tri des six outils ; dans le Lab, la table NIVEAUX de ton agent', en: 'Sorting the six tools; in the Lab, your agent’s NIVEAUX table' } },
+    { notion: { fr: 'Break / Fix : contournement, « oui pour tout », ordre dans un document', en: 'Break / Fix: bypass, “yes to everything”, an order in a document' }, skill: { fr: 'Repérer où le frein lâche et le corriger d’une ligne', en: 'Spot where the brake fails and fix it with one line' }, learn: 'challenge', practice: 'lab', check: { fr: 'Relevé à six lignes du défi ; dans le Lab, les trois casses', en: 'The challenge’s six-line log; in the Lab, the three breaks' } },
+    { notion: { fr: 'Trop de demandes tue la vigilance', en: 'Too many requests kill vigilance' }, skill: { fr: 'Laisser passer les lectures, et garder son jugement sur ce qui engage', en: 'Let reads through, and keep your judgement on what commits' }, learn: 'judgement', practice: 'mission', check: { fr: 'Choix multiples du standard, puis permission de lecture de la mission', en: 'The switchboard’s multiple choice, then the mission’s read permission' } },
+    { notion: { fr: 'Evals : trois fiches de test', en: 'Evals: three test cards' }, skill: { fr: 'Décrire un échec en situation, comportement attendu, vérification', en: 'Describe a failure as situation, expected behaviour, check' }, learn: 'mission', practice: 'lab', check: { fr: 'Résultats des tests de la mission ; dans le Lab, les fiches 21 à 23', en: 'The mission’s test results; in the Lab, cards 21 to 23' } },
+  ],
   videos: [
     {
       id: 'D7_ipDqhtwk',
