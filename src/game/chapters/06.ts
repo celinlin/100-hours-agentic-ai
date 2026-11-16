@@ -150,30 +150,7 @@ const ch06: ChapterGame = {
           },
         ],
       },
-      takeaway: {
-        fr: 'Un embedding est une liste de nombres qui résume un texte : deux sens proches donnent des listes proches. Plus la distance est petite, plus les textes parlent de la même chose.',
-        en: 'An embedding is a list of numbers that sums up a text: two close meanings give close lists. The smaller the distance, the more the texts talk about the same thing.',
-      },
-      more: {
-        fr: 'C’est l’expérience 1 du programme. Par défaut, Chroma calcule les embeddings en local : tes documents restent sur ta machine.',
-        en: 'This is the programme’s experiment 1. By default, Chroma computes embeddings locally: your documents stay on your machine.',
-      },
-    },
-    {
-      id: 'grounded',
-      prop: 'c06_lectern',
-      at: { x: 800, y: 690 },
-      object: { fr: 'Le pupitre à la loupe', en: 'The lectern and magnifier' },
-      title: { fr: 'Une réponse ancrée ne dit que ce qu’elle a lu', en: 'A grounded answer only says what it read' },
-      everyday: {
-        analogy: { fr: 'Comme une note de bas de page dans un rapport : chaque chiffre renvoie à une page que le lecteur peut ouvrir.', en: 'Like a footnote in a report: every figure points to a page the reader can open.' },
-        limit: { fr: 'Une note de bas de page peut être fausse : le modèle peut coller une source sur une phrase qu’elle ne contient pas. La citation se vérifie en ouvrant le passage.', en: 'A footnote can be wrong: the model can attach a source to a sentence it does not contain. A citation is checked by opening the passage.' },
-      },
-      show: {
-        fr: 'Le modèle ne lira que les passages posés devant lui. Trouve d’abord les bons passages ; tu vérifieras ensuite une réponse, phrase par phrase.',
-        en: 'The model will only read the passages laid in front of it. First find the right passages; then you will check an answer, sentence by sentence.',
-      },
-      mechanic: {
+      then: {
         kind: 'desk',
         prompt: { fr: 'Joue la recherche : trois passages tiennent sur le bureau. Choisis-les, puis fais entrer le client.', en: 'Play the search: three passages fit on the desk. Choose them, then let the guest in.' },
         slots: 3,
@@ -206,6 +183,34 @@ const ch06: ChapterGame = {
             missing: { fr: 'La section Clients parle bien de l’agence, pas de son équipe : bon document, mauvais passage.', en: 'The Clients section is about the agency, not its team: right document, wrong passage.' },
           },
         ],
+      },
+      takeaway: {
+        fr: 'Un embedding est une liste de nombres qui résume un texte : deux sens proches donnent des listes proches. Plus la distance est petite, plus les textes parlent de la même chose.',
+        en: 'An embedding is a list of numbers that sums up a text: two close meanings give close lists. The smaller the distance, the more the texts talk about the same thing.',
+      },
+      more: {
+        fr: 'C’est l’expérience 1 du programme. Par défaut, Chroma calcule les embeddings en local : tes documents restent sur ta machine.',
+        en: 'This is the programme’s experiment 1. By default, Chroma computes embeddings locally: your documents stay on your machine.',
+      },
+    },
+    {
+      id: 'grounded',
+      prop: 'c06_lectern',
+      at: { x: 800, y: 690 },
+      object: { fr: 'Le pupitre à la loupe', en: 'The lectern and magnifier' },
+      title: { fr: 'Une réponse ancrée ne dit que ce qu’elle a lu', en: 'A grounded answer only says what it read' },
+      everyday: {
+        analogy: { fr: 'Comme une note de bas de page dans un rapport : chaque chiffre renvoie à une page que le lecteur peut ouvrir.', en: 'Like a footnote in a report: every figure points to a page the reader can open.' },
+        limit: { fr: 'Une note de bas de page peut être fausse : le modèle peut coller une source sur une phrase qu’elle ne contient pas. La citation se vérifie en ouvrant le passage.', en: 'A footnote can be wrong: the model can attach a source to a sentence it does not contain. A citation is checked by opening the passage.' },
+      },
+      show: {
+        fr: 'Trois questions d’Inès Caron, une bibliothèque, deux épingles : chaque réponse est jugée sur le passage qu’elle cite. Tu vérifieras ensuite une réponse, phrase par phrase.',
+        en: 'Three questions from Inès Caron, one bookcase, two pins: every answer is judged on the passage it cites. Then you will check an answer, sentence by sentence.',
+      },
+      mechanic: {
+        kind: 'custom',
+        game: 'c06',
+        prompt: { fr: 'Mène l’enquête : tire un livre, épingle deux passages au plus, puis remets une réponse que la cliente peut vérifier.', en: 'Run the investigation: pull a book, pin two passages at most, then hand in an answer the client can check.' },
       },
       then: {
         kind: 'spot',
@@ -566,11 +571,11 @@ const ch06: ChapterGame = {
   coverage: [
     { notion: { fr: 'Qu’est-ce que le RAG ?', en: 'What is RAG?' }, skill: { fr: 'Décrire retrouver puis répondre, étape par étape', en: 'Describe retrieve then answer, step by step' }, learn: 'pipeline', practice: 'mission', check: { fr: 'Question de l’animation, puis remise en ordre des cinq étapes', en: 'The animation’s question, then ordering the five steps' } },
     { notion: { fr: 'Pourquoi découper un document en passages ?', en: 'Why split a document into passages?' }, skill: { fr: 'Expliquer qu’un passage trop long noie la réponse, et viser 150 à 300 mots', en: 'Explain that an overlong passage drowns the answer, and aim for 150 to 300 words' }, learn: 'pipeline', practice: 'diagnose', check: { fr: 'Panne « 500 mots » à ranger, puis sa correction à associer dans l’épreuve', en: 'The “500 words” failure to sort, then its fix to match in the challenge' } },
-    { notion: { fr: 'Qu’est-ce qu’un embedding ?', en: 'What is an embedding?' }, skill: { fr: 'Dire qu’un embedding résume le sens d’un texte en nombres', en: 'Say that an embedding sums up a text’s meaning in numbers' }, learn: 'embeddings', practice: 'lab', check: { fr: 'Choix du passage le plus proche sans mot commun', en: 'Choosing the closest passage with no word in common' } },
+    { notion: { fr: 'Qu’est-ce qu’un embedding ?', en: 'What is an embedding?' }, skill: { fr: 'Dire qu’un embedding résume le sens d’un texte en nombres', en: 'Say that an embedding sums up a text’s meaning in numbers' }, learn: 'embeddings', practice: 'lab', check: { fr: 'Choix du passage le plus proche sans mot commun, puis trois passages à poser sur le bureau', en: 'Choosing the closest passage with no word in common, then three passages to lay on the desk' } },
     { notion: { fr: 'Comment mesurer la proximité de deux textes ?', en: 'How do you measure how close two texts are?' }, skill: { fr: 'Lire une distance : plus elle est petite, plus les textes sont proches', en: 'Read a distance: the smaller, the closer the texts' }, learn: 'embeddings', practice: 'code', check: { fr: 'Trou « dist < SEUIL » du code, et trace aux quatre distances', en: 'The “dist < SEUIL” blank in the code, and the trace with four distances' } },
-    { notion: { fr: 'À quoi servent les métadonnées ?', en: 'What are metadata for?' }, skill: { fr: 'Garder source et section pour filtrer et citer', en: 'Keep source and section to filter and cite' }, learn: 'grounded', practice: 'code', check: { fr: 'Passages étiquetés à choisir, trou « source », panne du document sans étiquette', en: 'Labelled passages to choose, the “source” blank, the unlabelled-document failure' } },
+    { notion: { fr: 'À quoi servent les métadonnées ?', en: 'What are metadata for?' }, skill: { fr: 'Garder source et section pour filtrer et citer', en: 'Keep source and section to filter and cite' }, learn: 'grounded', practice: 'code', check: { fr: 'Passages étiquetés à épingler et à citer dans l’enquête, trou « source », panne du document sans étiquette', en: 'Labelled passages to pin and cite in the investigation, the “source” blank, the unlabelled-document failure' } },
     { notion: { fr: 'Qu’est-ce que le reranking ?', en: 'What is reranking?' }, skill: { fr: 'Situer le second tri entre la recherche et la réponse', en: 'Place the second sort between retrieval and answer' }, learn: 'pipeline', practice: 'diagnose', check: { fr: 'Panne « bon passage en 4e position » à ranger', en: 'The “right passage in 4th place” failure to sort' } },
-    { notion: { fr: 'Qu’est-ce qu’une réponse ancrée ?', en: 'What is a grounded answer?' }, skill: { fr: 'Vérifier qu’une réponse ne dit que ce que ses passages contiennent', en: 'Check that an answer only says what its passages contain' }, learn: 'grounded', practice: 'mission', check: { fr: 'Phrases non prouvées à repérer', en: 'Unproven sentences to spot' } },
+    { notion: { fr: 'Qu’est-ce qu’une réponse ancrée ?', en: 'What is a grounded answer?' }, skill: { fr: 'Vérifier qu’une réponse ne dit que ce que ses passages contiennent', en: 'Check that an answer only says what its passages contain' }, learn: 'grounded', practice: 'mission', check: { fr: 'Enquête à la bibliothèque (réponse sans source, passage hors sujet), puis phrases non prouvées à repérer', en: 'Library investigation (unsourced answer, off-topic passage), then unproven sentences to spot' } },
     { notion: { fr: 'Quand le RAG échoue-t-il ?', en: 'When does RAG fail?' }, skill: { fr: 'Situer une panne : lecture, recherche ou génération', en: 'Locate a failure: reading, retrieval or generation' }, learn: 'diagnose', practice: 'challenge', check: { fr: 'Six pannes à ranger, puis une trace à diagnostiquer', en: 'Six failures to sort, then a trace to diagnose' } },
     { notion: { fr: 'Build : l’outil documents()', en: 'Build: the documents() tool' }, skill: { fr: 'Écrire une recherche qui garde la source et applique un seuil', en: 'Write a search that keeps the source and applies a threshold' }, learn: 'code', practice: 'lab', check: { fr: 'Quatre trous du code de référence', en: 'Four blanks in the reference code' } },
     { notion: { fr: 'Break / Fix : le passage est absent', en: 'Break / Fix: the passage is missing' }, skill: { fr: 'Faire dire « je ne trouve pas » plutôt qu’inventer', en: 'Get “I can’t find it” rather than an invention' }, learn: 'intro', practice: 'challenge', check: { fr: 'Trace du chien d’Inès, test « frais de taxi » de la mission', en: 'The Inès’s dog trace, the mission’s “taxi expenses” test' } },

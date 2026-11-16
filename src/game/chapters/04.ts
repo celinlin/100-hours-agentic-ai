@@ -113,20 +113,13 @@ const ch04: ChapterGame = {
       object: { fr: 'Le tableau des voyants', en: 'The lamp board' },
       title: { fr: 'Un code d’erreur est une réponse', en: 'An error code is a response' },
       show: {
-        fr: 'Trois chiffres disent comment s’est passée la requête : 2xx réussi, 4xx ta faute, 5xx celle du service.',
-        en: 'Three digits say how the request went: 2xx success, 4xx your fault, 5xx the service’s.',
+        fr: 'Trois chiffres disent comment s’est passée la requête : 2xx réussi, 4xx ta faute, 5xx celle du service. Prends le standard : branche quatre appels vers l’agenda et lis chaque voyant.',
+        en: 'Three digits say how the request went: 2xx success, 4xx your fault, 5xx the service’s. Take the switchboard: put four calls through to the calendar and read each lamp.',
       },
       mechanic: {
-        kind: 'match',
-        prompt: { fr: 'Relie chaque voyant à ce qu’il signifie et à ce que l’agent doit en faire.', en: 'Link each lamp to what it means and what the agent should do with it.' },
-        pairs: [
-          { id: '200', left: { fr: '200 OK', en: '200 OK' }, right: { fr: 'Réussi : garder titre et heures, en texte court', en: 'Success: keep title and times, as short text' } },
-          { id: '401', left: { fr: '401 Unauthorized', en: '401 Unauthorized' }, right: { fr: 'Jeton absent ou invalide : dire que l’accès est perdu', en: 'Token missing or invalid: say access is lost' } },
-          { id: '403', left: { fr: '403 Forbidden', en: '403 Forbidden' }, right: { fr: 'Identité reconnue, droit insuffisant : réessayer ne changera rien', en: 'Identity known, permission insufficient: retrying changes nothing' } },
-          { id: '404', left: { fr: '404 Not Found', en: '404 Not Found' }, right: { fr: 'Ressource introuvable : vérifier l’adresse demandée', en: 'Resource not found: check the requested address' } },
-          { id: '429', left: { fr: '429 Too Many Requests', en: '429 Too Many Requests' }, right: { fr: 'Limite de débit atteinte : attendre, puis réessayer', en: 'Rate limit hit: wait, then retry' } },
-          { id: '500', left: { fr: '500 Internal Server Error', en: '500 Internal Server Error' }, right: { fr: 'Panne côté service : signaler, sans inventer', en: 'Failure on the service’s side: report it, without inventing' } },
-        ],
+        kind: 'custom',
+        game: 'c04',
+        prompt: { fr: 'Tu tiens le standard. Compose chaque appel, lis le voyant, puis dis au client ce qui s’est vraiment passé.', en: 'You run the switchboard. Compose each call, read the lamp, then tell the guest what really happened.' },
       },
       then: {
         kind: 'sort',
@@ -345,10 +338,22 @@ const ch04: ChapterGame = {
   challenge: {
     title: { fr: 'La ligne directe', en: 'The direct line' },
     brief: {
-      fr: 'Trois épreuves pour passer la porte : un relevé d’appels à corriger, une règle de tri à appliquer, un droit à demander.',
-      en: 'Three trials to go through the door: a call log to correct, a sorting rule to apply, a permission to request.',
+      fr: 'Quatre épreuves pour passer la porte : six voyants à relier, un relevé d’appels à corriger, une règle de tri à appliquer, un droit à demander.',
+      en: 'Four trials to go through the door: six lamps to link, a call log to correct, a sorting rule to apply, a permission to request.',
     },
     steps: [
+      {
+        kind: 'match',
+        prompt: { fr: 'Relie chaque voyant à ce qu’il signifie et à ce que l’agent doit en faire.', en: 'Link each lamp to what it means and what the agent should do with it.' },
+        pairs: [
+          { id: '200', left: { fr: '200 OK', en: '200 OK' }, right: { fr: 'Réussi : garder titre et heures, en texte court', en: 'Success: keep title and times, as short text' } },
+          { id: '401', left: { fr: '401 Unauthorized', en: '401 Unauthorized' }, right: { fr: 'Jeton absent ou invalide : dire que l’accès est perdu', en: 'Token missing or invalid: say access is lost' } },
+          { id: '403', left: { fr: '403 Forbidden', en: '403 Forbidden' }, right: { fr: 'Identité reconnue, droit insuffisant : réessayer ne changera rien', en: 'Identity known, permission insufficient: retrying changes nothing' } },
+          { id: '404', left: { fr: '404 Not Found', en: '404 Not Found' }, right: { fr: 'Ressource introuvable : vérifier l’adresse demandée', en: 'Resource not found: check the requested address' } },
+          { id: '429', left: { fr: '429 Too Many Requests', en: '429 Too Many Requests' }, right: { fr: 'Limite de débit atteinte : attendre, puis réessayer', en: 'Rate limit hit: wait, then retry' } },
+          { id: '500', left: { fr: '500 Internal Server Error', en: '500 Internal Server Error' }, right: { fr: 'Panne côté service : signaler, sans inventer', en: 'Failure on the service’s side: report it, without inventing' } },
+        ],
+      },
       {
         kind: 'spot',
         code: true,
@@ -601,7 +606,7 @@ const ch04: ChapterGame = {
   },
   coverage: [
     { notion: { fr: 'Que contient une requête HTTP ?', en: 'What does an HTTP request contain?' }, skill: { fr: 'Nommer méthode, adresse, en-têtes, corps, et ce que porte la réponse', en: 'Name method, address, headers, body, and what the response carries' }, learn: 'request', practice: 'code', check: { fr: 'Remettre dans l’ordre ce qui circule pendant un appel', en: 'Put in order what travels during a call' } },
-    { notion: { fr: 'Que dit un code de statut ?', en: 'What does a status code tell you?' }, skill: { fr: 'Lire 2xx, 4xx, 5xx et choisir la réaction de l’agent', en: 'Read 2xx, 4xx, 5xx and choose the agent’s reaction' }, learn: 'status', practice: 'challenge', check: { fr: 'Relier six codes à leur sens, puis repérer une erreur passée pour un agenda vide', en: 'Link six codes to their meaning, then spot an error passed off as an empty calendar' } },
+    { notion: { fr: 'Que dit un code de statut ?', en: 'What does a status code tell you?' }, skill: { fr: 'Lire 2xx, 4xx, 5xx et choisir la réaction de l’agent', en: 'Read 2xx, 4xx, 5xx and choose the agent’s reaction' }, learn: 'status', practice: 'challenge', check: { fr: 'Tenir le standard sur quatre appels (200, liste vide, 401, 403), puis relier six codes et repérer une erreur passée pour un agenda vide', en: 'Run the switchboard over four calls (200, empty list, 401, 403), then link six codes and spot an error passed off as an empty calendar' } },
     { notion: { fr: 'GET ou POST ?', en: 'GET or POST?' }, skill: { fr: 'Distinguer lire et créer, et savoir ce qu’on peut relancer sans risque', en: 'Tell reading from creating, and know what can be retried safely' }, learn: 'status', practice: 'mission', check: { fr: 'Trier cinq appels entre GET et POST', en: 'Sort five calls between GET and POST' } },
     { notion: { fr: 'Pourquoi une API renvoie du JSON ?', en: 'Why does an API return JSON?' }, skill: { fr: 'Expliquer les champs nommés, et n’envoyer au modèle qu’un texte court', en: 'Explain named fields, and send the model only short text' }, learn: 'request', practice: 'code', check: { fr: 'Question de l’animation, puis clé « items » à retrouver dans le code', en: 'The animation’s question, then the “items” key to find in the code' } },
     { notion: { fr: 'Une clé d’API : où la ranger ?', en: 'An API key: where do you keep it?' }, skill: { fr: 'Garder clés et jetons hors du code, du dépôt et du contexte', en: 'Keep keys and tokens out of the code, the repository and the context' }, learn: 'keys', practice: 'teach', check: { fr: 'Choisir les pratiques justes parmi quatre', en: 'Choose the right practices among four' } },

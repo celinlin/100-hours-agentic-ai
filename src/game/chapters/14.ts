@@ -60,10 +60,15 @@ const ch14: ChapterGame = {
       object: { fr: 'Le bureau de livraison', en: 'The delivery desk' },
       title: { fr: 'Livrer, c’est prouver', en: 'Delivering means proving' },
       show: {
-        fr: 'Livrer, ce n’est pas envoyer du code : c’est donner à Inès de quoi s’en servir seule. Le programme fixe un ordre.',
-        en: 'Delivering isn’t sending code: it’s giving Inès what she needs to use it on her own. The programme sets an order.',
+        fr: 'Livrer, ce n’est pas envoyer du code : c’est donner à Inès de quoi s’en servir seule. Joue la semaine de livraison en trois actes (le dossier, la démo, la semaine sans toi), puis remets les étapes dans l’ordre du programme.',
+        en: 'Delivering isn’t sending code: it’s giving Inès what she needs to use it on her own. Play the delivery week in three acts (the file, the demo, the week without you), then put the steps back in the programme’s order.',
       },
       mechanic: {
+        kind: 'custom',
+        game: 'c14',
+        prompt: { fr: 'La remise des clés : monte le dossier, fais la démo, puis laisse Inès seule une semaine. Elle ne signe que si tout tient.', en: 'Handing over the keys: build the file, run the demo, then leave Inès alone for a week. She only signs if everything holds.' },
+      },
+      then: {
         kind: 'order',
         prompt: { fr: 'Remets la livraison dans l’ordre.', en: 'Put the handover in order.' },
         items: [
@@ -569,7 +574,7 @@ const ch14: ChapterGame = {
     ],
   },
   coverage: [
-    { notion: { fr: '1 · Qu’est-ce qu’un agent prêt à livrer ?', en: '1 · What is an agent that’s ready to deliver?' }, skill: { fr: 'Dire qu’un agent est prêt quand les tests sont verts, le dossier écrit, et qu’une autre personne sait s’en servir.', en: 'Say an agent is ready when tests are green, the file is written, and someone else knows how to use it.' }, learn: 'handover', practice: 'mission', check: { fr: 'Ordre de livraison reconstitué ; dans la mission, la version ne part que si la suite est rejouée.', en: 'Handover order rebuilt; in the mission, the version only leaves if the suite is replayed.' } },
+    { notion: { fr: '1 · Qu’est-ce qu’un agent prêt à livrer ?', en: '1 · What is an agent that’s ready to deliver?' }, skill: { fr: 'Dire qu’un agent est prêt quand les tests sont verts, le dossier écrit, et qu’une autre personne sait s’en servir.', en: 'Say an agent is ready when tests are green, the file is written, and someone else knows how to use it.' }, learn: 'handover', practice: 'mission', check: { fr: 'Jeu « La remise des clés » (dossier, démo, semaine sans toi), puis ordre de livraison reconstitué ; dans la mission, la version ne part que si la suite est rejouée.', en: 'The “Handing over the keys” game (file, demo, week without you), then handover order rebuilt; in the mission, the version only leaves if the suite is replayed.' } },
     { notion: { fr: '2 · Que contient le dossier de livraison ?', en: '2 · What does the handover file contain?' }, skill: { fr: 'Écrire fiche, tests, traces et dette : ce que l’agent fait, refuse, la date du verdict, le retour arrière.', en: 'Write guide, tests, traces and debt: what the agent does, refuses, the verdict’s date, the rollback.' }, learn: 'file', practice: 'lab', check: { fr: 'Script de livraison complété ; dans le Lab, ton propre livraison.json.', en: 'Delivery script completed; in the Lab, your own livraison.json.' } },
     { notion: { fr: '3 · Comment choisir les cas de la démo ?', en: '3 · How do you choose the cases for the demo?' }, skill: { fr: 'Choisir les cas avec l’utilisatrice, dans ses vrais dossiers, jamais tes exemples.', en: 'Choose the cases with the user, from her real files, never your examples.' }, learn: 'demo', practice: 'teach', check: { fr: 'Choix des cas de démo ; réexpliqué à Bastien, qui confond démo et mise en service.', en: 'Choice of demo cases; re-explained to Bastien, who confuses demo and going live.' } },
     { notion: { fr: '4 · Que faire d’une demande hors périmètre ?', en: '4 · What do you do with an out-of-scope request?' }, skill: { fr: 'Faire refuser et orienter : dire ce que l’agent ne fait pas, et qui le fait.', en: 'Have it refuse and redirect: say what the agent does not do, and who does.' }, learn: 'file', practice: 'challenge', check: { fr: 'Question de l’animation « refuse » ; dans le défi, le devis n’est pas appelé et le prix inventé est repéré dans les traces.', en: 'Check question of the “refuse” animation; in the challenge, the quote is not called and the invented price is spotted in the traces.' } },

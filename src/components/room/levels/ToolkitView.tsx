@@ -15,7 +15,6 @@ const T = {
     questions: 'Trois questions pour vérifier',
     mistakes: 'Les erreurs fréquentes',
     vigilance: 'Points de vigilance',
-    print: 'Imprimer le kit',
   },
   en: {
     title: 'Teaching kit',
@@ -28,7 +27,6 @@ const T = {
     questions: 'Three questions to check understanding',
     mistakes: 'Common mistakes',
     vigilance: 'Points to watch',
-    print: 'Print the kit',
   },
 };
 
@@ -91,9 +89,6 @@ export default function ToolkitView({ lang, kit, chapter }: { lang: Lang; kit: T
           </dd>
         </div>
       </dl>
-      <button type="button" className="room-btn room-btn--paper" onClick={() => window.print()}>
-        {t.print}
-      </button>
     </div>
   );
 }

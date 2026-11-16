@@ -168,10 +168,15 @@ const ch12: ChapterGame = {
       object: { fr: 'La porte aux trois serrures', en: 'The three-lock door' },
       title: { fr: 'Le trio dangereux', en: 'The lethal trifecta' },
       show: {
-        fr: 'Une attaque réussit quand trois choses se croisent : des données privées, du contenu externe, un moyen d’envoyer. Retires-en une, elle échoue.',
-        en: 'An attack succeeds when three things meet: private data, external content, a way to send. Remove one, and it fails.',
+        fr: 'Une attaque réussit quand trois choses se croisent : des données privées, du contenu externe, un moyen d’envoyer. Passe la lampe sur le mail, puis rejoue l’attaque contre tes défenses.',
+        en: 'An attack succeeds when three things meet: private data, external content, a way to send. Run the lamp over the email, then replay the attack against your defences.',
       },
       mechanic: {
+        kind: 'custom',
+        game: 'c12',
+        prompt: { fr: 'Trouve les ordres cachés, puis contiens l’attaque sans casser le travail de l’agent.', en: 'Find the hidden orders, then contain the attack without breaking the agent’s job.' },
+      },
+      then: {
         kind: 'choice',
         prompt: { fr: 'Quelle mesure borne vraiment le risque ?', en: 'Which measure truly bounds the risk?' },
         scene: {

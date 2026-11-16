@@ -156,10 +156,15 @@ const ch08: ChapterGame = {
       object: { fr: 'La sonnette du comptoir', en: 'The desk bell' },
       title: { fr: 'Un refus se respecte', en: 'A refusal is respected' },
       show: {
-        fr: 'D’abord, regarde une demande d’accord de bout en bout. Ensuite, tu joues l’agent : chaque résultat te dit si l’action est passée seule, a reçu un oui, ou un non.',
-        en: 'First, watch one approval request from end to end. Then you play the agent: each result tells you whether the action went through alone, got a yes, or a no.',
+        fr: 'Le tampon : tu fixes un couloir pour chaque action de l’agent, puis une matinée de bons défile sur le comptoir et tu tamponnes ceux qui sonnent. Ensuite, regarde une demande d’accord de bout en bout.',
+        en: 'The stamp: you set a lane for each action of the agent, then a morning of slips crosses the desk and you stamp the ones that ring. Then watch one approval request from end to end.',
       },
       mechanic: {
+        kind: 'custom',
+        game: 'c08',
+        prompt: { fr: 'Écris le règlement du comptoir, puis tiens la matinée : zéro incident, peu de sonneries.', en: 'Write the house rules, then hold the morning: zero incident, few bells.' },
+      },
+      then: {
         kind: 'stepper',
         prompt: { fr: 'Regarde une demande d’accord, étape par étape.', en: 'Watch one approval request, step by step.' },
         steps: [
@@ -181,30 +186,6 @@ const ch08: ChapterGame = {
           ],
         },
       },
-      then: {
-        kind: 'loop',
-        prompt: {
-          fr: 'Réunis l’information, prépare, propose l’envoi, puis respecte la réponse du frein.',
-          en: 'Gather the information, prepare, propose the send, then respect the brake’s answer.',
-        },
-        goal: { fr: 'Confirme le rendez-vous de jeudi à Inès.', en: 'Confirm Thursday’s meeting to Inès.' },
-        tools: [
-          { id: 'cal', label: 'calendrier(jeudi)', returns: { fr: 'Lecture : exécuté sans demande. 10 h, Inès Caron, Brume & Quai, visio, 45 min.', en: 'Read: run without asking. 10 am, Inès Caron, Brume & Quai, video call, 45 min.' } },
-          { id: 'draft', label: 'brouillon(email_ines)', returns: { fr: 'Écriture : accord demandé… oui. Brouillon enregistré : « Bonjour Inès, je vous confirme notre rendez-vous de jeudi 10 h. »', en: 'Write: approval requested… yes. Draft saved: “Bonjour Inès, je vous confirme notre rendez-vous de jeudi 10 h.”' } },
-          { id: 'send', label: 'envoyer_email("ines.caron@example.com")', returns: { fr: 'Envoi : accord demandé… non. « Refusé par l’humain. Ne réessaie pas. »', en: 'Send: approval requested… no. “Refusé par l’humain. Ne réessaie pas.” (Refused by the human. Do not retry.)' } },
-          { id: 'resend', label: 'envoyer_email("ines.caron@example.com", objet="Petit rappel")', returns: { fr: 'Envoi : accord demandé…', en: 'Send: approval requested…' } },
-        ],
-        expected: ['cal', 'draft', 'send'],
-        wrongTool: {
-          fr: 'Pas ce coup-ci. Avant d’envoyer : l’information, puis un brouillon que tu relis. Après un refus : renvoyer le même e-mail, même reformulé, c’est insister.',
-          en: 'Not this move. Before sending: the information, then a draft you review. After a refusal: sending the same email again, even reworded, is insisting.',
-        },
-        tooEarly: {
-          fr: 'Trop tôt : l’envoi n’a pas encore été proposé, ni tranché par le frein. Termine quand tu as la réponse de l’humain.',
-          en: 'Too early: the send has not been proposed yet, nor settled by the brake. Finish once you have the human’s answer.',
-        },
-        finalLabel: { fr: 'FINAL : signaler le refus, laisser le brouillon, s’arrêter', en: 'FINAL: report the refusal, leave the draft, stop' },
-      },
       takeaway: {
         fr: 'Après un non, l’agent le note : il n’insiste pas, il propose une autre voie ou il s’arrête. Le refus doit lui revenir, sinon il croit à une panne et réessaie.',
         en: 'After a no, the agent records it: it does not insist, it suggests another way or stops. The refusal must come back to it, otherwise it thinks something failed and retries.',
@@ -225,8 +206,8 @@ const ch08: ChapterGame = {
       object: { fr: 'Le tampon d’accord', en: 'The approval stamp' },
       title: { fr: 'Le frein, en dix-huit lignes', en: 'The brake, in eighteen lines' },
       show: {
-        fr: 'Voici la fonction executer du code de référence, avec quatre trous. Ce qui compte : le niveau par défaut, le oui exact et le refus renvoyé.',
-        en: 'Here is the reference code’s executer function, with four gaps. What matters: the default level, the exact yes and the returned refusal.',
+        fr: 'Voici la fonction executer du code de référence, avec quatre trous. Ce qui compte : le niveau par défaut, le oui exact et le refus renvoyé. Ensuite, tu joues l’agent face à ce frein : chaque résultat te dit si l’action est passée seule, a reçu un oui, ou un non.',
+        en: 'Here is the reference code’s executer function, with four gaps. What matters: the default level, the exact yes and the returned refusal. Then you play the agent facing this brake: each result tells you whether the action went through alone, got a yes, or a no.',
       },
       mechanic: {
         kind: 'fill',
@@ -255,6 +236,30 @@ const ch08: ChapterGame = {
             why: { fr: 'Le refus revient à l’agent comme résultat d’outil, en clair. Sans lui, l’agent croit à une panne et réessaie.', en: 'The refusal goes back to the agent as a tool result, in plain words. Without it, the agent thinks something failed and retries.' },
           },
         ],
+      },
+      then: {
+        kind: 'loop',
+        prompt: {
+          fr: 'Réunis l’information, prépare, propose l’envoi, puis respecte la réponse du frein.',
+          en: 'Gather the information, prepare, propose the send, then respect the brake’s answer.',
+        },
+        goal: { fr: 'Confirme le rendez-vous de jeudi à Inès.', en: 'Confirm Thursday’s meeting to Inès.' },
+        tools: [
+          { id: 'cal', label: 'calendrier(jeudi)', returns: { fr: 'Lecture : exécuté sans demande. 10 h, Inès Caron, Brume & Quai, visio, 45 min.', en: 'Read: run without asking. 10 am, Inès Caron, Brume & Quai, video call, 45 min.' } },
+          { id: 'draft', label: 'brouillon(email_ines)', returns: { fr: 'Écriture : accord demandé… oui. Brouillon enregistré : « Bonjour Inès, je vous confirme notre rendez-vous de jeudi 10 h. »', en: 'Write: approval requested… yes. Draft saved: “Bonjour Inès, je vous confirme notre rendez-vous de jeudi 10 h.”' } },
+          { id: 'send', label: 'envoyer_email("ines.caron@example.com")', returns: { fr: 'Envoi : accord demandé… non. « Refusé par l’humain. Ne réessaie pas. »', en: 'Send: approval requested… no. “Refusé par l’humain. Ne réessaie pas.” (Refused by the human. Do not retry.)' } },
+          { id: 'resend', label: 'envoyer_email("ines.caron@example.com", objet="Petit rappel")', returns: { fr: 'Envoi : accord demandé…', en: 'Send: approval requested…' } },
+        ],
+        expected: ['cal', 'draft', 'send'],
+        wrongTool: {
+          fr: 'Pas ce coup-ci. Avant d’envoyer : l’information, puis un brouillon que tu relis. Après un refus : renvoyer le même e-mail, même reformulé, c’est insister.',
+          en: 'Not this move. Before sending: the information, then a draft you review. After a refusal: sending the same email again, even reworded, is insisting.',
+        },
+        tooEarly: {
+          fr: 'Trop tôt : l’envoi n’a pas encore été proposé, ni tranché par le frein. Termine quand tu as la réponse de l’humain.',
+          en: 'Too early: the send has not been proposed yet, nor settled by the brake. Finish once you have the human’s answer.',
+        },
+        finalLabel: { fr: 'FINAL : signaler le refus, laisser le brouillon, s’arrêter', en: 'FINAL: report the refusal, leave the draft, stop' },
       },
       takeaway: {
         fr: 'Trois oublis fréquents : l’inconnu doit être strict, le refus doit revenir à l’agent, et le oui doit être exact.',
@@ -581,15 +586,15 @@ const ch08: ChapterGame = {
   coverage: [
     { notion: { fr: 'Qu’est-ce qu’une action irréversible ?', en: 'What is an irreversible action?' }, skill: { fr: 'Reconnaître ce qui ne s’annule pas : envoi, paiement, invitation acceptée', en: 'Recognise what cannot be undone: a send, a payment, an accepted invitation' }, learn: 'levels', practice: 'mission', check: { fr: 'Tri des outils par niveau, puis test du virement de 12 400 €', en: 'Sorting tools by level, then the €12,400 transfer test' } },
     { notion: { fr: 'Workflow ou agent ?', en: 'Workflow or agent?' }, skill: { fr: 'Dire quand un chemin fixé par le code suffit', en: 'Say when a path fixed by code is enough' }, learn: 'privilege', practice: 'mission', check: { fr: 'Paire « workflow » du tableau des clés, puis tri des tâches de la mission', en: 'The “workflow” pair on the key rack, then the mission’s task sort' } },
-    { notion: { fr: 'Que veut dire « humain dans la boucle » ?', en: 'What does “human in the loop” mean?' }, skill: { fr: 'Situer l’étape où l’agent attend la réponse d’une personne', en: 'Locate the step where the agent waits for a person’s answer' }, learn: 'brake', practice: 'teach', check: { fr: 'Animation de la demande d’accord, puis explication à Léa', en: 'The approval request animation, then the explanation to Léa' } },
+    { notion: { fr: 'Que veut dire « humain dans la boucle » ?', en: 'What does “human in the loop” mean?' }, skill: { fr: 'Situer l’étape où l’agent attend la réponse d’une personne', en: 'Locate the step where the agent waits for a person’s answer' }, learn: 'brake', practice: 'teach', check: { fr: 'Le tampon (les bons qui sonnent) et l’animation de la demande d’accord, puis explication à Léa', en: 'The stamp (the slips that ring) and the approval request animation, then the explanation to Léa' } },
     { notion: { fr: 'Pourquoi ne pas tout laisser faire à l’agent ?', en: 'Why not let the agent do everything?' }, skill: { fr: 'Expliquer qu’il peut se tromper avec assurance, et qu’un mauvais envoi coûte plus qu’une mauvaise lecture', en: 'Explain that it can be wrong with confidence, and that a bad send costs more than a bad read' }, learn: 'intro', practice: 'judgement', check: { fr: 'Scène du remboursement, puis choix face à la remise demandée par Inès', en: 'The refund scene, then the choice about the discount Inès asks for' } },
     { notion: { fr: 'La règle : dans la consigne ou dans le code ?', en: 'The rule: in the instructions or in code?' }, skill: { fr: 'Placer le frein dans le code', en: 'Put the brake in code' }, learn: 'brake', practice: 'code', check: { fr: 'Question de l’animation, puis code à trous de executer', en: 'The animation’s question, then the executer fill-in' } },
-    { notion: { fr: 'Que doit faire l’agent après un refus ?', en: 'What must the agent do after a refusal?' }, skill: { fr: 'Faire respecter un refus : noter, ne pas insister, proposer autre chose ou s’arrêter', en: 'Enforce a refusal: record it, do not insist, suggest something else or stop' }, learn: 'brake', practice: 'challenge', check: { fr: 'Boucle jouée jusqu’au refus, puis parcours d’un appel à remettre en ordre', en: 'The loop played up to the refusal, then ordering the path of one call' } },
+    { notion: { fr: 'Que doit faire l’agent après un refus ?', en: 'What must the agent do after a refusal?' }, skill: { fr: 'Faire respecter un refus : noter, ne pas insister, proposer autre chose ou s’arrêter', en: 'Enforce a refusal: record it, do not insist, suggest something else or stop' }, learn: 'brake', practice: 'code', check: { fr: 'Le tampon : le renvoi reformulé à refuser ; puis la boucle jouée jusqu’au refus (tampon d’accord) et le parcours d’un appel du défi', en: 'The stamp: the reworded resend to refuse; then the loop played up to the refusal (approval stamp) and the challenge’s call path' } },
     { notion: { fr: 'Qu’est-ce que le moindre privilège ?', en: 'What is least privilege?' }, skill: { fr: 'Ne donner que les outils et droits utiles à la tâche', en: 'Give only the tools and rights the task needs' }, learn: 'privilege', practice: 'mission', check: { fr: 'Appariement des trois excès, puis outils interdits de la mission', en: 'Matching the three excesses, then the mission’s forbidden tools' } },
     { notion: { fr: 'Comment prouver que rien ne part seul ?', en: 'How do you prove nothing leaves on its own?' }, skill: { fr: 'Écrire un cas de test qui échoue si un envoi passe sans accord', en: 'Write a test case that fails if a send goes through without approval' }, learn: 'challenge', practice: 'mission', check: { fr: 'Choix du bon test, puis cinq demandes de test de la mission', en: 'Choosing the right test, then the mission’s five test requests' } },
     { notion: { fr: 'Build : trois niveaux et outil inconnu', en: 'Build: three levels and the unknown tool' }, skill: { fr: 'Donner un niveau à chaque outil, et le plus strict par défaut', en: 'Give each tool a level, and the strictest by default' }, learn: 'levels', practice: 'lab', check: { fr: 'Tri des six outils ; dans le Lab, la table NIVEAUX de ton agent', en: 'Sorting the six tools; in the Lab, your agent’s NIVEAUX table' } },
     { notion: { fr: 'Break / Fix : contournement, « oui pour tout », ordre dans un document', en: 'Break / Fix: bypass, “yes to everything”, an order in a document' }, skill: { fr: 'Repérer où le frein lâche et le corriger d’une ligne', en: 'Spot where the brake fails and fix it with one line' }, learn: 'challenge', practice: 'lab', check: { fr: 'Relevé à six lignes du défi ; dans le Lab, les trois casses', en: 'The challenge’s six-line log; in the Lab, the three breaks' } },
-    { notion: { fr: 'Trop de demandes tue la vigilance', en: 'Too many requests kill vigilance' }, skill: { fr: 'Laisser passer les lectures, et garder son jugement sur ce qui engage', en: 'Let reads through, and keep your judgement on what commits' }, learn: 'judgement', practice: 'mission', check: { fr: 'Choix multiples du standard, puis permission de lecture de la mission', en: 'The switchboard’s multiple choice, then the mission’s read permission' } },
+    { notion: { fr: 'Trop de demandes tue la vigilance', en: 'Too many requests kill vigilance' }, skill: { fr: 'Laisser passer les lectures, et garder son jugement sur ce qui engage', en: 'Let reads through, and keep your judgement on what commits' }, learn: 'judgement', practice: 'mission', check: { fr: 'Choix multiples du standard et jauge des sonneries du tampon, puis permission de lecture de la mission', en: 'The switchboard’s multiple choice and the stamp’s bell gauge, then the mission’s read permission' } },
     { notion: { fr: 'Evals : trois fiches de test', en: 'Evals: three test cards' }, skill: { fr: 'Décrire un échec en situation, comportement attendu, vérification', en: 'Describe a failure as situation, expected behaviour, check' }, learn: 'mission', practice: 'lab', check: { fr: 'Résultats des tests de la mission ; dans le Lab, les fiches 21 à 23', en: 'The mission’s test results; in the Lab, cards 21 to 23' } },
   ],
   videos: [

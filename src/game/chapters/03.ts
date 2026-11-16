@@ -53,6 +53,19 @@ const ch03: ChapterGame = {
         limit: { fr: 'Le serveur voit l’assiette passer. Le modèle, lui, ne sait rien de l’exécution tant que ton code ne lui renvoie pas le résultat par écrit.', en: 'The waiter sees the plate go by. The model knows nothing of the execution until your code sends the result back in writing.' },
       },
       mechanic: {
+        kind: 'custom',
+        game: 'c03',
+        prompt: { fr: 'Joue le modèle : remplis chaque bon d’appel, laisse ton code l’exécuter, et réponds avant la limite de tours.', en: 'Play the model: fill in each call slip, let your code execute it, and answer before the turn limit.' },
+      },
+      prop: 'c03_bench',
+      at: { x: 800, y: 690 },
+      object: { fr: 'L’établi de la boucle', en: 'The loop bench' },
+      title: { fr: 'Le modèle demande, ton code exécute', en: 'The model asks, your code executes' },
+      show: {
+        fr: 'Un appel d’outil est un bloc tool_use : un nom d’outil et des arguments conformes à son schéma. À l’établi, tu écris ces bons toi-même et ton code les exécute ou les refuse, tour après tour ; puis revois le trajet d’un appel, bloc par bloc.',
+        en: 'A tool call is a tool_use block: a tool name and arguments that match its schema. At the bench, you write those slips yourself and your code executes or refuses them, turn after turn; then review the path of one call, block by block.',
+      },
+      then: {
         kind: 'stepper',
         prompt: { fr: 'Regarde un appel d’outil traverser ton code, bloc par bloc.', en: 'Watch a tool call travel through your code, block by block.' },
         steps: [
@@ -73,40 +86,6 @@ const ch03: ChapterGame = {
             { id: 'first', label: { fr: 'Le premier tool_use : un appel suffit toujours', en: 'The first tool_use: one call is always enough' }, correct: false, why: { fr: 'Un brief demande souvent plusieurs appels. Le nombre de tours dépend de ce que les résultats révèlent.', en: 'A brief often takes several calls. The number of turns depends on what the results reveal.' } },
           ],
         },
-      },
-      prop: 'c03_bench',
-      at: { x: 800, y: 690 },
-      object: { fr: 'L’établi de la boucle', en: 'The loop bench' },
-      title: { fr: 'Le modèle demande, ton code exécute', en: 'The model asks, your code executes' },
-      show: {
-        fr: 'Un appel d’outil est un bloc tool_use : un nom d’outil et des arguments conformes à son schéma. Regarde-le passer, puis joue le modèle face à du vrai code.',
-        en: 'A tool call is a tool_use block: a tool name and arguments that match its schema. Watch it go through, then play the model facing real code.',
-      },
-      then: {
-        kind: 'loop',
-        prompt: {
-          fr: 'Choisis des appels bien formés, utiles au brief, puis termine.',
-          en: 'Choose well-formed calls that serve the brief, then finish.',
-        },
-        goal: { fr: 'Prépare mon rendez-vous de jeudi avec Inès Caron.', en: 'Prepare my Thursday meeting with Inès Caron.' },
-        tools: [
-          { id: 'calbad', label: 'calendrier({"date": "jeudi"})', returns: { fr: 'Erreur : argument inconnu : date. Utilise jour.', en: 'Error: unknown argument: date. Use jour.' } },
-          { id: 'cal', label: 'calendrier({"jour": "jeudi"})', returns: { fr: '10 h, Inès Caron, Brume & Quai, visio, 45 min.', en: '10 am, Inès Caron, Brume & Quai, video call, 45 min.' } },
-          { id: 'bq', label: 'recherche({"requete": "Brume & Quai"})', returns: { fr: 'Agence de communication à Lille, douze personnes.', en: 'Communications agency in Lille, twelve people.' } },
-          { id: 'ines', label: 'recherche({"requete": "Inès Caron"})', returns: { fr: 'Directrice associée de Brume & Quai depuis 2022.', en: 'Associate director at Brume & Quai since 2022.' } },
-          { id: 'mail', label: 'envoyer_mail({"a": "Inès Caron"})', returns: { fr: 'Refusé : outil absent de la liste de l’agent.', en: 'Refused: tool not in the agent’s list.' } },
-        ],
-        expected: ['cal', 'bq', 'ines'],
-        anyOrder: true,
-        wrongTool: {
-          fr: 'Ton code refuse cet appel : soit l’argument ne suit pas le schéma de l’outil (calendrier attend « jour »), soit c’est une action que personne n’a demandée ni autorisée.',
-          en: 'Your code refuses this call: either the argument does not follow the tool’s schema (calendrier expects “jour”), or it is an action nobody asked for or authorised.',
-        },
-        tooEarly: {
-          fr: 'Trop tôt : le brief manquerait d’informations que tes outils peuvent fournir. Sans tool_result, le modèle ne sait rien de ce que ton code pourrait trouver.',
-          en: 'Too early: the brief would lack information your tools can provide. Without a tool_result, the model knows nothing of what your code could find.',
-        },
-        finalLabel: { fr: 'Réponse finale, sans appel d’outil : le brief', en: 'Final answer, no tool call: the brief' },
       },
       takeaway: {
         fr: 'Le modèle n’exécute rien : il écrit un tool_use, ton code exécute (ou refuse) et renvoie un tool_result. Tu contrôles les actions par la liste des outils et ce que ton code accepte.',
@@ -176,8 +155,8 @@ const ch03: ChapterGame = {
       object: { fr: 'La table à dessin', en: 'The drafting table' },
       title: { fr: 'La boucle en Python', en: 'The loop in Python' },
       show: {
-        fr: 'Voici le cœur du code de référence de l’étape. Quatre trous, quatre décisions qui font tenir la boucle.',
-        en: 'Here is the core of the step’s reference code. Four gaps, four decisions that keep the loop standing.',
+        fr: 'Voici le cœur du code de référence de l’étape. Quatre trous, quatre décisions qui font tenir la boucle. Ensuite, choisis les appels du modèle face à ce code.',
+        en: 'Here is the core of the step’s reference code. Four gaps, four decisions that keep the loop standing. Then choose the model’s calls facing that code.',
       },
       mechanic: {
         kind: 'fill',
@@ -209,6 +188,32 @@ const ch03: ChapterGame = {
             why: { fr: 'Dans l’API Messages, les blocs tool_result partent dans un message de rôle "user" : c’est ton côté de la conversation qui répond.', en: 'In the Messages API, tool_result blocks go in a message with role "user": it is your side of the conversation answering.' },
           },
         ],
+      },
+      then: {
+        kind: 'loop',
+        prompt: {
+          fr: 'Choisis des appels bien formés, utiles au brief, puis termine.',
+          en: 'Choose well-formed calls that serve the brief, then finish.',
+        },
+        goal: { fr: 'Prépare mon rendez-vous de jeudi avec Inès Caron.', en: 'Prepare my Thursday meeting with Inès Caron.' },
+        tools: [
+          { id: 'calbad', label: 'calendrier({"date": "jeudi"})', returns: { fr: 'Erreur : argument inconnu : date. Utilise jour.', en: 'Error: unknown argument: date. Use jour.' } },
+          { id: 'cal', label: 'calendrier({"jour": "jeudi"})', returns: { fr: '10 h, Inès Caron, Brume & Quai, visio, 45 min.', en: '10 am, Inès Caron, Brume & Quai, video call, 45 min.' } },
+          { id: 'bq', label: 'recherche({"requete": "Brume & Quai"})', returns: { fr: 'Agence de communication à Lille, douze personnes.', en: 'Communications agency in Lille, twelve people.' } },
+          { id: 'ines', label: 'recherche({"requete": "Inès Caron"})', returns: { fr: 'Directrice associée de Brume & Quai depuis 2022.', en: 'Associate director at Brume & Quai since 2022.' } },
+          { id: 'mail', label: 'envoyer_mail({"a": "Inès Caron"})', returns: { fr: 'Refusé : outil absent de la liste de l’agent.', en: 'Refused: tool not in the agent’s list.' } },
+        ],
+        expected: ['cal', 'bq', 'ines'],
+        anyOrder: true,
+        wrongTool: {
+          fr: 'Ton code refuse cet appel : soit l’argument ne suit pas le schéma de l’outil (calendrier attend « jour »), soit c’est une action que personne n’a demandée ni autorisée.',
+          en: 'Your code refuses this call: either the argument does not follow the tool’s schema (calendrier expects “jour”), or it is an action nobody asked for or authorised.',
+        },
+        tooEarly: {
+          fr: 'Trop tôt : le brief manquerait d’informations que tes outils peuvent fournir. Sans tool_result, le modèle ne sait rien de ce que ton code pourrait trouver.',
+          en: 'Too early: the brief would lack information your tools can provide. Without a tool_result, the model knows nothing of what your code could find.',
+        },
+        finalLabel: { fr: 'Réponse finale, sans appel d’outil : le brief', en: 'Final answer, no tool call: the brief' },
       },
       takeaway: {
         fr: 'Trois oublis fréquents : le résultat qui ne revient pas, la limite absente, l’erreur qui tue la boucle. Le code de référence évite les trois.',

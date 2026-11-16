@@ -163,10 +163,15 @@ const ch11: ChapterGame = {
       object: { fr: 'La console de bord', en: 'The control desk' },
       title: { fr: 'Un traceur qui ne perd rien', en: 'A tracer that loses nothing' },
       show: {
-        fr: 'Le code de référence enveloppe chaque appel : il mesure la durée, écrit l’erreur, puis la laisse remonter.',
-        en: 'The reference code wraps every call: it measures the duration, writes the error, then lets it propagate.',
+        fr: 'La console affiche la trace d’une demande ratée : remonte-la, lis ses durées et ses tokens, puis masque ce qui ne doit pas être écrit. Ensuite, le code de référence qui enveloppe chaque appel : il mesure la durée, écrit l’erreur, puis la laisse remonter.',
+        en: 'The console shows the trace of a failed request: follow it back, read its durations and tokens, then redact what must not be written. After that, the reference code that wraps every call: it measures the duration, writes the error, then lets it propagate.',
       },
       mechanic: {
+        kind: 'custom',
+        game: 'c11',
+        prompt: { fr: 'Le cas 12 a échoué. Lis sa trace sur la console : la cause, la lenteur, le coût, puis ce qu’il faut masquer avant d’écrire.', en: 'Case 12 failed. Read its trace on the console: the cause, the slowness, the cost, then what to redact before writing.' },
+      },
+      then: {
         kind: 'fill',
         prompt: { fr: 'Complète le traceur du programme.', en: 'Complete the programme’s tracer.' },
         code: true,
@@ -205,24 +210,6 @@ def tracer(cas: str, tour: int, evenement: str, nom: str):
           { options: ['perf_counter', 'sleep', 'localtime'], answer: 'perf_counter', why: { fr: 'perf_counter() est l’horloge faite pour mesurer une durée ; la différence donne duree_ms.', en: 'perf_counter() is the clock made for measuring a duration; the difference gives duree_ms.' } },
           { options: [':200', '200:', ':'], answer: ':200', why: { fr: 'Deux cents caractères au plus : jamais un document entier dans la trace.', en: 'Two hundred characters at most: never a whole document in the trace.' } },
           { options: ['raise', 'pass', 'return'], answer: 'raise', why: { fr: 'L’erreur est tracée, puis relancée : sinon le programme la cache.', en: 'The error is traced, then re-raised: otherwise the program hides it.' } },
-        ],
-      },
-      then: {
-        kind: 'sort',
-        prompt: { fr: 'Avant d’écrire la ligne : qu’est-ce qui part tel quel, et qu’est-ce qui doit être masqué, réduit ou retiré ?', en: 'Before writing the line: what goes in as is, and what must be redacted, reduced or removed?' },
-        bins: [
-          { id: 'write', label: { fr: 'À écrire tel quel', en: 'Write as is' } },
-          { id: 'mask', label: { fr: 'À masquer, réduire ou retirer', en: 'Redact, reduce or remove' } },
-        ],
-        items: [
-          { id: 'turn', label: { fr: 'Le cas, le tour, l’événement', en: 'The case, the turn, the event' }, bin: 'write', why: { fr: 'C’est ce qui relie les lignes et permet de remonter à la cause.', en: 'This is what links the lines and lets you go back to the cause.' } },
-          { id: 'ms', label: { fr: 'La durée de l’appel, en millisecondes', en: 'The duration of the call, in milliseconds' }, bin: 'write', why: { fr: 'Elle localise la lenteur : souvent un outil, pas toujours le modèle.', en: 'It locates the slowness: often a tool, not always the model.' } },
-          { id: 'tok', label: { fr: 'Les tokens d’entrée et de sortie', en: 'Input and output tokens' }, bin: 'write', why: { fr: 'Deux nombres : sans eux, impossible de calculer le coût du cas.', en: 'Two numbers: without them, you cannot compute the cost of the case.' } },
-          { id: 'tool', label: { fr: 'Le nom de l’outil appelé', en: 'The name of the tool called' }, bin: 'write', why: { fr: 'Un nom d’outil n’a rien de privé, et dit qui a échoué.', en: 'A tool name is not private, and says who failed.' } },
-          { id: 'key', label: { fr: 'L’en-tête de l’appel, avec la clé d’API', en: 'The call header, with the API key' }, bin: 'mask', why: { fr: 'Une clé ne s’écrit jamais : une trace se partage, se copie et se garde longtemps.', en: 'A key is never written: a trace gets shared, copied and kept for a long time.' } },
-          { id: 'mail', label: { fr: 'L’adresse complète du client, dans les arguments', en: 'The client’s full address, in the arguments' }, bin: 'mask', why: { fr: 'Les arguments s’écrivent masqués : jamais d’adresse complète.', en: 'Arguments are written redacted: never a full address.' } },
-          { id: 'ctx', label: { fr: 'Le contexte complet du tour', en: 'The full context of the turn' }, bin: 'mask', why: { fr: 'Une taille suffit : « contexte : 2 310 tokens, sans le texte ». Sinon la trace devient énorme et illisible.', en: 'A size is enough: “context: 2 310 tokens, without the text”. Otherwise the trace becomes huge and unreadable.' } },
-          { id: 'err', label: { fr: 'Le message d’erreur entier, document compris', en: 'The whole error message, document included' }, bin: 'mask', why: { fr: 'L’erreur s’écrit, mais coupée à 200 caractères : jamais un document entier.', en: 'The error is written, but cut to 200 characters: never a whole document.' } },
         ],
       },
       takeaway: {
@@ -328,8 +315,8 @@ def tracer(cas: str, tour: int, evenement: str, nom: str):
   challenge: {
     title: { fr: 'Le quart de nuit', en: 'The night watch' },
     brief: {
-      fr: 'Trois épreuves pour ouvrir la porte : un cache qui ne sert pas, un tableau à lire avec prudence, une trace à remonter.',
-      en: 'Three trials to open the door: a cache that does not help, a table to read cautiously, a trace to follow back.',
+      fr: 'Quatre épreuves pour ouvrir la porte : un cache qui ne sert pas, un tableau à lire avec prudence, une ligne à masquer, une trace à remonter.',
+      en: 'Four trials to open the door: a cache that does not help, a table to read cautiously, a line to redact, a trace to follow back.',
     },
     steps: [
       {
@@ -363,6 +350,24 @@ def tracer(cas: str, tour: int, evenement: str, nom: str):
           { id: 'all', label: { fr: 'L’agent coûte cher sur tous les cas', en: 'The agent is expensive on every case' }, bin: 'no', why: { fr: 'Quatre cas sur cinq coûtent 0,04 € ou moins : la moyenne trompe ici.', en: 'Four cases out of five cost 0.04 € or less: the mean misleads here.' } },
           { id: 'better', label: { fr: 'Le cache a rendu l’agent meilleur', en: 'Caching made the agent better' }, bin: 'no', why: { fr: 'Le tableau parle de coût, pas de qualité : seul le score de l’éval le dirait.', en: 'The table is about cost, not quality: only the eval score could say so.' } },
           { id: 'time', label: { fr: 'L’agent fait gagner 25 minutes par brief', en: 'The agent saves 25 minutes per brief' }, bin: 'no', why: { fr: 'Aucun temps « à la main » n’est mesuré dans ce tableau : le chiffre est inventé.', en: 'No “by hand” time is measured in this table: the figure is made up.' } },
+        ],
+      },
+      {
+        kind: 'sort',
+        prompt: { fr: 'Avant d’écrire la ligne : qu’est-ce qui part tel quel, et qu’est-ce qui doit être masqué, réduit ou retiré ?', en: 'Before writing the line: what goes in as is, and what must be redacted, reduced or removed?' },
+        bins: [
+          { id: 'write', label: { fr: 'À écrire tel quel', en: 'Write as is' } },
+          { id: 'mask', label: { fr: 'À masquer, réduire ou retirer', en: 'Redact, reduce or remove' } },
+        ],
+        items: [
+          { id: 'turn', label: { fr: 'Le cas, le tour, l’événement', en: 'The case, the turn, the event' }, bin: 'write', why: { fr: 'C’est ce qui relie les lignes et permet de remonter à la cause.', en: 'This is what links the lines and lets you go back to the cause.' } },
+          { id: 'ms', label: { fr: 'La durée de l’appel, en millisecondes', en: 'The duration of the call, in milliseconds' }, bin: 'write', why: { fr: 'Elle localise la lenteur : souvent un outil, pas toujours le modèle.', en: 'It locates the slowness: often a tool, not always the model.' } },
+          { id: 'tok', label: { fr: 'Les tokens d’entrée et de sortie', en: 'Input and output tokens' }, bin: 'write', why: { fr: 'Deux nombres : sans eux, impossible de calculer le coût du cas.', en: 'Two numbers: without them, you cannot compute the cost of the case.' } },
+          { id: 'tool', label: { fr: 'Le nom de l’outil appelé', en: 'The name of the tool called' }, bin: 'write', why: { fr: 'Un nom d’outil n’a rien de privé, et dit qui a échoué.', en: 'A tool name is not private, and says who failed.' } },
+          { id: 'key', label: { fr: 'L’en-tête de l’appel, avec la clé d’API', en: 'The call header, with the API key' }, bin: 'mask', why: { fr: 'Une clé ne s’écrit jamais : une trace se partage, se copie et se garde longtemps.', en: 'A key is never written: a trace gets shared, copied and kept for a long time.' } },
+          { id: 'mail', label: { fr: 'L’adresse complète du client, dans les arguments', en: 'The client’s full address, in the arguments' }, bin: 'mask', why: { fr: 'Les arguments s’écrivent masqués : jamais d’adresse complète.', en: 'Arguments are written redacted: never a full address.' } },
+          { id: 'ctx', label: { fr: 'Le contexte complet du tour', en: 'The full context of the turn' }, bin: 'mask', why: { fr: 'Une taille suffit : « contexte : 2 310 tokens, sans le texte ». Sinon la trace devient énorme et illisible.', en: 'A size is enough: “context: 2 310 tokens, without the text”. Otherwise the trace becomes huge and unreadable.' } },
+          { id: 'err', label: { fr: 'Le message d’erreur entier, document compris', en: 'The whole error message, document included' }, bin: 'mask', why: { fr: 'L’erreur s’écrit, mais coupée à 200 caractères : jamais un document entier.', en: 'The error is written, but cut to 200 characters: never a whole document.' } },
         ],
       },
       {
@@ -553,10 +558,10 @@ def tracer(cas: str, tour: int, evenement: str, nom: str):
   coverage: [
     { notion: { fr: 'Qu’est-ce qu’une trace ?', en: 'What is a trace?' }, skill: { fr: 'Décrire une trace : tous les événements d’un cas, dans l’ordre, sous un identifiant', en: 'Describe a trace: all the events of a case, in order, under one identifier' }, learn: 'trace', practice: 'mission', check: { fr: 'Animation et remise en ordre ; test de l’écart marketing', en: 'Animation and reordering; the marketing-variance test' } },
     { notion: { fr: 'Log ou trace ?', en: 'Log or trace?' }, skill: { fr: 'Dire ce qui relie des lignes isolées en un récit', en: 'Say what links isolated lines into a story' }, learn: 'trace', practice: 'teach', check: { fr: 'Question de l’animation ; réponse à Hugo', en: 'The animation’s question; answer to Hugo' } },
-    { notion: { fr: 'Que noter à chaque appel ?', en: 'What to record at each call?' }, skill: { fr: 'Écrire tour, événement, durée, tokens, et l’erreur s’il y en a une', en: 'Write turn, event, duration, tokens, and the error if there is one' }, learn: 'tracer', practice: 'lab', check: { fr: 'Code du traceur à compléter, tri des champs ; traceur écrit sur ta machine', en: 'Tracer code to complete, field sort; tracer written on your machine' } },
+    { notion: { fr: 'Que noter à chaque appel ?', en: 'What to record at each call?' }, skill: { fr: 'Écrire tour, événement, durée, tokens, et l’erreur s’il y en a une', en: 'Write turn, event, duration, tokens, and the error if there is one' }, learn: 'tracer', practice: 'lab', check: { fr: 'Jeu de la console, code du traceur à compléter ; traceur écrit sur ta machine', en: 'Console game, tracer code to complete; tracer written on your machine' } },
     { notion: { fr: 'Calculer le coût d’un cas', en: 'Computing the cost of a case' }, skill: { fr: 'Multiplier les tokens d’entrée et de sortie par leurs prix respectifs', en: 'Multiply input and output tokens by their respective prices' }, learn: 'cost', practice: 'mission', check: { fr: 'Calcul du brief ; test « coût par demande » de la mission', en: 'The brief’s calculation; the mission’s “cost per request” test' } },
-    { notion: { fr: 'Pourquoi mesurer la durée de chaque outil', en: 'Why measure each tool’s duration' }, skill: { fr: 'Localiser une lenteur : outil ou modèle', en: 'Locate a slowness: tool or model' }, learn: 'backwards', practice: 'mission', check: { fr: 'Ligne lente du cas 17 à cliquer ; demande de 95 secondes de la mission', en: 'Slow line of case 17 to click; the mission’s 95-second request' } },
-    { notion: { fr: 'Ce qu’on n’écrit jamais dans une trace', en: 'What is never written in a trace' }, skill: { fr: 'Masquer, réduire ou retirer clés et données privées avant d’écrire', en: 'Redact, reduce or remove keys and private data before writing' }, learn: 'tracer', practice: 'mission', check: { fr: 'Tri « tel quel / à masquer » ; tests IBAN et masse salariale ; clé à repérer au défi', en: '“As is / redact” sort; IBAN and payroll tests; key to spot in the challenge' } },
+    { notion: { fr: 'Pourquoi mesurer la durée de chaque outil', en: 'Why measure each tool’s duration' }, skill: { fr: 'Localiser une lenteur : outil ou modèle', en: 'Locate a slowness: tool or model' }, learn: 'backwards', practice: 'mission', check: { fr: 'Ligne lente du cas 17 à cliquer, tour lent du jeu de la console ; demande de 95 secondes de la mission', en: 'Slow line of case 17 to click, slow turn in the console game; the mission’s 95-second request' } },
+    { notion: { fr: 'Ce qu’on n’écrit jamais dans une trace', en: 'What is never written in a trace' }, skill: { fr: 'Masquer, réduire ou retirer clés et données privées avant d’écrire', en: 'Redact, reduce or remove keys and private data before writing' }, learn: 'tracer', practice: 'mission', check: { fr: 'Pupitre de masquage du jeu de la console ; tests IBAN et masse salariale ; tri « tel quel / à masquer » et clé à repérer au défi', en: 'Redaction desk of the console game; IBAN and payroll tests; “as is / redact” sort and key to spot in the challenge' } },
     { notion: { fr: 'Le cache de prompt', en: 'Prompt caching' }, skill: { fr: 'Dire ce que le cache réutilise, et pourquoi un début qui change l’annule', en: 'Say what the cache reuses, and why a changing start cancels it' }, learn: 'cost', practice: 'challenge', check: { fr: 'Deuxième activité du compteur ; première épreuve du défi', en: 'Second activity of the meter; first trial of the challenge' } },
     { notion: { fr: 'Retrouver la cause d’un échec', en: 'Finding the cause of a failure' }, skill: { fr: 'Lire la trace à l’envers, du symptôme au tour où tout bascule', en: 'Read the trace backwards, from the symptom to the turn where it tips over' }, learn: 'backwards', practice: 'challenge', check: { fr: 'Scène d’ouverture, cas 12 ; cas 30 du défi', en: 'Opening scene, case 12; case 30 in the challenge' } },
     { notion: { fr: 'Build : le traceur', en: 'Build: the tracer' }, skill: { fr: 'Envelopper chaque appel : flush, durée, erreur tracée puis relancée, détail coupé', en: 'Wrap every call: flush, duration, error traced then re-raised, truncated detail' }, learn: 'tracer', practice: 'lab', check: { fr: 'Code à compléter, puis traces.jsonl produit sur ta machine', en: 'Code to complete, then traces.jsonl produced on your machine' } },

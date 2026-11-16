@@ -159,10 +159,15 @@ const ch13: ChapterGame = {
       object: { fr: 'Le tableau des vannes', en: 'The valve board' },
       title: { fr: 'La clé dehors, les essais bornés', en: 'Key outside, retries bounded' },
       show: {
-        fr: 'Voici le service du code de référence. La clé vit dans une variable d’environnement, le plafond passe avant l’appel, et les essais sont comptés.',
-        en: 'Here is the service from the reference code. The key lives in an environment variable, the cap comes before the call, and attempts are counted.',
+        fr: 'La clé vit dans une variable d’environnement, le plafond passe avant l’appel, et les essais sont comptés. Règle le régulateur, puis laisse tourner une nuit sans toi.',
+        en: 'The key lives in an environment variable, the cap comes before the call, and attempts are counted. Set the regulator, then let a night run without you.',
       },
       mechanic: {
+        kind: 'custom',
+        game: 'c13',
+        prompt: { fr: 'Règle le régulateur pour que la nuit tienne : tout ce qui peut repasser est servi, rien d’inutile, coût borné, alerte lue.', en: 'Set the regulator so the night holds: everything that can get through is served, nothing wasted, cost bounded, alert read.' },
+      },
+      then: {
         kind: 'fill',
         prompt: { fr: 'Règle chaque vanne du code.', en: 'Set each valve of the code.' },
         code: true,

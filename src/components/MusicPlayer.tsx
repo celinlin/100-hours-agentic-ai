@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { music, useMusic, type Mood } from '../game/music';
+import { MOODS, music, useMusic, type Mood } from '../game/music';
 import type { Lang } from '../lib/i18n';
 
 const L = {
@@ -10,20 +10,20 @@ const L = {
     play: 'Lancer la musique',
     pause: 'Mettre en pause',
     volume: 'Volume',
-    note: 'Composée en direct dans ton navigateur : lente, sans paroles ni percussions. Aucun fichier audio.',
+    note: 'Compositions originales, jouées en direct par ton navigateur. Sans paroles. Elle continue de chambre en chambre.',
     open: 'Musique de concentration',
     close: 'Fermer',
-    moods: { salon: ['Salon', 'Nappes chaudes et piano épars'], pluie: ['Pluie', 'Nappes douces sous la pluie'], nuit: ['Nuit', 'Bourdon grave, notes lointaines'] } as Record<Mood, [string, string]>,
+    moods: { salon: ['Salon', 'Nappes chaudes et piano épars'], piano: ['Piano', 'Piano seul, minimaliste'], lofi: ['Lo-fi', 'Accords feutrés, rythme discret'], pluie: ['Pluie', 'Nappes douces sous la pluie'], nuit: ['Nuit', 'Bourdon grave, notes lointaines'] } as Record<Mood, [string, string]>,
   },
   en: {
     title: 'Focus music',
     play: 'Play music',
     pause: 'Pause',
     volume: 'Volume',
-    note: 'Composed live in your browser: slow, no lyrics, no percussion. No audio file.',
+    note: 'Original compositions, played live by your browser. No lyrics. It keeps playing from room to room.',
     open: 'Focus music',
     close: 'Close',
-    moods: { salon: ['Lounge', 'Warm pads and sparse piano'], pluie: ['Rain', 'Soft pads under the rain'], nuit: ['Night', 'Low drone, distant notes'] } as Record<Mood, [string, string]>,
+    moods: { salon: ['Lounge', 'Warm pads and sparse piano'], piano: ['Piano', 'Solo piano, minimalist'], lofi: ['Lo-fi', 'Muted chords, discreet beat'], pluie: ['Rain', 'Soft pads under the rain'], nuit: ['Night', 'Low drone, distant notes'] } as Record<Mood, [string, string]>,
   },
 };
 
@@ -72,7 +72,7 @@ export default function MusicPlayer({ lang }: { lang: Lang }) {
             {playing ? t.pause : t.play}
           </button>
           <div className="music__moods" role="radiogroup" aria-label={t.title}>
-            {(Object.keys(t.moods) as Mood[]).map((k) => (
+            {MOODS.map((k) => (
               <button
                 key={k}
                 type="button"

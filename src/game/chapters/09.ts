@@ -83,19 +83,13 @@ const ch09: ChapterGame = {
       object: { fr: 'Le passe', en: 'The pass' },
       title: { fr: 'Un chef, deux aidants', en: 'One lead, two helpers' },
       show: {
-        fr: 'Le chef découpe la tâche : chaque aidant fait sa part, dans son propre contexte. Rien ne sort de la cuisine sans passer par le chef.',
-        en: 'The lead splits the task: each helper does its part, in its own context. Nothing leaves the kitchen without going through the lead.',
+        fr: 'Le passe : tu écris le bon d’un aidant, tu lances le service et tu vois revenir les assiettes, le temps et l’addition. Le chef découpe, confie, puis vérifie : rien ne sort sans passer par lui.',
+        en: 'The pass: you write a helper’s ticket, run the service and watch the plates, the time and the bill come back. The lead splits, delegates, then checks: nothing leaves without going through it.',
       },
       mechanic: {
-        kind: 'order',
-        prompt: { fr: 'Remets le service dans l’ordre.', en: 'Put the service in order.' },
-        items: [
-          { id: 'split', label: { fr: 'Le chef lit la demande et la coupe en deux parts', en: 'The lead reads the request and splits it into two parts' } },
-          { id: 'research', label: { fr: 'L’aidant recherche lit l’index et cite ses sources', en: 'The research helper reads the index and cites its sources' }, hint: { fr: 'On ne rédige rien avant d’avoir les notes.', en: 'Nothing is written before the notes exist.' } },
-          { id: 'write', label: { fr: 'L’aidant rédaction écrit le brief à partir des notes', en: 'The writing helper writes the brief from the notes' }, hint: { fr: 'La rédaction part des notes de la recherche.', en: 'The writing starts from the research notes.' } },
-          { id: 'json', label: { fr: 'Chaque aidant rend un retour court, en JSON', en: 'Each helper returns a short reply, in JSON' } },
-          { id: 'check', label: { fr: 'Le chef assemble, vérifie, puis répond', en: 'The lead assembles, checks, then answers' }, hint: { fr: 'La vérification vient en dernier, juste avant la réponse.', en: 'Checking comes last, just before the answer.' } },
-        ],
+        kind: 'custom',
+        game: 'c09',
+        prompt: { fr: 'Tu es le chef : écris le bon d’un aidant, lance le service, goûte les retours, puis choisis la brigade d’une petite commande.', en: 'You are the lead: write a helper’s ticket, run the service, taste the returns, then choose the brigade for a small order.' },
       },
       then: {
         kind: 'desk',
@@ -170,6 +164,17 @@ const ch09: ChapterGame = {
           { id: 'verify', label: { fr: 'Vérifier format, source et cohérence des retours', en: 'Check the returns’ format, source and consistency' }, bin: 'chef', why: { fr: 'C’est le chef qui vérifie, avant de répondre.', en: 'The lead is the one who checks, before answering.' } },
           { id: 'send', label: { fr: 'Demander l’envoi de l’e-mail à Inès', en: 'Request sending the email to Inès' }, bin: 'chef', why: { fr: 'Aucun aidant n’a envoyer_email : seul le chef le demande, et il passe par le frein de l’étape 08.', en: 'No helper has envoyer_email: only the lead requests it, and it goes through step 08’s brake.' } },
           { id: 'half', label: { fr: 'Les deux moitiés d’une même phrase du brief', en: 'The two halves of one sentence of the brief' }, bin: 'whole', why: { fr: 'Pas deux moitiés d’une phrase : les parts dépendent l’une de l’autre, les découper ajoute des erreurs.', en: 'Not two halves of a sentence: the parts depend on each other, splitting them adds errors.' } },
+        ],
+      },
+      then: {
+        kind: 'order',
+        prompt: { fr: 'Remets le service dans l’ordre.', en: 'Put the service in order.' },
+        items: [
+          { id: 'split', label: { fr: 'Le chef lit la demande et la coupe en deux parts', en: 'The lead reads the request and splits it into two parts' } },
+          { id: 'research', label: { fr: 'L’aidant recherche lit l’index et cite ses sources', en: 'The research helper reads the index and cites its sources' }, hint: { fr: 'On ne rédige rien avant d’avoir les notes.', en: 'Nothing is written before the notes exist.' } },
+          { id: 'write', label: { fr: 'L’aidant rédaction écrit le brief à partir des notes', en: 'The writing helper writes the brief from the notes' }, hint: { fr: 'La rédaction part des notes de la recherche.', en: 'The writing starts from the research notes.' } },
+          { id: 'json', label: { fr: 'Chaque aidant rend un retour court, en JSON', en: 'Each helper returns a short reply, in JSON' } },
+          { id: 'check', label: { fr: 'Le chef assemble, vérifie, puis répond', en: 'The lead assembles, checks, then answers' }, hint: { fr: 'La vérification vient en dernier, juste avant la réponse.', en: 'Checking comes last, just before the answer.' } },
         ],
       },
       takeaway: {
@@ -603,11 +608,11 @@ const ch09: ChapterGame = {
     ],
   },
   coverage: [
-    { notion: { fr: 'Qu’est-ce qu’un orchestrateur ?', en: 'What is an orchestrator?' }, skill: { fr: 'Décrire le chef : il découpe, confie, puis assemble les retours', en: 'Describe the lead: it splits, hands over, then assembles the returns' }, learn: 'roles', practice: 'challenge', check: { fr: 'Service à remettre en ordre, puis boucle jouée en chef', en: 'Ordering the service, then the loop played as the lead' } },
+    { notion: { fr: 'Qu’est-ce qu’un orchestrateur ?', en: 'What is an orchestrator?' }, skill: { fr: 'Décrire le chef : il découpe, confie, puis assemble les retours', en: 'Describe the lead: it splits, hands over, then assembles the returns' }, learn: 'roles', practice: 'challenge', check: { fr: 'Le passe joué en chef et le service à remettre en ordre (rail des bons), puis boucle jouée en chef', en: 'The pass played as the lead and ordering the service (ticket rail), then the loop played as the lead' } },
     { notion: { fr: 'Que gagne-t-on à déléguer à un aidant ?', en: 'What do you gain by delegating to a helper?' }, skill: { fr: 'Expliquer le contexte court de l’aidant, et le chef qui ne se noie pas', en: 'Explain the helper’s short context, and the lead that does not drown' }, learn: 'methods', practice: 'mission', check: { fr: 'Paire « un agent seul fait tout », puis test de la veille en parallèle', en: 'The “one agent does everything” pair, then the parallel review test' } },
     { notion: { fr: 'Que coûte un système à plusieurs agents ?', en: 'What does a multi-agent system cost?' }, skill: { fr: 'Compter en appels et en tokens : plusieurs fois le prix d’un agent seul', en: 'Count in calls and tokens: several times the price of a single agent' }, learn: 'methods', practice: 'mission', check: { fr: 'Appariement des méthodes, puis test des trois lignes et des dix aidants', en: 'Matching the methods, then the three-lines-and-ten-helpers test' } },
     { notion: { fr: 'Quelles tâches se découpent bien ?', en: 'Which tasks split well?' }, skill: { fr: 'Repérer des parts indépendantes, et refuser de couper une phrase en deux', en: 'Spot independent parts, and refuse to cut a sentence in two' }, learn: 'split', practice: 'mission', check: { fr: 'Tri des bons, puis tri des tâches de l’agence', en: 'Sorting the tickets, then sorting the agency’s tasks' } },
-    { notion: { fr: 'Que doit contenir la mission d’un aidant ?', en: 'What must a helper’s mission contain?' }, skill: { fr: 'Écrire tâche, contexte, format du retour, limite', en: 'Write task, context, return format, limit' }, learn: 'roles', practice: 'challenge', check: { fr: 'Bureau de l’aidant à quatre places, puis mission fautive à corriger', en: 'The helper’s four-place desk, then the faulty mission to fix' } },
+    { notion: { fr: 'Que doit contenir la mission d’un aidant ?', en: 'What must a helper’s mission contain?' }, skill: { fr: 'Écrire tâche, contexte, format du retour, limite', en: 'Write task, context, return format, limit' }, learn: 'roles', practice: 'challenge', check: { fr: 'Bon de l’aidant à écrire au passe et bureau à quatre places, puis mission fautive à corriger', en: 'The helper’s ticket written at the pass and the four-place desk, then the faulty mission to fix' } },
     { notion: { fr: 'Pourquoi isoler le contexte de chaque aidant ?', en: 'Why isolate each helper’s context?' }, skill: { fr: 'Ne remettre à l’aidant que ce qui sert sa part', en: 'Hand the helper only what serves its part' }, learn: 'roles', practice: 'mission', check: { fr: 'Documents laissés hors du bureau, puis test des dossiers de tous les clients', en: 'Documents left off the desk, then the every-client-folder test' } },
     { notion: { fr: 'Qui vérifie le travail des aidants ?', en: 'Who checks the helpers’ work?' }, skill: { fr: 'Faire vérifier format, source et cohérence par le chef, et signaler un écart', en: 'Have the lead check format, source and consistency, and flag a gap' }, learn: 'conflict', practice: 'mission', check: { fr: 'Animation des deux retours et sa question, puis test du prix 29 € / 35 €', en: 'The two-returns animation and its question, then the €29 / €35 price test' } },
     { notion: { fr: 'Quand un seul agent suffit-il ?', en: 'When is a single agent enough?' }, skill: { fr: 'Renoncer aux aidants quand la tâche ne se découpe pas', en: 'Give up helpers when the task does not split' }, learn: 'split', practice: 'challenge', check: { fr: 'Bon « ne se découpe pas », puis dernier choix du défi', en: 'The “does not split” ticket, then the challenge’s last choice' } },

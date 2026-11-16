@@ -183,10 +183,15 @@ const ch02: ChapterGame = {
       object: { fr: 'La presse à format', en: 'The format press' },
       title: { fr: 'Décrire la sortie par un schéma', en: 'Describe the output with a schema' },
       show: {
-        fr: 'Un schéma JSON décrit les champs attendus, leur type et ceux qui sont obligatoires. Il permet de vérifier une sortie automatiquement.',
-        en: 'A JSON Schema describes the expected fields, their type and which ones are required. It lets you check an output automatically.',
+        fr: 'Pose des plombs de consigne sur la presse, tire le levier et lis ce qui sort : le tirage dépend de ce que tu as mis, et la contrôleuse le vérifie. Ensuite, complète le schéma JSON qui décrit les champs attendus, leur type et ceux qui sont obligatoires.',
+        en: 'Set instruction blocks on the press, pull the lever and read what comes out: the print depends on what you put in, and the checking machine verifies it. Then complete the JSON Schema that describes the expected fields, their type and which ones are required.',
       },
       mechanic: {
+        kind: 'custom',
+        game: 'c02',
+        prompt: { fr: 'Imprime un brief qui passe les trois contrôles, avec le moins de plombs possible.', en: 'Print a brief that passes all three checks, with as few blocks as possible.' },
+      },
+      then: {
         kind: 'fill',
         code: true,
         prompt: { fr: 'Complète le schéma du brief.', en: 'Complete the brief’s schema.' },
@@ -655,7 +660,7 @@ const ch02: ChapterGame = {
     { notion: { fr: 'À quoi sert un exemple dans un prompt ?', en: 'What is an example in a prompt for?' }, skill: { fr: 'Fixer une forme par un exemple complet (few-shot)', en: 'Pin down a form with a complete example (few-shot)' }, learn: 'fewshot', practice: 'mission', check: { fr: 'Choix de l’ajout qui stabilise la forme ; les posts validés retenus comme contexte', en: 'Choosing the addition that stabilises the form; approved posts kept as context' } },
     { notion: { fr: 'Pourquoi une consigne vague donne-t-elle des réponses variables ?', en: 'Why does a vague instruction give variable answers?' }, skill: { fr: 'Expliquer que le non-dit est laissé au tirage, et le réduire', en: 'Explain that the unsaid is left to the draw, and reduce it' }, learn: 'intro', practice: 'teach', check: { fr: 'Scène d’ouverture ; réponse à Léa notée 10/10', en: 'Opening scene; answer to Léa scored 10/10' } },
     { notion: { fr: 'Qu’est-ce qu’une sortie structurée ?', en: 'What is structured output?' }, skill: { fr: 'Reconnaître une sortie que du code peut lire champ par champ', en: 'Recognise an output that code can read field by field' }, learn: 'trials', practice: 'mission', check: { fr: 'Repérer les trois essais échoués sur cinq ; test d’import de la mission', en: 'Spot the three failed trials out of five; the mission’s import test' } },
-    { notion: { fr: 'Que décrit un schéma JSON ?', en: 'What does a JSON schema describe?' }, skill: { fr: 'Lire et compléter un schéma : types, required, champs en trop', en: 'Read and complete a schema: types, required, extra fields' }, learn: 'schema', practice: 'lab', check: { fr: 'Quatre trous du schéma à remplir ; validateur en ligne au Practice Lab', en: 'Four blanks of the schema to fill; online validator in the Practice Lab' } },
+    { notion: { fr: 'Que décrit un schéma JSON ?', en: 'What does a JSON schema describe?' }, skill: { fr: 'Lire et compléter un schéma : types, required, champs en trop', en: 'Read and complete a schema: types, required, extra fields' }, learn: 'schema', practice: 'lab', check: { fr: 'Trois contrôles de la presse à passer, puis quatre trous du schéma à remplir ; validateur en ligne au Practice Lab', en: 'Three checks of the press to pass, then four blanks of the schema to fill; online validator in the Practice Lab' } },
     { notion: { fr: 'Prompt engineering ou context engineering ?', en: 'Prompt engineering or context engineering?' }, skill: { fr: 'Choisir ce qui entre dans le contexte : le minimum utile, la bonne version', en: 'Choose what enters the context: the useful minimum, the right version' }, learn: 'context', practice: 'teach', check: { fr: 'Bureau à trois places, puis tri du tiroir ; réponse à Hugo notée 10/10', en: 'Three-slot desk, then the drawer sort; answer to Hugo scored 10/10' } },
     { notion: { fr: 'Pourquoi une consigne noyée peut-elle être ignorée ?', en: 'Why can a buried instruction be ignored?' }, skill: { fr: 'Désencombrer un contexte et répéter la consigne à la fin', en: 'Declutter a context and repeat the instruction at the end' }, learn: 'context', practice: 'challenge', check: { fr: 'Épreuve « le brief sort en texte libre » du défi final', en: 'The “brief comes out as free text” trial of the final challenge' } },
     { notion: { fr: 'Build : la consigne du brief, durcie sur cinq essais neufs', en: 'Build: the brief instruction, hardened over five fresh trials' }, skill: { fr: 'Choisir une consigne sur ses contraintes tenues et prévoir les vérifications', en: 'Choose an instruction by the constraints it meets and plan the checks' }, learn: 'trials', practice: 'lab', check: { fr: 'Épreuve « quelle consigne garder » ; relevé des cinq essais au Practice Lab', en: 'The “which instruction to keep” trial; the five-trial log in the Practice Lab' } },
